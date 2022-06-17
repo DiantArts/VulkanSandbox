@@ -32,17 +32,17 @@ public:
             ::std::size_t width,
             ::std::size_t height
         );
-        VkViewport viewport;
-        VkRect2D scissor;
-        VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-        VkPipelineRasterizationStateCreateInfo rasterizationInfo;
-        VkPipelineMultisampleStateCreateInfo multisampleInfo;
-        VkPipelineColorBlendAttachmentState colorBlendAttachment;
-        VkPipelineColorBlendStateCreateInfo colorBlendInfo;
-        VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
-        VkPipelineLayout pipelineLayout = nullptr;
-        VkRenderPass renderPass = nullptr;
-        uint32_t subpass = 0;
+        ::VkViewport viewport{};
+        ::VkRect2D scissor{};
+        ::VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
+        ::VkPipelineRasterizationStateCreateInfo rasterizationInfo{};
+        ::VkPipelineMultisampleStateCreateInfo multisampleInfo{};
+        ::VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+        ::VkPipelineColorBlendStateCreateInfo colorBlendInfo{};
+        ::VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
+        ::VkPipelineLayout pipelineLayout{ nullptr };
+        ::VkRenderPass renderPass{ nullptr };
+        ::std::uint32_t subpass{ 0 };
     };
 
 

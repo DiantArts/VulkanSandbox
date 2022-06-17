@@ -25,75 +25,6 @@
     ::std::size_t height
 )
 {
-    // this->inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    // this->inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    // this->inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
-
-    // this->viewport.x = 0.0f;
-    // this->viewport.y = 0.0f;
-    // this->viewport.width = static_cast<float>(width);
-    // this->viewport.height = static_cast<float>(height);
-    // this->viewport.minDepth = 0.0f;
-    // this->viewport.maxDepth = 1.0f;
-
-    // this->scissor.offset = {0, 0};
-    // this->scissor.extent = {
-        // static_cast<::std::uint32_t>(width),
-        // static_cast<::std::uint32_t>(height)
-    // };
-
-    // this->rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    // this->rasterizationInfo.depthClampEnable = VK_FALSE;
-    // this->rasterizationInfo.rasterizerDiscardEnable = VK_FALSE;
-    // this->rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
-    // this->rasterizationInfo.lineWidth = 1.0f;
-    // this->rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
-    // this->rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    // this->rasterizationInfo.depthBiasEnable = VK_FALSE;
-    // this->rasterizationInfo.depthBiasConstantFactor = 0.0f;  // Optional
-    // this->rasterizationInfo.depthBiasClamp = 0.0f;           // Optional
-    // this->rasterizationInfo.depthBiasSlopeFactor = 0.0f;     // Optional
-
-    // this->multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    // this->multisampleInfo.sampleShadingEnable = VK_FALSE;
-    // this->multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-    // this->multisampleInfo.minSampleShading = 1.0f;           // Optional
-    // this->multisampleInfo.pSampleMask = nullptr;             // Optional
-    // this->multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional
-    // this->multisampleInfo.alphaToOneEnable = VK_FALSE;       // Optional
-
-    // this->colorBlendAttachment.colorWriteMask =
-        // VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-        // VK_COLOR_COMPONENT_A_BIT;
-    // this->colorBlendAttachment.blendEnable = VK_FALSE;
-    // this->colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
-    // this->colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
-    // this->colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;              // Optional
-    // this->colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
-    // this->colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
-    // this->colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;              // Optional
-
-    // this->colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    // this->colorBlendInfo.logicOpEnable = VK_FALSE;
-    // this->colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional
-    // this->colorBlendInfo.attachmentCount = 1;
-    // this->colorBlendInfo.pAttachments = &this->colorBlendAttachment;
-    // this->colorBlendInfo.blendConstants[0] = 0.0f;  // Optional
-    // this->colorBlendInfo.blendConstants[1] = 0.0f;  // Optional
-    // this->colorBlendInfo.blendConstants[2] = 0.0f;  // Optional
-    // this->colorBlendInfo.blendConstants[3] = 0.0f;  // Optional
-
-    // this->depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    // this->depthStencilInfo.depthTestEnable = VK_TRUE;
-    // this->depthStencilInfo.depthWriteEnable = VK_TRUE;
-    // this->depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS;
-    // this->depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
-    // this->depthStencilInfo.minDepthBounds = 0.0f;  // Optional
-    // this->depthStencilInfo.maxDepthBounds = 1.0f;  // Optional
-    // this->depthStencilInfo.stencilTestEnable = VK_FALSE;
-    // this->depthStencilInfo.front = {};  // Optional
-    // this->depthStencilInfo.back = {};   // Optional
-
     this->inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     this->inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     this->inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
@@ -105,8 +36,8 @@
     this->viewport.minDepth = 0.0f;
     this->viewport.maxDepth = 1.0f;
 
-    this->scissor.offset = {0, 0};
-    this->scissor.extent = {width, height};
+    this->scissor.offset = { 0, 0 };
+    this->scissor.extent = { width, height };
 
     this->rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     this->rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -129,7 +60,9 @@
     this->multisampleInfo.alphaToOneEnable = VK_FALSE;       // Optional
 
     this->colorBlendAttachment.colorWriteMask =
-        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+        VK_COLOR_COMPONENT_R_BIT |
+        VK_COLOR_COMPONENT_G_BIT |
+        VK_COLOR_COMPONENT_B_BIT |
         VK_COLOR_COMPONENT_A_BIT;
     this->colorBlendAttachment.blendEnable = VK_FALSE;
     this->colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
@@ -215,7 +148,7 @@
         return;
     }
 
-    ::VkPipelineShaderStageCreateInfo shaderStages[2] = {};
+    ::VkPipelineShaderStageCreateInfo shaderStages[2];
     shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
     shaderStages[0].module = m_vertexShaderModule;
@@ -233,12 +166,6 @@
 
     ::VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    // auto& bindingDescriptions = configuration.bindingDescriptions;
-    // vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
-    // vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
-    // auto& attributeDescriptions = configuration.attributeDescriptions;
-    // vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    // vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     vertexInputInfo.vertexAttributeDescriptionCount = 0;
     vertexInputInfo.pVertexAttributeDescriptions = nullptr;
     vertexInputInfo.vertexBindingDescriptionCount = 0;
@@ -262,7 +189,6 @@
     pipelineInfo.pMultisampleState = &configuration.multisampleInfo;
     pipelineInfo.pColorBlendState = &configuration.colorBlendInfo;
     pipelineInfo.pDepthStencilState = &configuration.depthStencilInfo;
-    // pipelineInfo.pDynamicState = &configuration.dynamicStateInfo;
     pipelineInfo.pDynamicState = nullptr;
 
     pipelineInfo.layout = configuration.pipelineLayout;

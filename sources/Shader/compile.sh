@@ -1,4 +1,5 @@
 #/bin/sh
+
 extension="glsl"
 compileFragment(){
     for file in $(find ./sources/Shader/fragment -name *.$extension); do
