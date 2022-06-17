@@ -54,6 +54,9 @@ void ::vksb::App::run()
 {
     while (!m_window.shouldClose()) {
         m_window.handleEvents();
+        if (this->drawFrame()) {
+            break;
+        }
     }
 }
 
@@ -95,7 +98,7 @@ auto ::vksb::App::createPipeline()
     ::vksb::Pipeline::Configuration pipelineConfig{ m_swapChain.width(), m_swapChain.height() };
     pipelineConfig.renderPass = m_swapChain.getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
-    m_pipeline = ::std::make_unique<::vksb::Pipeline>(m_device, pipelineConfig, "simple");
+    m_pPipeline = ::std::make_unique<::vksb::Pipeline>(m_device, pipelineConfig, "simple");
     return true;
 }
 
@@ -109,10 +112,10 @@ auto ::vksb::App::createCommandBuffers()
     ::VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = m_device.getCommandPoll();
-    allocInfo.commandBufferCount = static_cast<::std::uint16_t>(m_commandBuffers.size());
+    allocInfo.commandPool = m_device.getCommandPool();
+    allocInfo.commandBufferCount = static_cast<::std::uint32_t>(m_commandBuffers.size());
 
-    if (::vkAllocateCommandBuffers(m_device, &allocInfo, m_commandBuffers.data()) != VK_SUCCESS) {
+    if (::vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) != VK_SUCCESS) {
         ::xrn::Logger::openError() << "Failed to allocate command buffer.\n";
         return false;
     }
@@ -121,6 +124,9 @@ auto ::vksb::App::createCommandBuffers()
 
         ::VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = 0;
+        beginInfo.pInheritanceInfo = nullptr;
+
         if (::vkBeginCommandBuffer(m_commandBuffers[i], &beginInfo) != VK_SUCCESS) {
             ::xrn::Logger::openError() << "Failed to begin recording the command buffer.\n";
             return false;
@@ -133,13 +139,22 @@ auto ::vksb::App::createCommandBuffers()
         renderPassInfo.renderArea.offset = { 0, 0 };
         renderPassInfo.renderArea.extent = m_swapChain.getSwapChainExtent();
 
-        ::std::array<VkClearValue, 2> clearValue{};
-        clearValue[0].color = { 0.1f, 0.1f, 0.1f, 0.1f };
-        clearValue[1].depthStencil = { 0.1f, 0 };
-        renderPassInfo.clearValueCount = static_cast<::std::uint32_t>(clearValue.size());
-        renderPassInfo.pClearValue = clearValue.data();
+        ::std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = { 0.1f, 0.1f, 0.1f, 0.1f };
+        clearValues[1].depthStencil = { 0.1f, 0 };
+        renderPassInfo.clearValueCount = static_cast<::std::uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
 
         vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        m_pPipeline->bind(m_commandBuffers[i]);
+        vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
+
+        vkCmdEndRenderPass(m_commandBuffers[i]);
+        if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS) {
+            ::xrn::Logger::openError() << "Failed to record command buffer.\n";
+            return false;
+        }
     }
     return true;
 }
@@ -147,5 +162,21 @@ auto ::vksb::App::createCommandBuffers()
 ///////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::App::drawFrame()
-{}
+auto ::vksb::App::drawFrame()
+    -> bool
+{
+    ::std::uint32_t imageIndex;
+    if (
+        auto result{ m_swapChain.acquireNextImage(&imageIndex) };
+        result != VK_SUCCESS || result != VK_SUBOPTIMAL_KHR
+    ) {
+        ::xrn::Logger::openError() << "Failed to aquire swapChain image.\n";
+        return false;
+    }
+
+    if ( m_swapChain.submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex) != VK_SUCCESS) {
+        ::xrn::Logger::openError() << "Failed to present swapChain image.\n";
+        return false;
+    }
+    return true;
+}
