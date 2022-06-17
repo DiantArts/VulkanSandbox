@@ -105,6 +105,42 @@ auto ::vksb::App::createPipeline()
 auto ::vksb::App::createCommandBuffers()
     -> bool
 {
+    m_commandBuffers.resize(m_swapChain.imageCount());
+    ::VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = m_device.getCommandPoll();
+    allocInfo.commandBufferCount = static_cast<::std::uint16_t>(m_commandBuffers.size());
+
+    if (::vkAllocateCommandBuffers(m_device, &allocInfo, m_commandBuffers.data()) != VK_SUCCESS) {
+        ::xrn::Logger::openError() << "Failed to allocate command buffer.\n";
+        return false;
+    }
+
+    for (auto i{ 0uz }; i < m_commandBuffers.size(); ++i) {
+
+        ::VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        if (::vkBeginCommandBuffer(m_commandBuffers[i], &beginInfo) != VK_SUCCESS) {
+            ::xrn::Logger::openError() << "Failed to begin recording the command buffer.\n";
+            return false;
+        }
+
+        ::VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = m_swapChain.getRenderPass();
+        renderPassInfo.framebuffer = m_swapChain.getFrameBuffer(i);
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = m_swapChain.getSwapChainExtent();
+
+        ::std::array<VkClearValue, 2> clearValue{};
+        clearValue[0].color = { 0.1f, 0.1f, 0.1f, 0.1f };
+        clearValue[1].depthStencil = { 0.1f, 0 };
+        renderPassInfo.clearValueCount = static_cast<::std::uint32_t>(clearValue.size());
+        renderPassInfo.pClearValue = clearValue.data();
+
+        vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    }
     return true;
 }
 
