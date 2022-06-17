@@ -1,0 +1,2 @@
+g++
+%h %cpp -std=c++11 -Iincludes -Ilibraries/xrnEcs/sources -Ilibraries/xrnLog/sources
