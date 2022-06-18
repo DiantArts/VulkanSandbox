@@ -54,10 +54,10 @@ void ::vksb::App::run()
 {
     while (!m_window.shouldClose()) {
         m_window.handleEvents();
-        if (this->drawFrame()) {
-            break;
-        }
+        this->drawFrame();
     }
+
+    vkDeviceWaitIdle(m_device.device());
 }
 
 
@@ -168,7 +168,7 @@ auto ::vksb::App::drawFrame()
     ::std::uint32_t imageIndex;
     if (
         auto result{ m_swapChain.acquireNextImage(&imageIndex) };
-        result != VK_SUCCESS || result != VK_SUBOPTIMAL_KHR
+        result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR
     ) {
         ::xrn::Logger::openError() << "Failed to aquire swapChain image.\n";
         return false;
