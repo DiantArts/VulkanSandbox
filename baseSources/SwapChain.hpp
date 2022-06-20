@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lve_device.hpp"
+#include <Device.hpp>
 
 // vulkan headers
 #include <vulkan/vulkan.h>
@@ -9,17 +9,17 @@
 #include <string>
 #include <vector>
 
-namespace lve {
+namespace xrn {
 
-class LveSwapChain {
+class SwapChain {
  public:
   static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-  LveSwapChain(LveDevice &deviceRef, VkExtent2D windowExtent);
-  ~LveSwapChain();
+  SwapChain(Device &deviceRef, VkExtent2D windowExtent);
+  ~SwapChain();
 
-  LveSwapChain(const LveSwapChain &) = delete;
-  void operator=(const LveSwapChain &) = delete;
+  SwapChain(const SwapChain &) = delete;
+  void operator=(const SwapChain &) = delete;
 
   VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
   VkRenderPass getRenderPass() { return renderPass; }
@@ -65,7 +65,7 @@ class LveSwapChain {
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
 
-  LveDevice &device;
+  Device &device;
   VkExtent2D windowExtent;
 
   VkSwapchainKHR swapChain;
@@ -77,4 +77,4 @@ class LveSwapChain {
   size_t currentFrame = 0;
 };
 
-}  // namespace lve
+}  // namespace xrn

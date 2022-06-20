@@ -1,12 +1,12 @@
 #pragma once
 
-#include "lve_device.hpp"
+#include <Device.hpp>
 
 // std
 #include <string>
 #include <vector>
 
-namespace lve {
+namespace xrn {
 
 struct PipelineConfigInfo {
   VkViewport viewport;
@@ -22,17 +22,17 @@ struct PipelineConfigInfo {
   uint32_t subpass = 0;
 };
 
-class LvePipeline {
+class Pipeline {
  public:
-  LvePipeline(
-      LveDevice& device,
+  Pipeline(
+      Device& device,
       const std::string& vertFilepath,
       const std::string& fragFilepath,
       const PipelineConfigInfo& configInfo);
-  ~LvePipeline();
+  ~Pipeline();
 
-  LvePipeline(const LvePipeline&) = delete;
-  void operator=(const LvePipeline&) = delete;
+  Pipeline(const Pipeline&) = delete;
+  void operator=(const Pipeline&) = delete;
 
   void bind(VkCommandBuffer commandBuffer);
 
@@ -48,9 +48,9 @@ class LvePipeline {
 
   void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
-  LveDevice& lveDevice;
+  Device& lveDevice;
   VkPipeline graphicsPipeline;
   VkShaderModule vertShaderModule;
   VkShaderModule fragShaderModule;
 };
-}  // namespace lve
+}  // namespace xrn

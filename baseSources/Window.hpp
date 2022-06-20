@@ -4,18 +4,18 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
-namespace lve {
+namespace xrn {
 
-class LveWindow {
+class Window {
  public:
-  LveWindow(int w, int h, std::string name);
-  ~LveWindow();
+  Window(int w, int h, std::string name);
+  ~Window();
 
-  LveWindow(const LveWindow &) = delete;
-  LveWindow &operator=(const LveWindow &) = delete;
+  Window(const Window &) = delete;
+  Window &operator=(const Window &) = delete;
 
   bool shouldClose() { return glfwWindowShouldClose(window); }
-  VkExtent2D getExtent() { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
+  VkExtent2D getSize() { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
 
   void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
@@ -28,4 +28,4 @@ class LveWindow {
   std::string windowName;
   GLFWwindow *window;
 };
-}  // namespace lve
+}  // namespace xrn

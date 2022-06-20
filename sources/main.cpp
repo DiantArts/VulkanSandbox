@@ -1,26 +1,21 @@
-///////////////////////////////////////////////////////////////////////////
-// Precompilled headers
-///////////////////////////////////////////////////////////////////////////
 #include <pch.hpp>
 
-///////////////////////////////////////////////////////////////////////////
-// Headers
-///////////////////////////////////////////////////////////////////////////
 #include <App.hpp>
 
-[[ nodiscard ]] int func();
+// std
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
 
-///////////////////////////////////////////////////////////////////////////
-auto main()
-    -> int
-try {
-    ::vksb::App app{};
+int main() {
+  vksb::FirstApp app{};
+
+  try {
     app.run();
-    return EXIT_SUCCESS;
-} catch (const ::std::exception& e) {
-    ::xrn::Logger::openError() << e.what() << '\n';
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << '\n';
     return EXIT_FAILURE;
-} catch (...) {
-    ::xrn::Logger::openError() << "Unknown exception\n";
-    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }

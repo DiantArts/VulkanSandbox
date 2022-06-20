@@ -1,5 +1,6 @@
+#include <pch.hpp>
 
-#include "first_app.hpp"
+#include <App.hpp>
 
 // std
 #include <cstdlib>
@@ -7,7 +8,7 @@
 #include <stdexcept>
 
 int main() {
-  lve::FirstApp app{};
+  xrn::FirstApp app{};
 
   try {
     app.run();

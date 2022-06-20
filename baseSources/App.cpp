@@ -1,9 +1,10 @@
-#include "first_app.hpp"
+#include <pch.hpp>
+#include <App.hpp>
 
 // std
 #include <array>
 
-namespace lve {
+namespace xrn {
 
 FirstApp::FirstApp() {
   createPipelineLayout();
@@ -37,10 +38,10 @@ void FirstApp::createPipelineLayout() {
 
 void FirstApp::createPipeline() {
   auto pipelineConfig =
-      LvePipeline::defaultPipelineConfigInfo(lveSwapChain.width(), lveSwapChain.height());
+      Pipeline::defaultPipelineConfigInfo(lveSwapChain.width(), lveSwapChain.height());
   pipelineConfig.renderPass = lveSwapChain.getRenderPass();
   pipelineConfig.pipelineLayout = pipelineLayout;
-  lvePipeline = std::make_unique<LvePipeline>(
+  lvePipeline = std::make_unique<Pipeline>(
       lveDevice,
       "sources/Shader/vertex/simple.spv",
       "sources/Shader/fragment/simple.spv",
@@ -107,4 +108,4 @@ void FirstApp::drawFrame() {
   }
 }
 
-}  // namespace lve
+}  // namespace xrn
