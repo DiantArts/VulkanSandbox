@@ -4,7 +4,7 @@
 // std
 #include <array>
 
-namespace xrn {
+namespace vksb {
 
 FirstApp::FirstApp() {
   createPipelineLayout();
@@ -108,4 +108,4 @@ void FirstApp::drawFrame() {
   }
 }
 
-}  // namespace xrn
+}  // namespace vksb

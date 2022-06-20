@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 int main() {
-  xrn::FirstApp app{};
+  xrn::App app{};
 
   try {
     app.run();

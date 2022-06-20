@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 int main() {
-  vksb::FirstApp app{};
+  vksb::App app{};
 
   try {
     app.run();
