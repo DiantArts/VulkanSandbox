@@ -1,12 +1,6 @@
 #include <pch.hpp>
 #include <Device.hpp>
 
-// std headers
-#include <cstring>
-#include <iostream>
-#include <set>
-#include <unordered_set>
-
 namespace vksb {
 
 // local callback functions
@@ -48,7 +42,7 @@ void DestroyDebugUtilsMessengerEXT(
 }
 
 // class member functions
-Device::Device(Window &window) : window{window} {
+Device::Device(::vksb::Window &window) : window{window} {
   createInstance();
   setupDebugMessenger();
   createSurface();
@@ -194,7 +188,11 @@ void Device::createCommandPool() {
   }
 }
 
-void Device::createSurface() { window.createWindowSurface(instance, &surface_); }
+void Device::createSurface() {
+    if (!window.createWindowSurface(instance, &surface_)) {
+        throw std::runtime_error("failed to create a window surface!");
+    }
+}
 
 bool Device::isDeviceSuitable(VkPhysicalDevice device) {
   QueueFamilyIndices indices = findQueueFamilies(device);
@@ -214,11 +212,11 @@ bool Device::isDeviceSuitable(VkPhysicalDevice device) {
          supportedFeatures.samplerAnisotropy;
 }
 
-void Device::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
+void Device::populateDebugMessengerCreateInfo(
+    VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
   createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
   createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
@@ -533,3 +531,23 @@ void Device::createImageWithInfo(
 }
 
 }  // namespace vksb
+
+class OpenGLMemoryManager {
+    OpenGLMemoryManager()
+    {
+        if (!glfwInit()) {
+            throw::std::runtime_error("glwfInit failed");
+        }
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        // stbi_set_flip_vertically_on_load(true);
+    }
+
+    ~OpenGLMemoryManager()
+    {
+        glfwTerminate();
+    }
+
+    static const OpenGLMemoryManager _;
+};
+const OpenGLMemoryManager OpenGLMemoryManager::_;

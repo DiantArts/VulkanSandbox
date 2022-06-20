@@ -2,10 +2,6 @@
 
 #include <Window.hpp>
 
-// std lib headers
-#include <string>
-#include <vector>
-
 namespace vksb {
 
 struct SwapChainSupportDetails {
@@ -30,7 +26,7 @@ class Device {
   const bool enableValidationLayers = true;
 #endif
 
-  Device(Window &window);
+  Device(::vksb::Window &window);
   ~Device();
 
   // Not copyable or movable
@@ -93,7 +89,7 @@ class Device {
   VkInstance instance;
   VkDebugUtilsMessengerEXT debugMessenger;
   VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-  Window &window;
+  ::vksb::Window &window;
   VkCommandPool commandPool;
 
   VkDevice device_;
