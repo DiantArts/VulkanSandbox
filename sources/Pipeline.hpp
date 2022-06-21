@@ -182,9 +182,9 @@ private:
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     static inline constexpr const auto shadersDirectory{ "./sources/Shader/"sv };
-    static inline constexpr const auto fragmentDirectory{ "fragment/"sv };
+    static inline constexpr const auto fragmentDirectory{ "Fragment/"sv };
     static inline constexpr const auto fragmentExtension{ ".spv"sv };
-    static inline constexpr const auto vertexDirectory{ "vertex/"sv };
+    static inline constexpr const auto vertexDirectory{ "Vertex/"sv };
     static inline constexpr const auto vertexExtension{ ".spv"sv };
 
 
