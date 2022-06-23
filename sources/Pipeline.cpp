@@ -9,6 +9,7 @@
 #include <Pipeline.hpp>
 #include <Window.hpp>
 #include <Device.hpp>
+#include <Model.hpp>
 
 
 
@@ -37,7 +38,7 @@
     this->viewport.maxDepth = 1.0f;
 
     this->scissor.offset = { 0, 0 };
-    this->scissor.extent = { width, height };
+    this->scissor.extent = { static_cast<::std::uint32_t>(width), static_cast<::std::uint32_t>(height) };
 
     this->rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     this->rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -164,12 +165,14 @@
     shaderStages[1].pNext = nullptr;
     shaderStages[1].pSpecializationInfo = nullptr;
 
+    auto bindingDescriptions{ ::vksb::Model::Vertex::getBindingDescriptions() };
+    auto attributeDescriptions{ ::vksb::Model::Vertex::getAttributeDescriptions() };
     ::VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<::std::uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    vertexInputInfo.vertexBindingDescriptionCount = static_cast<::std::uint32_t>(bindingDescriptions.size());
+    vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
     ::VkPipelineViewportStateCreateInfo viewportInfo{};
     viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

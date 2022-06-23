@@ -20,6 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::App::App()
 {
+    this->loadModels();
     if (!this->createPipelineLayout() || !this->createPipeline() || !this->createCommandBuffers()) {
         throw ::std::runtime_error{ "unable to create the app" };
     }
@@ -70,7 +71,16 @@ void ::vksb::App::run()
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-///
+void ::vksb::App::loadModels()
+{
+    ::std::vector<::vksb::Model::Vertex> m_vertices {
+        { { 0.5f, -0.5f } },
+        { { 0.5f, 0.5f } },
+        { { -0.5f, 0.5f } },
+    };
+    m_pModel = ::std::make_unique<::vksb::Model>(m_device, m_vertices);
+}
+
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::App::createPipelineLayout()
     -> bool
@@ -120,7 +130,7 @@ auto ::vksb::App::createCommandBuffers()
         return false;
     }
 
-    for (int i = 0; i < m_commandBuffers.size(); i++) {
+    for (auto i{ 0uz }; i < m_commandBuffers.size(); ++i) {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -146,7 +156,8 @@ auto ::vksb::App::createCommandBuffers()
         vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         m_pPipeline->bind(m_commandBuffers[i]);
-        vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
+        m_pModel->bind(m_commandBuffers[i]);
+        m_pModel->draw(m_commandBuffers[i]);
 
         vkCmdEndRenderPass(m_commandBuffers[i]);
         if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS) {
