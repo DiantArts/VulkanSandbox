@@ -21,7 +21,7 @@
 ::vksb::App::App()
 {
     this->loadModels();
-    if (!this->createPipelineLayout() || !this->createPipeline() || !this->createCommandBuffers()) {
+    if (!this->createPipelineLayout() || !this->recreateSwapChain() || !this->createCommandBuffers()) {
         throw ::std::runtime_error{ "unable to create the app" };
     }
 }
@@ -105,8 +105,11 @@ auto ::vksb::App::createPipelineLayout()
 auto ::vksb::App::createPipeline()
     -> bool
 {
-    ::vksb::Pipeline::Configuration pipelineConfig{ m_swapChain.width(), m_swapChain.height() };
-    pipelineConfig.renderPass = m_swapChain.getRenderPass();
+    assert(m_pSwapChain != nullptr && "Cannot create pipeline before swap chain");
+    assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+    ::vksb::Pipeline::Configuration pipelineConfig{};
+    pipelineConfig.renderPass = m_pSwapChain->getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
     m_pPipeline = ::std::make_unique<::vksb::Pipeline>(m_device, pipelineConfig, "simple");
     return true;
@@ -116,7 +119,7 @@ auto ::vksb::App::createPipeline()
 auto ::vksb::App::createCommandBuffers()
     -> bool
 {
-    m_commandBuffers.resize(m_swapChain.imageCount());
+    m_commandBuffers.resize(m_pSwapChain->imageCount());
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -134,12 +137,24 @@ auto ::vksb::App::createCommandBuffers()
 }
 
 ///////////////////////////////////////////////////////////////////////////
+void ::vksb::App::freeCommandBuffers()
+{
+    ::vkFreeCommandBuffers(
+        m_device.device(),
+        m_device.getCommandPool(),
+        static_cast<::std::size_t>(m_commandBuffers.size()),
+        m_commandBuffers.data()
+    );
+    m_commandBuffers.clear();
+}
+
+///////////////////////////////////////////////////////////////////////////
 auto ::vksb::App::drawFrame()
     -> bool
 {
     ::std::uint32_t imageIndex;
 
-    switch (m_swapChain.acquireNextImage(&imageIndex)) {
+    switch (m_pSwapChain->acquireNextImage(&imageIndex)) {
     case VK_SUCCESS:
     case VK_SUBOPTIMAL_KHR:
         break;
@@ -154,7 +169,7 @@ auto ::vksb::App::drawFrame()
 
     this->recordCommandBuffer(imageIndex);
     if (
-        auto result{ m_swapChain.submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex) };
+        auto result{ m_pSwapChain->submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex) };
         result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR
     ) {
         m_window.setResizedFlag();
@@ -182,8 +197,15 @@ auto ::vksb::App::recreateSwapChain()
     }
     ::vkDeviceWaitIdle(m_device.device());
 
-    m_swapChain.~SwapChain(); // destruct
-    new (&m_swapChain) ::vksb::SwapChain{ m_device, windowSize }; // reconstruct
+    if (!m_pSwapChain) {
+        m_pSwapChain = ::std::make_unique<::vksb::SwapChain>(m_device, windowSize);
+    } else {
+        m_pSwapChain = ::std::make_unique<::vksb::SwapChain>(m_device, windowSize, ::std::move(m_pSwapChain));
+        if (m_pSwapChain->imageCount() != m_commandBuffers.size()) {
+            this->freeCommandBuffers();
+            this->createCommandBuffers();
+        }
+    }
     if (!this->createPipeline()) {
         ::xrn::Logger::openError() << "Failed to create pipeline with the new swapchain.\n";
         return false;
@@ -208,11 +230,11 @@ auto ::vksb::App::recordCommandBuffer(
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_swapChain.getRenderPass();
-    renderPassInfo.framebuffer = m_swapChain.getFrameBuffer(imageIndex);
+    renderPassInfo.renderPass = m_pSwapChain->getRenderPass();
+    renderPassInfo.framebuffer = m_pSwapChain->getFrameBuffer(imageIndex);
 
     renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = m_swapChain.getSwapChainExtent();
+    renderPassInfo.renderArea.extent = m_pSwapChain->getSwapChainExtent();
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = {0.1f, 0.1f, 0.1f, 1.0f};
@@ -221,6 +243,17 @@ auto ::vksb::App::recordCommandBuffer(
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(m_commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = static_cast<float>(m_pSwapChain->getSwapChainExtent().width);
+    viewport.height = static_cast<float>(m_pSwapChain->getSwapChainExtent().height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    VkRect2D scissor{{0, 0}, m_pSwapChain->getSwapChainExtent()};
+    vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
+    vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
 
     m_pPipeline->bind(m_commandBuffers[imageIndex]);
     m_pModel->bind(m_commandBuffers[imageIndex]);

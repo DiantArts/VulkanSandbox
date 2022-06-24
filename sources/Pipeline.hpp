@@ -28,18 +28,23 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     struct Configuration {
+        Configuration();
         Configuration(
-            ::std::size_t width,
-            ::std::size_t height
-        );
-        ::VkViewport viewport{};
-        ::VkRect2D scissor{};
+            const ::vksb::Pipeline::Configuration&
+        ) = delete;
+        ::vksb::Pipeline::Configuration& operator=(
+            const ::vksb::Pipeline::Configuration&
+        ) = delete;
+
+        ::VkPipelineViewportStateCreateInfo viewportInfo{};
         ::VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
         ::VkPipelineRasterizationStateCreateInfo rasterizationInfo{};
         ::VkPipelineMultisampleStateCreateInfo multisampleInfo{};
         ::VkPipelineColorBlendAttachmentState colorBlendAttachment{};
         ::VkPipelineColorBlendStateCreateInfo colorBlendInfo{};
         ::VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
+        ::std::vector<::VkDynamicState> dynamicStateEnables{};
+        ::VkPipelineDynamicStateCreateInfo dynamicStateInfo{};
         ::VkPipelineLayout pipelineLayout{ nullptr };
         ::VkRenderPass renderPass{ nullptr };
         ::std::uint32_t subpass{ 0 };

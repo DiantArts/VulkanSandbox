@@ -21,24 +21,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-::vksb::Pipeline::Configuration::Configuration(
-    ::std::size_t width,
-    ::std::size_t height
-)
+::vksb::Pipeline::Configuration::Configuration()
 {
     this->inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     this->inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     this->inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-    this->viewport.x = 0.0f;
-    this->viewport.y = 0.0f;
-    this->viewport.width = static_cast<float>(width);
-    this->viewport.height = static_cast<float>(height);
-    this->viewport.minDepth = 0.0f;
-    this->viewport.maxDepth = 1.0f;
-
-    this->scissor.offset = { 0, 0 };
-    this->scissor.extent = { static_cast<::std::uint32_t>(width), static_cast<::std::uint32_t>(height) };
+    this->viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    this->viewportInfo.viewportCount = 1;
+    this->viewportInfo.pViewports = nullptr;
+    this->viewportInfo.scissorCount = 1;
+    this->viewportInfo.pScissors = nullptr;
 
     this->rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     this->rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -93,6 +86,12 @@
     this->depthStencilInfo.stencilTestEnable = VK_FALSE;
     this->depthStencilInfo.front = {};  // Optional
     this->depthStencilInfo.back = {};   // Optional
+
+    this->dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+    this->dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    this->dynamicStateInfo.pDynamicStates = this->dynamicStateEnables.data();
+    this->dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(this->dynamicStateEnables.size());
+    this->dynamicStateInfo.flags = 0;
 }
 
 
@@ -174,25 +173,18 @@
     vertexInputInfo.vertexBindingDescriptionCount = static_cast<::std::uint32_t>(bindingDescriptions.size());
     vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
-    ::VkPipelineViewportStateCreateInfo viewportInfo{};
-    viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportInfo.viewportCount = 1;
-    viewportInfo.pViewports = &configuration.viewport;
-    viewportInfo.scissorCount = 1;
-    viewportInfo.pScissors = &configuration.scissor;
-
     ::VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
     pipelineInfo.pStages = shaderStages;
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &configuration.inputAssemblyInfo;
-    pipelineInfo.pViewportState = &viewportInfo;
+    pipelineInfo.pViewportState = &configuration.viewportInfo;
     pipelineInfo.pRasterizationState = &configuration.rasterizationInfo;
     pipelineInfo.pMultisampleState = &configuration.multisampleInfo;
     pipelineInfo.pColorBlendState = &configuration.colorBlendInfo;
     pipelineInfo.pDepthStencilState = &configuration.depthStencilInfo;
-    pipelineInfo.pDynamicState = nullptr;
+    pipelineInfo.pDynamicState = &configuration.dynamicStateInfo;
 
     pipelineInfo.layout = configuration.pipelineLayout;
     pipelineInfo.renderPass = configuration.renderPass;

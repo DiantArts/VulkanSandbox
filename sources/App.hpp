@@ -132,6 +132,11 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
+    void freeCommandBuffers();
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
     auto drawFrame()
         -> bool;
 
@@ -161,7 +166,7 @@ private:
 
     ::vksb::Window m_window{ false };
     ::vksb::Device m_device{ m_window };
-    ::vksb::SwapChain m_swapChain{ m_device, m_window.getSize() };
+    ::std::unique_ptr<::vksb::SwapChain> m_pSwapChain;
     ::std::unique_ptr<::vksb::Pipeline> m_pPipeline;
     ::VkPipelineLayout m_pipelineLayout;
     ::std::vector<VkCommandBuffer> m_commandBuffers;

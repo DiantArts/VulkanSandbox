@@ -248,8 +248,8 @@ private:
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    static constexpr const Window::Size defaultSize{ 1920uz, 1080uz };
-    static constexpr const auto defaultName{ "MainWindow" };
+    static constexpr const Window::Size defaultSize{ 800uz, 600uz };
+    static constexpr const auto defaultName{ "GlfwMainWindow" };
 
 
 

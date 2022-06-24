@@ -14,6 +14,17 @@ namespace vksb {
 
 SwapChain::SwapChain(::vksb::Device &deviceRef, VkExtent2D extent)
     : device{deviceRef}, windowExtent{extent} {
+    this->init();
+}
+
+SwapChain::SwapChain(::vksb::Device &deviceRef, VkExtent2D extent, ::std::shared_ptr<::vksb::SwapChain> previous)
+    : device{deviceRef}, windowExtent{extent}, oldSwapchain{ previous } {
+    this->init();
+    oldSwapchain = nullptr;
+}
+
+void SwapChain::init()
+{
   createSwapChain();
   createImageViews();
   createRenderPass();
@@ -163,7 +174,7 @@ void SwapChain::createSwapChain() {
   createInfo.presentMode = presentMode;
   createInfo.clipped = VK_TRUE;
 
-  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  createInfo.oldSwapchain = !oldSwapchain ? VK_NULL_HANDLE : oldSwapchain->swapChain;
 
   if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
     throw std::runtime_error("failed to create swap chain!");
