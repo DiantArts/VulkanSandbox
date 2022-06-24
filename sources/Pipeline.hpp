@@ -181,7 +181,7 @@ private:
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    static inline constexpr const auto shadersDirectory{ "./sources/Shader/"sv };
+    static inline constexpr const auto shadersDirectory{ "./Shader/"sv };
     static inline constexpr const auto fragmentDirectory{ "Fragment/"sv };
     static inline constexpr const auto fragmentExtension{ ".spv"sv };
     static inline constexpr const auto vertexDirectory{ "Vertex/"sv };

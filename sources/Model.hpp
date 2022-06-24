@@ -24,6 +24,7 @@ public:
 
     struct Vertex {
         ::glm::vec2 position;
+        ::glm::vec3 color;
 
         [[ nodiscard ]] static auto getBindingDescriptions()
             -> ::std::vector<::VkVertexInputBindingDescription>;

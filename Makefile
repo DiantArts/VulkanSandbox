@@ -290,7 +290,7 @@ externs : $(FOUNDEXTERNBIN)
 
 compilation : $(C_OBJ) $(CPP_OBJ)
 	$(PRINTF) "$(LCYAN)[Compilation]$(NORMAL) done\n"
-	./sources/Shader/compile.sh
+	./Shader/compile.sh
 	$(PRINTF) "$(LCYAN)[Compilation][Shaders]$(NORMAL) done\n"
 
 linkage : $(NAME)$(MODE_EXT)

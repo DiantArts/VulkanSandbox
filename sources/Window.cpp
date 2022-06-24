@@ -8,18 +8,19 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <Window.hpp>
 
-void framebufferResizeCallback(
-    GLFWwindow *window,
-    int width,
-    int height
-);
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // static elements
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+auto ::vksb::Window::Size::isValid()
+    -> bool
+{
+    return !(!this->width || !this->height);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::Window::Size::operator VkExtent2D() const
@@ -55,7 +56,7 @@ void framebufferResizeCallback(
     }
 
     glfwSetWindowUserPointer(m_window.get(), this);
-    glfwSetFramebufferSizeCallback(m_window.get(), framebufferResizeCallback);
+    glfwSetFramebufferSizeCallback(m_window.get(), Window::framebufferResizeCallback);
 
     // glfwMakeContextCurrent(&*m_window);
     // glfwSetFramebufferSizeCallback(&*m_window, ::engine::graphic::opengl::detail::framebufferSizeCallback);
@@ -126,12 +127,26 @@ void ::vksb::Window::handleEvents()
 }
 
 ///////////////////////////////////////////////////////////////////////////
+auto ::vksb::Window::wasResized()
+    -> bool
+{
+    return m_framebufferResized;
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::Window::setResizedFlag()
+{
+    m_framebufferResized = true;
+}
+
+///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::resize(
     const Window::Size& size
 )
 {
     m_size.width = size.width;
     m_size.height = size.height;
+    this->setResizedFlag();
     ::xrn::Logger::openBasic() << "Window resized.\n";
 }
 
@@ -169,6 +184,28 @@ auto ::vksb::Window::createWindowSurface(
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// GLFW callbacks
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::Window::framebufferResizeCallback(
+    ::GLFWwindow* windowPtr,
+    int width,
+    int height
+) {
+    auto& window{ *reinterpret_cast<::vksb::Window*>(glfwGetWindowUserPointer(windowPtr)) };
+    window.resize({
+        .width = static_cast<::std::size_t>(width),
+        .height = static_cast<::std::size_t>(height)
+    });
+}
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,14 +223,22 @@ void ::vksb::Window::Deleter::operator()(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void framebufferResizeCallback(
-    GLFWwindow* windowPtr,
-    int width,
-    int height
-) {
-  auto& window{ *reinterpret_cast<::vksb::Window*>(glfwGetWindowUserPointer(windowPtr)) };
-  window.resize({ .width = width, .height = height });
-  // window->framebufferResized = true;
-  // window.m_size.width = width;
-  // window.m_size.height = height;
-}
+class GlfwMemoryManager {
+    GlfwMemoryManager()
+    {
+        if (!glfwInit()) {
+            throw::std::runtime_error("glwfInit failed");
+        }
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        // stbi_set_flip_vertically_on_load(true);
+    }
+
+    ~GlfwMemoryManager()
+    {
+        glfwTerminate();
+    }
+
+    static const GlfwMemoryManager _;
+};
+const ::GlfwMemoryManager GlfwMemoryManager::_;

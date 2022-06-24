@@ -531,23 +531,3 @@ void Device::createImageWithInfo(
 }
 
 }  // namespace vksb
-
-class OpenGLMemoryManager {
-    OpenGLMemoryManager()
-    {
-        if (!glfwInit()) {
-            throw::std::runtime_error("glwfInit failed");
-        }
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        // stbi_set_flip_vertically_on_load(true);
-    }
-
-    ~OpenGLMemoryManager()
-    {
-        glfwTerminate();
-    }
-
-    static const OpenGLMemoryManager _;
-};
-const OpenGLMemoryManager OpenGLMemoryManager::_;
