@@ -191,7 +191,7 @@ auto ::vksb::App::recreateSwapChain()
     -> bool
 {
     auto windowSize{ m_window.getSize() };
-    while (windowSize.isValid()) {
+    while (!windowSize.isValid()) {
         windowSize = m_window.getSize();
         ::glfwWaitEvents();
     }
