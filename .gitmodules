@@ -1,6 +1,3 @@
-[submodule "libraries/xrnLog"]
-	path = libraries/xrnLog
-	url = git@github.com:DiantArts/xrnLog.git
 [submodule "libraries/xrnEcs"]
 	path = libraries/xrnEcs
 	url = git@github.com:DiantArts/xrnEcs.git

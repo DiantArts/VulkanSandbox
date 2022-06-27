@@ -147,7 +147,7 @@ void ::vksb::Window::resize(
     m_size.width = size.width;
     m_size.height = size.height;
     this->setResizedFlag();
-    ::xrn::Logger::openBasic() << "Window resized.\n";
+    ::std::cout << "Window resized." << ::std::endl;
 }
 
 

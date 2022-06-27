@@ -93,7 +93,7 @@ auto ::vksb::App::createPipelineLayout()
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
     if (::vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
-        ::xrn::Logger::openError() << "Failed to create pipeline layout.\n";
+        throw ::std::runtime_error{ "Failed to create pipeline layout.\n" };
         return false;
     }
     return true;
@@ -129,7 +129,7 @@ auto ::vksb::App::createCommandBuffers()
 
     if (vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) !=
         VK_SUCCESS) {
-        ::xrn::Logger::openError() << "failed to allocate command buffers!\n";
+        throw ::std::runtime_error{ "failed to allocate command buffers!\n" };
         return false;
     }
 
@@ -159,11 +159,11 @@ auto ::vksb::App::drawFrame()
     case VK_SUBOPTIMAL_KHR:
         break;
     case VK_ERROR_OUT_OF_DATE_KHR:
-        ::xrn::Logger::openBasic() << "New swapchain needs to be created.\n";
+        ::std::cout << "New swapchain needs to be created." << ::std::endl;
         m_window.setResizedFlag();
         return this->recreateSwapChain();
     default:
-        ::xrn::Logger::openError() << "Failed to aquire swapChain image.\n";
+        throw ::std::runtime_error{ "Failed to aquire swapChain image.\n" };
         return false;
     }
 
@@ -178,7 +178,7 @@ auto ::vksb::App::drawFrame()
     WINDOW_RESIZED:
         return recreateSwapChain();
     } else {
-        ::xrn::Logger::openError() << "Failed to present swapChain image.\n";
+        throw ::std::runtime_error{ "Failed to present swapChain image.\n" };
         return false;
     }
 
@@ -207,7 +207,7 @@ auto ::vksb::App::recreateSwapChain()
         }
     }
     if (!this->createPipeline()) {
-        ::xrn::Logger::openError() << "Failed to create pipeline with the new swapchain.\n";
+        throw ::std::runtime_error{ "Failed to create pipeline with the new swapchain.\n" };
         return false;
     }
     return true;
@@ -224,7 +224,7 @@ auto ::vksb::App::recordCommandBuffer(
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     if (vkBeginCommandBuffer(m_commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
-        ::xrn::Logger::openError() << "failed to begin recording command buffer!\n";
+        throw ::std::runtime_error{ "failed to begin recording command buffer!\n" };
         return false;
     }
 
@@ -261,7 +261,7 @@ auto ::vksb::App::recordCommandBuffer(
 
     vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
     if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS) {
-        ::xrn::Logger::openError() << "Failed to record command buffer.\n";
+        throw ::std::runtime_error{ "Failed to record command buffer.\n" };
         return false;
     }
     return true;

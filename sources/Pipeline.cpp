@@ -203,7 +203,7 @@
             &m_graphicsPipeline
         ) != VK_SUCCESS
     ) {
-        ::xrn::Logger::openError() << "failed to create pipeline.\n";
+        throw ::std::runtime_error{ "failed to create pipeline.\n" };
     }
 }
 
@@ -278,7 +278,7 @@ auto ::vksb::Pipeline::createShaderModule(
     // open the file
     ::std::ifstream file{ filepath, ::std::ios::ate | ::std::ios::binary };
     if (!file.is_open()) {
-        ::xrn::Logger::openError() << "File '" << filepath << "' has failed to open.\n";
+        throw ::std::runtime_error{ "File '"s + filepath + "' has failed to open.\n" };
         return false;
     }
 
@@ -299,7 +299,7 @@ auto ::vksb::Pipeline::createShaderModule(
 
     // create the shader module
     if (::vkCreateShaderModule(m_device.device(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-        ::xrn::Logger::openError() << "Failed to create Vulkan shader module.\n";
+        throw ::std::runtime_error{ "Failed to create Vulkan shader module.\n" };
         return false;
     }
 
