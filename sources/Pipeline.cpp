@@ -131,9 +131,7 @@
     filepath += Pipeline::vertexDirectory;
     filepath += shaderFilenames;
     filepath += Pipeline::vertexExtension;
-    if (!this->createShaderModule(filepath, m_vertexShaderModule)) {
-        return;
-    }
+    this->createShaderModule(filepath, m_vertexShaderModule);
 
     // Fragment file
     filepath.reserve(
@@ -144,9 +142,7 @@
     filepath += Pipeline::fragmentDirectory;
     filepath += shaderFilenames;
     filepath += Pipeline::fragmentExtension;
-    if (!this->createShaderModule(filepath, m_fragmentShaderModule)) {
-        return;
-    }
+    this->createShaderModule(filepath, m_fragmentShaderModule);
 
     ::VkPipelineShaderStageCreateInfo shaderStages[2];
     shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -203,7 +199,7 @@
             &m_graphicsPipeline
         ) != VK_SUCCESS
     ) {
-        throw ::std::runtime_error{ "failed to create pipeline.\n" };
+        throw ::std::runtime_error{ "Failed to create pipeline.\n" };
     }
 }
 
@@ -270,16 +266,15 @@ void ::vksb::Pipeline::bind(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::Pipeline::createShaderModule(
+void ::vksb::Pipeline::createShaderModule(
     const ::std::string& filepath,
     ::VkShaderModule& shaderModule
-) -> bool
+)
 {
     // open the file
     ::std::ifstream file{ filepath, ::std::ios::ate | ::std::ios::binary };
     if (!file.is_open()) {
         throw ::std::runtime_error{ "File '"s + filepath + "' has failed to open.\n" };
-        return false;
     }
 
     // check its size
@@ -300,8 +295,5 @@ auto ::vksb::Pipeline::createShaderModule(
     // create the shader module
     if (::vkCreateShaderModule(m_device.device(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to create Vulkan shader module.\n" };
-        return false;
     }
-
-    return true;
 }

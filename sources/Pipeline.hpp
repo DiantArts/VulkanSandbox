@@ -171,10 +171,10 @@ private:
     /// TODO: What is a shader module
     ///
     ///////////////////////////////////////////////////////////////////////////
-    [[ nodiscard ]] auto createShaderModule(
+    void createShaderModule(
         const ::std::string& filepath,
         ::VkShaderModule& shaderModule
-    ) -> bool;
+    );
 
 
 
@@ -186,7 +186,7 @@ private:
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    static inline constexpr const auto shadersDirectory{ "./Shader/"sv };
+    static inline constexpr const auto shadersDirectory{ "./Shaders/"sv };
     static inline constexpr const auto fragmentDirectory{ "Fragment/"sv };
     static inline constexpr const auto fragmentExtension{ ".spv"sv };
     static inline constexpr const auto vertexDirectory{ "Vertex/"sv };

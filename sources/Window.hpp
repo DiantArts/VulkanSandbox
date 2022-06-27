@@ -191,10 +191,10 @@ public:
     /// \brief Vulkan specific
     ///
     ///////////////////////////////////////////////////////////////////////////
-    [[ nodiscard ]] auto createWindowSurface(
+    void createWindowSurface(
         ::VkInstance instance,
         ::VkSurfaceKHR* surface
-    ) -> bool;
+    );
 
 
 

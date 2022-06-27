@@ -52,7 +52,7 @@ auto ::vksb::Window::Size::isValid()
 {
     if (!m_window) {
         glfwTerminate();
-        throw::std::runtime_error("Window creation failed");
+        throw::std::runtime_error("Window creation Failed");
     }
 
     glfwSetWindowUserPointer(m_window.get(), this);
@@ -63,7 +63,7 @@ auto ::vksb::Window::Size::isValid()
 
     // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         // glfwTerminate();
-        // throw::std::runtime_error("glad initialization failed");
+        // throw::std::runtime_error("glad initialization Failed");
     // }
 
     // ::engine::graphic::opengl::detail::applyDefaultConfiguration(&*m_window, m_events);
@@ -174,12 +174,14 @@ auto ::vksb::Window::getSize() const
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::Window::createWindowSurface(
+void ::vksb::Window::createWindowSurface(
     ::VkInstance instance,
     ::VkSurfaceKHR* surface
-) -> bool
+)
 {
-    return ::glfwCreateWindowSurface(instance, m_window.get(), nullptr, surface) == VK_SUCCESS;
+    if (::glfwCreateWindowSurface(instance, m_window.get(), nullptr, surface) != VK_SUCCESS) {
+        throw ::std::runtime_error{ "Failed to create window surface" };
+    }
 }
 
 
@@ -227,7 +229,7 @@ class GlfwMemoryManager {
     GlfwMemoryManager()
     {
         if (!glfwInit()) {
-            throw::std::runtime_error("glwfInit failed");
+            throw::std::runtime_error("glwfInit Failed");
         }
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);

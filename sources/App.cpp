@@ -21,9 +21,9 @@
 ::vksb::App::App()
 {
     this->loadModels();
-    if (!this->createPipelineLayout() || !this->recreateSwapChain() || !this->createCommandBuffers()) {
-        throw ::std::runtime_error{ "unable to create the app" };
-    }
+    this->createPipelineLayout();
+    this->recreateSwapChain();
+    this->createCommandBuffers();
 }
 
 
@@ -51,7 +51,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::App::run()
+auto ::vksb::App::run()
+    -> ::std::uint8_t
 {
     while (!m_window.shouldClose()) {
         m_window.handleEvents();
@@ -59,6 +60,7 @@ void ::vksb::App::run()
     }
 
     vkDeviceWaitIdle(m_device.device());
+    return 0;
 }
 
 
@@ -82,8 +84,7 @@ void ::vksb::App::loadModels()
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::App::createPipelineLayout()
-    -> bool
+void ::vksb::App::createPipelineLayout()
 {
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -94,16 +95,13 @@ auto ::vksb::App::createPipelineLayout()
 
     if (::vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to create pipeline layout.\n" };
-        return false;
     }
-    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::App::createPipeline()
-    -> bool
+void ::vksb::App::createPipeline()
 {
     assert(m_pSwapChain != nullptr && "Cannot create pipeline before swap chain");
     assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
@@ -112,12 +110,10 @@ auto ::vksb::App::createPipeline()
     pipelineConfig.renderPass = m_pSwapChain->getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
     m_pPipeline = ::std::make_unique<::vksb::Pipeline>(m_device, pipelineConfig, "simple");
-    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::App::createCommandBuffers()
-    -> bool
+void ::vksb::App::createCommandBuffers()
 {
     m_commandBuffers.resize(m_pSwapChain->imageCount());
 
@@ -127,13 +123,9 @@ auto ::vksb::App::createCommandBuffers()
     allocInfo.commandPool = m_device.getCommandPool();
     allocInfo.commandBufferCount = static_cast<uint32_t>(m_commandBuffers.size());
 
-    if (vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) !=
-        VK_SUCCESS) {
-        throw ::std::runtime_error{ "failed to allocate command buffers!\n" };
-        return false;
+    if (vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) != VK_SUCCESS) {
+        throw ::std::runtime_error{ "Failed to allocate command buffers!\n" };
     }
-
-    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -149,8 +141,7 @@ void ::vksb::App::freeCommandBuffers()
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::App::drawFrame()
-    -> bool
+void ::vksb::App::drawFrame()
 {
     ::std::uint32_t imageIndex;
 
@@ -161,10 +152,10 @@ auto ::vksb::App::drawFrame()
     case VK_ERROR_OUT_OF_DATE_KHR:
         ::std::cout << "New swapchain needs to be created." << ::std::endl;
         m_window.setResizedFlag();
-        return this->recreateSwapChain();
+        this->recreateSwapChain();
+        return;
     default:
         throw ::std::runtime_error{ "Failed to aquire swapChain image.\n" };
-        return false;
     }
 
     this->recordCommandBuffer(imageIndex);
@@ -176,19 +167,15 @@ auto ::vksb::App::drawFrame()
         goto WINDOW_RESIZED;
     } else if (m_window.wasResized()) {
     WINDOW_RESIZED:
-        return recreateSwapChain();
+        recreateSwapChain();
+        return;
     } else {
         throw ::std::runtime_error{ "Failed to present swapChain image.\n" };
-        return false;
     }
-
-    // for (auto i{ 0uz }; i < m_commandBuffers.size(); ++i) {}
-    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::App::recreateSwapChain()
-    -> bool
+void ::vksb::App::recreateSwapChain()
 {
     auto windowSize{ m_window.getSize() };
     while (!windowSize.isValid()) {
@@ -206,26 +193,23 @@ auto ::vksb::App::recreateSwapChain()
             this->createCommandBuffers();
         }
     }
-    if (!this->createPipeline()) {
-        throw ::std::runtime_error{ "Failed to create pipeline with the new swapchain.\n" };
-        return false;
-    }
-    return true;
+    this->createPipeline();
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::App::recordCommandBuffer(
+void ::vksb::App::recordCommandBuffer(
     ::std::size_t imageIndex
-) -> bool
+)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     if (vkBeginCommandBuffer(m_commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "failed to begin recording command buffer!\n" };
-        return false;
+        throw ::std::runtime_error{ "Failed to begin recording command buffer!\n" };
     }
 
     VkRenderPassBeginInfo renderPassInfo{};
@@ -262,7 +246,5 @@ auto ::vksb::App::recordCommandBuffer(
     vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
     if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to record command buffer.\n" };
-        return false;
     }
-    return true;
 }
