@@ -143,7 +143,6 @@ void ::vksb::App::freeCommandBuffers()
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::drawFrame()
 {
-    ::std::cout << "DRAW FRAME INVALID" << ::std::endl;
     ::std::uint32_t imageIndex;
 
     switch (m_pSwapChain->acquireNextImage(&imageIndex)) {
@@ -174,32 +173,6 @@ void ::vksb::App::drawFrame()
         throw ::std::runtime_error{ "Failed to present swapChain image.\n" };
     }
 }
-
-// void ::vksb::App::drawFrame() {
-  // uint32_t imageIndex;
-  // auto result = m_pSwapChain->acquireNextImage(&imageIndex);
-
-  // if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-    // recreateSwapChain();
-    // return;
-  // }
-
-  // if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-    // throw std::runtime_error("failed to acquire swap chain image!");
-  // }
-
-  // recordCommandBuffer(imageIndex);
-  // result = m_pSwapChain->submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex);
-  // if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-      // m_window.wasResized()) {
-    // m_window.setResizedFlag();
-    // recreateSwapChain();
-    // return;
-  // } else if (result != VK_SUCCESS) {
-    // throw std::runtime_error("failed to present swap chain image!");
-  // }
-// }
-
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::recreateSwapChain()
