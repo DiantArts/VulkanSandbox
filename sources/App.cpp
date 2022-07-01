@@ -258,7 +258,7 @@ void ::vksb::App::recordCommandBuffer(
     for (auto i{ 0uz }; i < 4; ++i) {
         ::SimplePushConstantData push{};
         push.offset = { -0.5f + frame * 0.02f, -0.4f + i * 0.25f };
-        push.color = { 0.0f, 0.0f, 0.2f * i};
+        push.color = { 0.0f, 0.0f, 0.2f + 0.2f * i };
         ::vkCmdPushConstants(
             m_commandBuffers[imageIndex],
             m_pipelineLayout,
