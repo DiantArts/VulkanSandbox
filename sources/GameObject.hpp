@@ -16,13 +16,14 @@ class GameObject {
 public:
 
     struct Transform2dComponent {
+        ::glm::vec2 translation;
+        ::glm::vec2 scale;
+
         [[ nodiscard ]] auto getMatrix() const
             -> ::glm::mat2
         {
-            return ::glm::mat2{ 1.0f };
+            return ::glm::mat2{ { scale.x, 0.0f }, { 0.0f, scale.y } };
         }
-
-        ::glm::vec2 translation;
     };
 
 public:
