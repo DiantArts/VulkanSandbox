@@ -109,6 +109,12 @@ public:
     [[ nodiscard ]] auto getCurrentCommandBuffer() const
         -> ::VkCommandBuffer;
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    [[ nodiscard ]] auto getFrameIndex() const
+        -> int;
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +185,7 @@ private:
     ::std::vector<VkCommandBuffer> m_commandBuffers;
 
     ::std::uint32_t m_currentImageIndex;
+    int m_currentFrameIndex;
     bool m_isFrameStarted{ false };
 
 };

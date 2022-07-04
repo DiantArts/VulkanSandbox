@@ -78,7 +78,15 @@ auto ::vksb::Renderer::getCurrentCommandBuffer() const
     -> ::VkCommandBuffer
 {
     assert(this->isFrameInProgress() && "Cannot get command buffer when frame is not in progress");
-    return m_commandBuffers[m_currentImageIndex];
+    return m_commandBuffers[m_currentFrameIndex];
+}
+
+///////////////////////////////////////////////////////////////////////////
+[[ nodiscard ]] auto ::vksb::Renderer::getFrameIndex() const
+    -> int
+{
+    assert(this->isFrameInProgress() && "Cannot get frame index when frame is not in progress");
+    return m_currentFrameIndex;
 }
 
 
@@ -142,6 +150,7 @@ void ::vksb::Renderer::endFrame()
     }
 
     m_isFrameStarted = false;
+    m_currentFrameIndex = (m_currentFrameIndex + 1) % ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -209,7 +218,7 @@ void ::vksb::Renderer::endSwapChainRenderPass(
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::Renderer::createCommandBuffers()
 {
-    m_commandBuffers.resize(m_pSwapChain->imageCount());
+    m_commandBuffers.resize(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT);
 
     ::VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -247,10 +256,10 @@ void ::vksb::Renderer::recreateSwapChain()
     if (!m_pSwapChain) {
         m_pSwapChain = ::std::make_unique<::vksb::SwapChain>(m_device, windowSize);
     } else {
-        m_pSwapChain = ::std::make_unique<::vksb::SwapChain>(m_device, windowSize, ::std::move(m_pSwapChain));
-        if (m_pSwapChain->imageCount() != m_commandBuffers.size()) {
-            this->freeCommandBuffers();
-            this->createCommandBuffers();
+        ::std::shared_ptr<::vksb::SwapChain> oldSwapchain{ ::std::move(m_pSwapChain) };
+        m_pSwapChain = ::std::make_unique<::vksb::SwapChain>(m_device, windowSize, oldSwapchain);
+        if (!oldSwapchain->compareSwapFormats(*m_pSwapChain.get())) {
+            throw ::std::runtime_error{ "Swap chain image or depth format has changed" };
         }
     }
 }
