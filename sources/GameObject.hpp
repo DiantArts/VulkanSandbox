@@ -17,12 +17,19 @@ public:
 
     struct Transform2dComponent {
         ::glm::vec2 translation;
-        ::glm::vec2 scale;
+        ::glm::vec2 scale{ 1.0f, 1.0f };
+        float rotation{ 0.0f };
 
         [[ nodiscard ]] auto getMatrix() const
             -> ::glm::mat2
         {
-            return ::glm::mat2{ { scale.x, 0.0f }, { 0.0f, scale.y } };
+            const float s{ ::glm::sin(this->rotation) };
+            const float c{ ::glm::cos(this->rotation) };
+
+            const ::glm::mat2 rotationMatrix{ {c, s}, { -s, c } };
+            const ::glm::mat2 scaleMatrix{ { this->scale.x, 0.0f }, { 0.0f, this->scale.y } };
+
+            return rotationMatrix * scaleMatrix;
         }
     };
 

@@ -93,6 +93,7 @@ void ::vksb::App::loadGameOjects()
     triangle.color = { 0.1f, 0.8f, 0.1f };
     triangle.transform2d.translation.x = 0.2f;
     triangle.transform2d.scale = { 2.0f, 0.5f };
+    triangle.transform2d.rotation = 0.25f * ::glm::two_pi<float>();
     m_gameObjects.push_back(::std::move(triangle));
 }
 
@@ -264,7 +265,9 @@ void ::vksb::App::renderGameObject(
 )
 {
     m_pPipeline->bind(commandBuffer);
-    for (const auto& object : m_gameObjects) {
+    for (auto& object : m_gameObjects) {
+        object.transform2d.rotation = ::glm::mod(object.transform2d.rotation + 0.01f, ::glm::two_pi<float>());
+
         ::SimplePushConstantData push{};
         push.offset = object.transform2d.translation;
         push.color = object.color;
