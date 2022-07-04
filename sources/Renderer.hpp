@@ -179,7 +179,7 @@ private:
     ::std::vector<VkCommandBuffer> m_commandBuffers;
 
     ::std::uint32_t m_currentImageIndex;
-    bool m_isFrameStarted;
+    bool m_isFrameStarted{ false };
 
 };
 
