@@ -92,6 +92,7 @@ void ::vksb::App::loadGameOjects()
     auto triangle{ ::vksb::GameObject{ model } };
     triangle.color = { 0.1f, 0.8f, 0.1f };
     triangle.transform2d.translation.x = 0.2f;
+    m_gameObjects.push_back(::std::move(triangle));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -267,6 +268,7 @@ void ::vksb::App::renderGameObject(
         push.offset = object.transform2d.translation;
         push.color = object.color;
         push.transform = object.transform2d.getMatrix();
+
         ::vkCmdPushConstants(
             commandBuffer,
             m_pipelineLayout,
