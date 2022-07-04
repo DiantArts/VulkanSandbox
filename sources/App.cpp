@@ -11,6 +11,7 @@
 
 
 struct SimplePushConstantData {
+    ::glm::mat2 transform{ 1.0f };
     ::glm::vec2 offset;
     alignas(16) ::glm::vec3 color;
 };
@@ -27,7 +28,7 @@ struct SimplePushConstantData {
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::App::App()
 {
-    this->loadModels();
+    this->loadGameOjects();
     this->createPipelineLayout();
     this->recreateSwapChain();
     this->createCommandBuffers();
@@ -80,14 +81,17 @@ auto ::vksb::App::run()
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::App::loadModels()
+void ::vksb::App::loadGameOjects()
 {
     ::std::vector<::vksb::Model::Vertex> m_vertices {
         { { 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f } },
         { { 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f } },
         { { -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } },
     };
-    m_pModel = ::std::make_unique<::vksb::Model>(m_device, m_vertices);
+    auto model{ ::std::make_shared<::vksb::Model>(m_device, m_vertices) };
+    auto triangle{ ::vksb::GameObject{ model } };
+    triangle.color = { 0.1f, 0.8f, 0.1f };
+    triangle.transform2d.translation.x = 0.2f;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -110,8 +114,6 @@ void ::vksb::App::createPipelineLayout()
     }
 }
 
-///////////////////////////////////////////////////////////////////////////
-///
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::createPipeline()
 {
@@ -207,18 +209,11 @@ void ::vksb::App::recreateSwapChain()
     this->createPipeline();
 }
 
-
-
-///////////////////////////////////////////////////////////////////////////
-///
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::recordCommandBuffer(
     ::std::size_t imageIndex
 )
 {
-    static ::std::size_t frame{ 0 };
-    frame = (frame + 1) % 100;
-
     ::VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -253,25 +248,34 @@ void ::vksb::App::recordCommandBuffer(
     ::vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
     ::vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
 
-    m_pPipeline->bind(m_commandBuffers[imageIndex]);
-    m_pModel->bind(m_commandBuffers[imageIndex]);
-    for (auto i{ 0uz }; i < 4; ++i) {
+    this->renderGameObject(m_commandBuffers[imageIndex]);
+
+    ::vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
+    if (::vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS) {
+        throw ::std::runtime_error{ "Failed to record command buffer.\n" };
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::App::renderGameObject(
+    ::VkCommandBuffer commandBuffer
+)
+{
+    m_pPipeline->bind(commandBuffer);
+    for (const auto& object : m_gameObjects) {
         ::SimplePushConstantData push{};
-        push.offset = { -0.5f + frame * 0.02f, -0.4f + i * 0.25f };
-        push.color = { 0.0f, 0.0f, 0.2f + 0.2f * i };
+        push.offset = object.transform2d.translation;
+        push.color = object.color;
+        push.transform = object.transform2d.getMatrix();
         ::vkCmdPushConstants(
-            m_commandBuffers[imageIndex],
+            commandBuffer,
             m_pipelineLayout,
             VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             0,
             sizeof(::SimplePushConstantData),
             &push
         );
-        m_pModel->draw(m_commandBuffers[imageIndex]);
-    }
-
-    ::vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
-    if (::vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to record command buffer.\n" };
+        object.model->bind(commandBuffer);
+        object.model->draw(commandBuffer);
     }
 }

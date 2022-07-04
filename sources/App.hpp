@@ -4,7 +4,7 @@
 #include <Device.hpp>
 #include <SwapChain.hpp>
 #include <Pipeline.hpp>
-#include <Model.hpp>
+#include <GameObject.hpp>
 
 namespace vksb {
 
@@ -110,7 +110,7 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    void loadModels();
+    void loadGameOjects();
 
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -149,6 +149,13 @@ private:
         ::std::size_t imageIndex
     );
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void renderGameObject(
+        ::VkCommandBuffer commandBuffer
+    );
+
 
 
 private:
@@ -166,7 +173,7 @@ private:
     ::std::unique_ptr<::vksb::Pipeline> m_pPipeline;
     ::VkPipelineLayout m_pipelineLayout;
     ::std::vector<VkCommandBuffer> m_commandBuffers;
-    ::std::unique_ptr<::vksb::Model> m_pModel;
+    ::std::vector<::vksb::GameObject> m_gameObjects;
 
 
 };
