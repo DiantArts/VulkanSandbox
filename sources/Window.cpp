@@ -7,6 +7,8 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <Window.hpp>
+#include <Event/KeyPressed.hpp>
+#include <Event/WindowResize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +44,7 @@ auto ::vksb::Window::Size::isValid()
     const ::std::string& windowName /* = Window::defaultName */
 )
     : m_size{ Window::defaultSize }
-    , m_window{ glfwCreateWindow(
+    , m_pWindow{ glfwCreateWindow(
         m_size.width,
         m_size.height,
         windowName.c_str(),
@@ -50,23 +52,18 @@ auto ::vksb::Window::Size::isValid()
         nullptr
     ) }
 {
-    if (!m_window) {
+    if (!m_pWindow) {
         glfwTerminate();
         throw::std::runtime_error("Window creation Failed");
     }
 
-    glfwSetWindowUserPointer(m_window.get(), this);
-    glfwSetFramebufferSizeCallback(m_window.get(), Window::framebufferResizeCallback);
+    glfwSetWindowUserPointer(m_pWindow.get(), &m_events);
 
-    // glfwMakeContextCurrent(&*m_window);
-    // glfwSetFramebufferSizeCallback(&*m_window, ::engine::graphic::opengl::detail::framebufferSizeCallback);
-
-    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        // glfwTerminate();
-        // throw::std::runtime_error("glad initialization Failed");
-    // }
-
-    // ::engine::graphic::opengl::detail::applyDefaultConfiguration(&*m_window, m_events);
+    // setup callbacks
+    glfwSetFramebufferSizeCallback(m_pWindow.get(), Window::framebufferResizeCallback);
+    glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
+    glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
+    glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
 }
 
 
@@ -105,7 +102,7 @@ auto ::vksb::Window::operator=(
 auto ::vksb::Window::shouldClose() const
     -> bool
 {
-    return ::glfwWindowShouldClose(m_window.get()) || m_shouldClose;
+    return ::glfwWindowShouldClose(m_pWindow.get()) || m_shouldClose;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -117,13 +114,16 @@ void ::vksb::Window::clear() const
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::display() const
 {
-    // ::glfwSwapBuffers(m_window.get());
+    // ::glfwSwapBuffers(m_pWindow.get());
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::Window::handleEvents()
+void ::vksb::Window::handleEvents(
+    ::vksb::App& app
+)
 {
     ::glfwPollEvents();
+    m_events.resolve(app);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ void ::vksb::Window::createWindowSurface(
     ::VkSurfaceKHR* surface
 )
 {
-    if (::glfwCreateWindowSurface(instance, m_window.get(), nullptr, surface) != VK_SUCCESS) {
+    if (::glfwCreateWindowSurface(instance, m_pWindow.get(), nullptr, surface) != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to create window surface" };
     }
 }
@@ -201,16 +201,52 @@ void ::vksb::Window::createWindowSurface(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::framebufferResizeCallback(
-    ::GLFWwindow* windowPtr,
-    int width,
-    int height
+    ::GLFWwindow* pWindow,
+    const int width,
+    const int height
 ) {
-    auto& window{ *reinterpret_cast<::vksb::Window*>(glfwGetWindowUserPointer(windowPtr)) };
-    window.resize({
+    auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
+    events.emplace<::vksb::event::WindowResize>(Window::Size{
         .width = static_cast<::std::size_t>(width),
         .height = static_cast<::std::size_t>(height)
     });
 }
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::Window::keyCallback(
+    GLFWwindow* pWindow,
+    const int keyCode,
+    const int scancode,
+    const int action,
+    const int mods
+)
+{
+    auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
+    if (action == GLFW_PRESS) {
+        events.emplace<::vksb::event::KeyPressed>(keyCode);
+    // } else if (action == GLFW_RELEASE) {
+        // events.emplace<::vksb::event::KeyReleased>(keyCode);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::Window::mouseMovedCallback(
+    GLFWwindow* pWindow,
+    const double xPos,
+    const double yPos
+)
+{
+    // auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
+    // events.emplace<::vksb::event::MouseMoved>(xPos, yPos);
+}
+
+void ::vksb::Window::mouseScrollcallback(
+    GLFWwindow*,
+    const double,
+    const double yOffset
+)
+{}
+
 
 
 
@@ -224,10 +260,10 @@ void ::vksb::Window::framebufferResizeCallback(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::Deleter::operator()(
-    ::GLFWwindow* window
+    ::GLFWwindow* pWindow
 )
 {
-    ::glfwDestroyWindow(window);
+    ::glfwDestroyWindow(pWindow);
 }
 
 ///////////////////////////////////////////////////////////////////////////

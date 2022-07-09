@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Event/Container.hpp>
+
+namespace vksb { class App; }
+
 namespace vksb {
 
 ///////////////////////////////////////////////////////////////////////////
@@ -141,7 +145,9 @@ public:
     /// \brief Pull and resolve the events
     ///
     ///////////////////////////////////////////////////////////////////////////
-    void handleEvents();
+    void handleEvents(
+        ::vksb::App& app
+    );
 
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -215,11 +221,39 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-
     static void framebufferResizeCallback(
-        GLFWwindow* windowPtr,
+        GLFWwindow* pWindowPtr,
         int width,
         int height
+    );
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    static void keyCallback(
+        GLFWwindow* window,
+        int keyCode,
+        int scancode,
+        int action,
+        int mods
+    );
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    static void mouseMovedCallback(
+        GLFWwindow* window,
+        double xPos,
+        double yPos
+    );
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    static void mouseScrollcallback(
+        GLFWwindow* window,
+        double xOffset,
+        double yOffset
     );
 
 
@@ -267,9 +301,11 @@ private:
 
     Window::Size m_size;
     bool m_framebufferResized{ false };
-    ::std::unique_ptr<::GLFWwindow, Window::Deleter> m_window;
+    ::std::unique_ptr<::GLFWwindow, Window::Deleter> m_pWindow;
 
     bool m_shouldClose{ false };
+
+    ::vksb::event::Container m_events;
 
 
 };

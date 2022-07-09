@@ -61,6 +61,7 @@ using ::std::chrono_literals::operator""ms;
 #include <xrn/Ecs.hpp>
 #include <xrn/Meta.hpp>
 #include <xrn/Util.hpp>
+using ::xrn::util::literal::operator""_ms;
 
 #include <debugMacros.hpp>
 
