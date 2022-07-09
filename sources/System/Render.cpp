@@ -100,13 +100,16 @@ void ::vksb::system::Render::renderGameObjects(
 )
 {
     m_pPipeline->bind(commandBuffer);
+
+    auto projectionView{ camera.getProjection() * camera.getView() };
+
     for (auto& object : gameObjects) {
         object.transform.rotation.y = ::glm::mod(object.transform.rotation.y + 0.01f, ::glm::two_pi<float>());
         object.transform.rotation.x = ::glm::mod(object.transform.rotation.x + 0.005f, ::glm::two_pi<float>());
 
         ::SimplePushConstantData push{};
         push.color = object.color;
-        push.transform = camera.getProjection() * object.transform.getMatrix();
+        push.transform = projectionView * object.transform.getMatrix();
 
         ::vkCmdPushConstants(
             commandBuffer,

@@ -52,6 +52,7 @@ auto ::vksb::App::run()
     ::vksb::system::Render renderSystem{ m_device, m_renderer.getSwapChainRenderPass() };
 
     ::vksb::Camera camera;
+    camera.setViewDirection(::glm::vec3{ 0.0f }, ::glm::vec3{ 0.5f, 0.0f, 1.0f });
 
     while (!m_window.shouldClose()) {
         m_window.handleEvents();
