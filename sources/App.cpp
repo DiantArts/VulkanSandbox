@@ -52,10 +52,14 @@ auto ::vksb::App::run()
     ::vksb::system::Render renderSystem{ m_device, m_renderer.getSwapChainRenderPass() };
 
     ::vksb::Camera camera;
-    camera.setOrthographicProjection(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
     while (!m_window.shouldClose()) {
         m_window.handleEvents();
+
+        float aspect{ m_renderer.getAspectRatio() };
+        // camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
+        camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 10.0f);
+
         if (auto commandBuffer{ m_renderer.beginFrame() }) {
             m_renderer.beginSwapChainRenderPass(commandBuffer);
             renderSystem.renderGameObjects(commandBuffer, m_gameObjects, camera);
@@ -144,7 +148,7 @@ static auto createCubeModel(
 void ::vksb::App::loadGameOjects()
 {
     ::vksb::GameObject cube{ createCubeModel(m_device, { 0.0f, 0.0f, 0.0f }) };
-    cube.transform.translation = { 0.0f, 0.0f, 0.5f };
+    cube.transform.translation = { 0.0f, 0.0f, 2.5f };
     cube.transform.scale = { 0.5f, 0.5f, 0.5f };
     m_gameObjects.push_back(::std::move(cube));
 }
