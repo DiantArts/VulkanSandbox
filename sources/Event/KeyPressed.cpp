@@ -62,6 +62,8 @@ void ::vksb::event::KeyPressed::resolve(
     ::vksb::App& app
 )
 {
+    auto& player{ app.getPlayer() };
+
     // move
     if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward) {
@@ -78,6 +80,7 @@ void ::vksb::event::KeyPressed::resolve(
 
     // look
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookUp) {
+        player.transform.rotation.z += ::vksb::configuration.rotateSpeed * deltaTime
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookDown) {
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookLeft) {
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookRight) {

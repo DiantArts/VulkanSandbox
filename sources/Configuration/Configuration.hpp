@@ -16,6 +16,12 @@ struct Configuration
 {
     ::vksb::detail::configuration::KeyBindings keyBindings{};
     ::vksb::detail::configuration::Filepaths filepaths{};
+
+    float moveSpeed{ 3.0f };
+    float rotateSpeed{ 1.5f }; // when rotating with keys
+    static inline constexpr float minPitch{ -89.999f };
+    static inline constexpr float maxPitch{ 89.999f };
+    static inline constexpr ::glm::vec3 m_sensitivity{ 0.1f, 0.1f, 1.0f };
 };
 
 } // namespace vksb::detail::configuration

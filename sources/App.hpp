@@ -96,6 +96,12 @@ public:
     [[ nodiscard ]] auto getWindow()
         -> ::vksb::Window&;
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    [[ nodiscard ]] auto getPlayer()
+        -> ::vksb::GameObject&;
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +149,7 @@ private:
     ::vksb::Renderer m_renderer{ m_window, m_device };
 
     ::std::vector<::vksb::GameObject> m_gameObjects;
+    ::std::size_t m_playerIndex{ 0 };
 
 
 };
