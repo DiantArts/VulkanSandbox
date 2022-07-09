@@ -95,7 +95,8 @@ void ::vksb::system::Render::createPipeline(
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::system::Render::renderGameObjects(
     ::VkCommandBuffer commandBuffer,
-    ::std::vector<::vksb::GameObject>& gameObjects
+    ::std::vector<::vksb::GameObject>& gameObjects,
+    const ::vksb::Camera& camera
 )
 {
     m_pPipeline->bind(commandBuffer);
@@ -105,7 +106,7 @@ void ::vksb::system::Render::renderGameObjects(
 
         ::SimplePushConstantData push{};
         push.color = object.color;
-        push.transform = object.transform.getMatrix();
+        push.transform = camera.getProjection() * object.transform.getMatrix();
 
         ::vkCmdPushConstants(
             commandBuffer,

@@ -51,11 +51,14 @@ auto ::vksb::App::run()
 {
     ::vksb::system::Render renderSystem{ m_device, m_renderer.getSwapChainRenderPass() };
 
+    ::vksb::Camera camera;
+    camera.setOrthographicProjection(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
     while (!m_window.shouldClose()) {
         m_window.handleEvents();
         if (auto commandBuffer{ m_renderer.beginFrame() }) {
             m_renderer.beginSwapChainRenderPass(commandBuffer);
-            renderSystem.renderGameObjects(commandBuffer, m_gameObjects);
+            renderSystem.renderGameObjects(commandBuffer, m_gameObjects, camera);
             m_renderer.endSwapChainRenderPass(commandBuffer);
             m_renderer.endFrame();
         }

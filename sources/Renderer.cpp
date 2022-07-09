@@ -138,12 +138,9 @@ void ::vksb::Renderer::endFrame()
     }
     if (
         auto result{ m_pSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex) };
-        result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR
+        result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.wasResized()
     ) {
-        m_window.setResizedFlag();
-        goto WINDOW_RESIZED;
-    } else if (m_window.wasResized()) {
-    WINDOW_RESIZED:
+        m_window.resetResizedFlag();
         recreateSwapChain();
     } else if (result != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to present swapChain image.\n" };

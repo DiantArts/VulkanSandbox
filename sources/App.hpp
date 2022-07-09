@@ -4,6 +4,7 @@
 #include <Device.hpp>
 #include <Renderer.hpp>
 #include <GameObject.hpp>
+#include <Camera.hpp>
 
 namespace vksb {
 

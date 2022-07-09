@@ -134,6 +134,12 @@ auto ::vksb::Window::wasResized()
 }
 
 ///////////////////////////////////////////////////////////////////////////
+void ::vksb::Window::resetResizedFlag()
+{
+    m_framebufferResized = false;
+}
+
+///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::setResizedFlag()
 {
     m_framebufferResized = true;
