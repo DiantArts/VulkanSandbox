@@ -94,7 +94,7 @@ void ::vksb::system::Render::createPipeline(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::Render::renderGameObject(
+void ::vksb::system::Render::renderGameObjects(
     ::VkCommandBuffer commandBuffer,
     ::std::vector<::vksb::GameObject>& gameObjects
 )

@@ -161,13 +161,6 @@ void ::vksb::Renderer::beginSwapChainRenderPass(
     assert(this->isFrameInProgress() && "Cannot call beginSwapChainRenderPass() if frame is not in progress");
     assert(commandBuffer == getCurrentCommandBuffer() && "Cannot begin render pass on command buffer from a different frame");
 
-    ::VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (::vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to begin recording command buffer!\n" };
-    }
-
     ::VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_pSwapChain->getRenderPass();

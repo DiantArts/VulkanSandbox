@@ -55,7 +55,7 @@ auto ::vksb::App::run()
         m_window.handleEvents();
         if (auto commandBuffer{ m_renderer.beginFrame() }) {
             m_renderer.beginSwapChainRenderPass(commandBuffer);
-            renderSystem.renderGameObject(commandBuffer, m_gameObjects);
+            renderSystem.renderGameObjects(commandBuffer, m_gameObjects);
             m_renderer.endSwapChainRenderPass(commandBuffer);
             m_renderer.endFrame();
         }
