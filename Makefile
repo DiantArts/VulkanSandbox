@@ -194,9 +194,9 @@ CXXMFLAGS		+=	$(foreach flag, $(CPPM_WFLAGS),$(addprefix -W,$(flag)))
 
 ## cpp.gch flags
 CPP_PCHFLAGS	+=	-x c++-header -fconcepts-ts
-# CPP_PCHFLAGS	+=	$(foreach flag, $(COMMON_WFLAGS),$(addprefix -W,$(flag)))
-# CPP_PCHFLAGS	+=	$(foreach flag, $(CPP_WFLAGS),$(addprefix -W,$(flag)))
-# CPP_PCHFLAGS	+=	$(CPP_FLAGS)
+CPP_PCHFLAGS	+=	$(foreach flag, $(COMMON_WFLAGS),$(addprefix -W,$(flag)))
+CPP_PCHFLAGS	+=	$(foreach flag, $(CPP_WFLAGS),$(addprefix -W,$(flag)))
+CPP_PCHFLAGS	+=	$(CPPFLAGS) $(CXXFLAGS)
 
 ## mode flags
 CFLAGS			+=	$(MODE_FLAGS)
@@ -209,6 +209,7 @@ CPPFLAGS		+=	$(foreach inc, $(COMMON_CPPFLAGS),$(addprefix -I,$(inc)))
 CPPFLAGS		+=	$(foreach inc, $(C_CPPFLAGS),$(addprefix -I,$(inc)))
 CPPFLAGS		+=	$(foreach inc, $(CXX_CPPFLAGS),$(addprefix -I,$(inc)))
 CPPFLAGS		+=	$(patsubst %,-I$(LIBDIR)/%/$(SRCDIR),$(FOUNDLIBS))
+
 
 ## libraries
 FOUNDLIBS		:=	$(patsubst $(LIBDIR)/%,%,$(FOUNDLIBS))
