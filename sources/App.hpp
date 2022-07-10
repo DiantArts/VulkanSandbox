@@ -1,5 +1,6 @@
 #pragma once
 
+#include <xrn/Ecs.hpp>
 #include <Window.hpp>
 #include <Device.hpp>
 #include <Renderer.hpp>
@@ -99,8 +100,10 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    [[ nodiscard ]] auto getPlayer()
-        -> ::vksb::GameObject&;
+    template <
+        ::xrn::ecs::detail::constraint::isComponent ComponentType
+    > [[ nodiscard ]] auto getPlayerComponent()
+        -> ComponentType&;
 
 
 
@@ -144,10 +147,18 @@ private:
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
+    // ECS
+    ::xrn::ecs::component::Container m_components{ 10 };
+    ::xrn::ecs::entity::Container m_entities{ m_components };
+    ::xrn::ecs::system::Container m_systems;
+    ::xrn::ecs::system::ConstContainer m_constSystems;
+
+    // Vulkan
     ::vksb::Window m_window{ false };
     ::vksb::Device m_device{ m_window };
     ::vksb::Renderer m_renderer{ m_window, m_device };
 
+    // Others
     ::std::vector<::vksb::GameObject> m_gameObjects;
     ::std::size_t m_playerIndex{ 0 };
 
@@ -155,3 +166,5 @@ private:
 };
 
 } // namespace vksb
+
+#include <App.impl.hpp>

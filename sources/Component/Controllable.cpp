@@ -1,5 +1,6 @@
 #include <pch.hpp>
 #include <Component/Controllable.hpp>
+#include <Component/Transformable.hpp>
 #include <Configuration.hpp>
 
 
@@ -237,13 +238,13 @@ void ::vksb::component::Controllable::rotate(
     const ::glm::vec2& offset
 )
 {
-    ::vksb::configuration.rotateSpeed.x += offset.x * m_sensitivity.x;
-    ::vksb::configuration.rotateSpeed.y += offset.y * m_sensitivity.y;
+    ::vksb::configuration.rotateSpeed.x += offset.x * ::vksb::configuration.mouseSensitivity.x;
+    ::vksb::configuration.rotateSpeed.y += offset.y * ::vksb::configuration.mouseSensitivity.y;
 
-    if (::vksb::configuration.rotateSpeed.y > this->maxPitch) {
-        ::vksb::configuration.rotateSpeed.y = this->maxPitch;
-    } else if (::vksb::configuration.rotateSpeed.y < this->minPitch) {
-        ::vksb::configuration.rotateSpeed.y = this->minPitch;
+    if (::vksb::configuration.rotateSpeed.y > ::vksb::configuration.maxPitch) {
+        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.maxPitch;
+    } else if (::vksb::configuration.rotateSpeed.y < ::vksb::configuration.minPitch) {
+        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.minPitch;
     }
 }
 
@@ -253,13 +254,13 @@ void ::vksb::component::Controllable::rotate(
     const float pitchOffset
 )
 {
-    ::vksb::configuration.rotateSpeed.x += yawOffset * m_sensitivity.x;
-    ::vksb::configuration.rotateSpeed.y += pitchOffset * m_sensitivity.y;
+    ::vksb::configuration.rotateSpeed.x += yawOffset * ::vksb::configuration.mouseSensitivity.x;
+    ::vksb::configuration.rotateSpeed.y += pitchOffset * ::vksb::configuration.mouseSensitivity.y;
 
-    if (::vksb::configuration.rotateSpeed.y > this->maxPitch) {
-        ::vksb::configuration.rotateSpeed.y = this->maxPitch;
-    } else if (::vksb::configuration.rotateSpeed.y < this->minPitch) {
-        ::vksb::configuration.rotateSpeed.y = this->minPitch;
+    if (::vksb::configuration.rotateSpeed.y > ::vksb::configuration.maxPitch) {
+        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.maxPitch;
+    } else if (::vksb::configuration.rotateSpeed.y < ::vksb::configuration.minPitch) {
+        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.minPitch;
     }
 }
 
@@ -268,7 +269,7 @@ void ::vksb::component::Controllable::rotateYaw(
     const float offset
 )
 {
-    ::vksb::configuration.rotateSpeed.x += offset * m_sensitivity.x;
+    ::vksb::configuration.rotateSpeed.x += offset * ::vksb::configuration.mouseSensitivity.x;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -276,12 +277,12 @@ void ::vksb::component::Controllable::rotatePitch(
     const float offset
 )
 {
-    ::vksb::configuration.rotateSpeed.y += offset * m_sensitivity.y;
+    ::vksb::configuration.rotateSpeed.y += offset * ::vksb::configuration.mouseSensitivity.y;
 
-    if (::vksb::configuration.rotateSpeed.y > this->maxPitch) {
-        ::vksb::configuration.rotateSpeed.y = this->maxPitch;
-    } else if (::vksb::configuration.rotateSpeed.y < this->minPitch) {
-        ::vksb::configuration.rotateSpeed.y = this->minPitch;
+    if (::vksb::configuration.rotateSpeed.y > ::vksb::configuration.maxPitch) {
+        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.maxPitch;
+    } else if (::vksb::configuration.rotateSpeed.y < ::vksb::configuration.minPitch) {
+        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.minPitch;
     }
 }
 

@@ -7,6 +7,7 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <Event/KeyPressed.hpp>
+#include <Component/Controllable.hpp>
 #include <Configuration.hpp>
 #include <App.hpp>
 
@@ -62,7 +63,7 @@ void ::vksb::event::KeyPressed::resolve(
     ::vksb::App& app
 )
 {
-    auto& player{ app.getPlayer() };
+    auto& player{ app.getPlayerComponent<::vksb::component::Controllable>() };
 
     // move
     if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {
@@ -80,7 +81,6 @@ void ::vksb::event::KeyPressed::resolve(
 
     // look
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookUp) {
-        player.transform.rotation.z += ::vksb::configuration.rotateSpeed * deltaTime
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookDown) {
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookLeft) {
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookRight) {

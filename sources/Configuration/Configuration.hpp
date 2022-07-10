@@ -14,14 +14,17 @@ namespace vksb::detail::configuration {
 ///////////////////////////////////////////////////////////////////////////
 struct Configuration
 {
-    ::vksb::detail::configuration::KeyBindings keyBindings{};
     ::vksb::detail::configuration::Filepaths filepaths{};
 
+    // Keys
+    ::vksb::detail::configuration::KeyBindings keyBindings{};
     float moveSpeed{ 3.0f };
-    float rotateSpeed{ 1.5f }; // when rotating with keys
+    ::glm::vec3 rotateSpeed{ 1.5f }; // when rotating with keys
+
+    // Mouse
+    ::glm::vec3 mouseSensitivity{ 0.1f, 0.1f, 1.0f };
     static inline constexpr float minPitch{ -89.999f };
     static inline constexpr float maxPitch{ 89.999f };
-    static inline constexpr ::glm::vec3 m_sensitivity{ 0.1f, 0.1f, 1.0f };
 };
 
 } // namespace vksb::detail::configuration
