@@ -1,6 +1,10 @@
 #pragma once
 
-namespace engine::core::ecs::component {
+#include <xrn/Ecs/Component.hpp>
+
+namespace vksb::component { class Transformable; }
+
+namespace vksb::component {
 
 ///////////////////////////////////////////////////////////////////////////
 /// \brief Window wrapper for GLFW
@@ -9,7 +13,7 @@ namespace engine::core::ecs::component {
 /// \include Controllable.hpp <Component/Controllable.hpp>
 ///
 ///////////////////////////////////////////////////////////////////////////
-class Controllable
+COMPONENT_IN_NAMESPACE(vksb::component, Controllable)
 {
 
 public:
@@ -41,7 +45,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto getSpeed() const
+    [[ nodiscard ]] auto getSpeed() const
         -> float;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -65,7 +69,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void updatePosition(
         float deltaTime,
-        ::engine::graphic::opengl::ecs::component::Transformable& transformable
+        ::vksb::component::Transformable& transformable
     );
 
 
@@ -168,37 +172,37 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto isMovingForward() const
+    [[ nodiscard ]] auto isMovingForward() const
         -> bool;
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto isMovingBackward() const
+    [[ nodiscard ]] auto isMovingBackward() const
         -> bool;
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto isMovingRight() const
+    [[ nodiscard ]] auto isMovingRight() const
         -> bool;
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto isMovingLeft() const
+    [[ nodiscard ]] auto isMovingLeft() const
         -> bool;
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto isMovingUp() const
+    [[ nodiscard ]] auto isMovingUp() const
         -> bool;
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    auto isMovingDown() const
+    [[ nodiscard ]] auto isMovingDown() const
         -> bool;
 
 
@@ -261,7 +265,7 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     void updateFly(
         float deltaTime,
-        ::engine::graphic::opengl::ecs::component::Transformable& transformable
+        ::vksb::component::Transformable& transformable
     );
 
     ///////////////////////////////////////////////////////////////////////////
@@ -269,14 +273,14 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     void updateRun(
         float deltaTime,
-        ::engine::graphic::opengl::ecs::component::Transformable& transformable
+        ::vksb::component::Transformable& transformable
     );
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
     void performRotation(
-        ::engine::graphic::opengl::ecs::component::Transformable& transformable
+        ::vksb::component::Transformable& transformable
     );
 
 
@@ -310,14 +314,8 @@ private:
     float m_moveSpeed{ 5.0f };
     ::glm::vec3 m_rotation{ 0.0f, 0.0f, 0.0f };
 
-    ::glm::vec3 m_position;
-    ::glm::vec3 m_scale{ 1.0F, 1.0F, 1.0F };
-    ::glm::vec2 m_rotation{ -90.00f, 0.0F }; // .x = yaw, .y = pitch
-    ::glm::vec3 m_direction;
-
-
 };
 
 
 
-} // namespace engine::core::ecs::component
+} // namespace vksb::component

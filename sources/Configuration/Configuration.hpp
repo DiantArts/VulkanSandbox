@@ -39,8 +39,14 @@ namespace vksb { using Configuration = ::vksb::detail::Configuration; }
 ///////////////////////////////////////////////////////////////////////////
 // Global
 ///////////////////////////////////////////////////////////////////////////
-namespace vksb::detail::configuration { extern ::vksb::detail::configuration::Configuration configuration; }
-namespace vksb::detail::configuration { extern ::vksb::detail::configuration::Configuration& config; }
-namespace vksb::detail { extern ::vksb::detail::configuration::Configuration& config; }
-namespace vksb { extern ::vksb::detail::configuration::Configuration& configuration; }
-namespace vksb { extern ::vksb::detail::configuration::Configuration& config; }
+namespace vksb::detail::configuration {
+    extern ::vksb::detail::configuration::Configuration configuration;
+    static inline constexpr auto& config{ ::vksb::detail::configuration::configuration };
+}
+namespace vksb::detail {
+    static inline constexpr auto& config{ ::vksb::detail::configuration::configuration };
+}
+namespace vksb {
+    static inline constexpr auto& configuration{ ::vksb::detail::configuration::configuration };
+    static inline constexpr auto& config{ ::vksb::detail::configuration::configuration };
+}

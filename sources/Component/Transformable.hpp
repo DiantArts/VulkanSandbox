@@ -1,16 +1,10 @@
 #pragma once
 
-#include <Engine/Core/Ecs/AComponent.hpp>
-#include <Engine/Core/Ecs/Component/Position.hpp>
+#include <xrn/Ecs/Component.hpp>
 
+namespace vksb::component {
 
-
-namespace engine::graphic::opengl::ecs::component {
-
-
-
-class Transformable
-    : public ::engine::core::ecs::AComponent<engine::graphic::opengl::ecs::component::Transformable>
+COMPONENT_IN_NAMESPACE(vksb::component, Transformable)
 {
 
 public:
@@ -306,6 +300,4 @@ private:
 
 };
 
-
-
-} // namespace engine::graphic::opengl::ecs::component
+} // namespace vksb::component

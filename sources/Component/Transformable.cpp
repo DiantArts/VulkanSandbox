@@ -1,18 +1,18 @@
 #include <pch.hpp>
-#include <Engine/Graphic/OpenGL/Ecs/Component/Transformable.hpp>
+#include <Component/Transformable.hpp>
 
 
 
 // ------------------------------------------------------------------ *structors
 
-::engine::graphic::opengl::ecs::component::Transformable::Transformable()
+::vksb::component::Transformable::Transformable()
     : m_position{ 0.0F }
 {
     this->adjustDirection();
     this->generateModel();
 }
 
-::engine::graphic::opengl::ecs::component::Transformable::Transformable(
+::vksb::component::Transformable::Transformable(
     const ::glm::vec3& position
 )
     : m_position{ position }
@@ -21,7 +21,7 @@
     this->generateModel();
 }
 
-::engine::graphic::opengl::ecs::component::Transformable::Transformable(
+::vksb::component::Transformable::Transformable(
     ::glm::vec3&& position
 )
     : m_position{ ::std::move(position) }
@@ -30,17 +30,17 @@
     this->generateModel();
 }
 
-::engine::graphic::opengl::ecs::component::Transformable::~Transformable() = default;
+::vksb::component::Transformable::~Transformable() = default;
 
 
 
 // ------------------------------------------------------------------ Move sementic
 
-::engine::graphic::opengl::ecs::component::Transformable::Transformable(
+::vksb::component::Transformable::Transformable(
     Transformable&&
 ) noexcept = default;
 
-auto ::engine::graphic::opengl::ecs::component::Transformable::operator=(
+auto ::vksb::component::Transformable::operator=(
     Transformable&&
 ) noexcept
     -> Transformable& = default;
@@ -49,7 +49,7 @@ auto ::engine::graphic::opengl::ecs::component::Transformable::operator=(
 
 // ------------------------------------------------------------------ Model
 
-void ::engine::graphic::opengl::ecs::component::Transformable::generateModel()
+void ::vksb::component::Transformable::generateModel()
 {
     m_model = ::glm::translate(::glm::mat4{ 1.0F }, m_position);
     m_model = ::glm::rotate(m_model, -::glm::radians(m_rotation.x), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
@@ -57,7 +57,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::generateModel()
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-[[ nodiscard ]] auto ::engine::graphic::opengl::ecs::component::Transformable::getModel() const
+[[ nodiscard ]] auto ::vksb::component::Transformable::getModel() const
     -> const ::glm::mat4&
 {
     return m_model;
@@ -66,7 +66,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::generateModel()
 
 // ------------------------------------------------------------------ Position
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveForward(
+void ::vksb::component::Transformable::moveForward(
     const float velocity
 )
 {
@@ -74,7 +74,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveForward(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveBackward(
+void ::vksb::component::Transformable::moveBackward(
     const float velocity
 )
 {
@@ -82,7 +82,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveBackward(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveRight(
+void ::vksb::component::Transformable::moveRight(
     const float velocity
 )
 {
@@ -90,7 +90,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveRight(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveLeft(
+void ::vksb::component::Transformable::moveLeft(
     const float velocity
 )
 {
@@ -98,7 +98,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveLeft(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveUp(
+void ::vksb::component::Transformable::moveUp(
     const float velocity
 )
 {
@@ -106,7 +106,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveUp(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveDown(
+void ::vksb::component::Transformable::moveDown(
     const float velocity
 )
 {
@@ -116,7 +116,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveDown(
 
 
 
-void ::engine::graphic::opengl::ecs::component::Transformable::move(
+void ::vksb::component::Transformable::move(
     const ::glm::vec3& offset
 )
 {
@@ -124,7 +124,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::move(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::move(
+void ::vksb::component::Transformable::move(
     const float offsetX,
     const float offsetY,
     const float offsetZ
@@ -134,7 +134,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::move(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveX(
+void ::vksb::component::Transformable::moveX(
     const float offset
 )
 {
@@ -142,7 +142,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveX(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveY(
+void ::vksb::component::Transformable::moveY(
     const float offset
 )
 {
@@ -150,7 +150,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveY(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::moveZ(
+void ::vksb::component::Transformable::moveZ(
     const float offset
 )
 {
@@ -160,7 +160,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::moveZ(
 
 
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPosition(
+void ::vksb::component::Transformable::setPosition(
     const ::glm::vec3& position
 )
 {
@@ -168,7 +168,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPosition(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPosition(
+void ::vksb::component::Transformable::setPosition(
     ::glm::vec3&& position
 )
 {
@@ -176,7 +176,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPosition(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPosition(
+void ::vksb::component::Transformable::setPosition(
     const float positionX,
     const float positionY,
     const float positionZ
@@ -186,7 +186,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPosition(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPositionX(
+void ::vksb::component::Transformable::setPositionX(
     const float position
 )
 {
@@ -194,7 +194,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPositionX(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPositionY(
+void ::vksb::component::Transformable::setPositionY(
     const float position
 )
 {
@@ -202,7 +202,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPositionY(
     this->generateModel();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPositionZ(
+void ::vksb::component::Transformable::setPositionZ(
     const float position
 )
 {
@@ -212,7 +212,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPositionZ(
 
 
 
-[[ nodiscard ]] auto ::engine::graphic::opengl::ecs::component::Transformable::getPosition() const
+[[ nodiscard ]] auto ::vksb::component::Transformable::getPosition() const
     -> const ::glm::vec3&
 {
     return m_position;
@@ -222,7 +222,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPositionZ(
 
 // ------------------------------------------------------------------ Scale
 
-void ::engine::graphic::opengl::ecs::component::Transformable::scale(
+void ::vksb::component::Transformable::scale(
     const float scale
 )
 {
@@ -230,7 +230,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::scale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::scale(
+void ::vksb::component::Transformable::scale(
     const ::glm::vec3& scale
 )
 {
@@ -238,7 +238,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::scale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::scale(
+void ::vksb::component::Transformable::scale(
     const float scaleX,
     const float scaleY,
     const float scaleZ
@@ -248,7 +248,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::scale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::scaleX(
+void ::vksb::component::Transformable::scaleX(
     const float scale
 )
 {
@@ -256,7 +256,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::scaleX(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::scaleY(
+void ::vksb::component::Transformable::scaleY(
     const float scale
 )
 {
@@ -264,7 +264,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::scaleY(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::scaleZ(
+void ::vksb::component::Transformable::scaleZ(
     const float scale
 )
 {
@@ -274,7 +274,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::scaleZ(
 
 
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
+void ::vksb::component::Transformable::setScale(
     const float scale
 )
 {
@@ -282,7 +282,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
+void ::vksb::component::Transformable::setScale(
     const ::glm::vec3& scale
 )
 {
@@ -290,7 +290,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
+void ::vksb::component::Transformable::setScale(
     ::glm::vec3&& scale
 )
 {
@@ -298,7 +298,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
+void ::vksb::component::Transformable::setScale(
     const float scaleX,
     const float scaleY,
     const float scaleZ
@@ -308,7 +308,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScale(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScaleX(
+void ::vksb::component::Transformable::setScaleX(
     const float scale
 )
 {
@@ -316,7 +316,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScaleX(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScaleY(
+void ::vksb::component::Transformable::setScaleY(
     const float scale
 )
 {
@@ -324,7 +324,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScaleY(
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setScaleZ(
+void ::vksb::component::Transformable::setScaleZ(
     const float scale
 )
 {
@@ -334,7 +334,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScaleZ(
 
 
 
-[[ nodiscard ]] auto ::engine::graphic::opengl::ecs::component::Transformable::getScale() const
+[[ nodiscard ]] auto ::vksb::component::Transformable::getScale() const
     -> const ::glm::vec3&
 {
     return m_scale;
@@ -344,7 +344,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setScaleZ(
 
 // ------------------------------------------------------------------ Rotation
 
-void ::engine::graphic::opengl::ecs::component::Transformable::rotate(
+void ::vksb::component::Transformable::rotate(
     const ::glm::vec2& offset
 )
 {
@@ -371,7 +371,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::rotate(
     this->adjustDirection();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::rotate(
+void ::vksb::component::Transformable::rotate(
     const float yawOffset,
     const float pitchOffset
 )
@@ -399,7 +399,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::rotate(
     this->adjustDirection();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::rotateYaw(
+void ::vksb::component::Transformable::rotateYaw(
     const float offset
 )
 {
@@ -412,7 +412,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::rotateYaw(
     this->adjustDirection();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::rotatePitch(
+void ::vksb::component::Transformable::rotatePitch(
     const float offset
 )
 {
@@ -436,7 +436,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::rotatePitch(
 
 
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setRotation(
+void ::vksb::component::Transformable::setRotation(
     const ::glm::vec2& rotation
 )
 {
@@ -451,7 +451,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setRotation(
     this->adjustDirection();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setRotation(
+void ::vksb::component::Transformable::setRotation(
     ::glm::vec2&& rotation
 )
 {
@@ -467,7 +467,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setRotation(
 }
 
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setRotation(
+void ::vksb::component::Transformable::setRotation(
     const float yaw,
     const float pitch
 )
@@ -484,7 +484,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setRotation(
     this->adjustDirection();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setYaw(
+void ::vksb::component::Transformable::setYaw(
     const float yaw
 )
 {
@@ -496,7 +496,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setYaw(
     this->adjustDirection();
 }
 
-void ::engine::graphic::opengl::ecs::component::Transformable::setPitch(
+void ::vksb::component::Transformable::setPitch(
     const float pitch
 )
 {
@@ -511,13 +511,13 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPitch(
 
 
 
-[[ nodiscard ]] auto ::engine::graphic::opengl::ecs::component::Transformable::getRotation() const
+[[ nodiscard ]] auto ::vksb::component::Transformable::getRotation() const
     -> const ::glm::vec2&
 {
     return m_rotation;
 }
 
-[[ nodiscard ]] auto ::engine::graphic::opengl::ecs::component::Transformable::getDirection() const
+[[ nodiscard ]] auto ::vksb::component::Transformable::getDirection() const
     -> const ::glm::vec3&
 {
     return m_direction;
@@ -527,7 +527,7 @@ void ::engine::graphic::opengl::ecs::component::Transformable::setPitch(
 
 // ------------------------------------------------------------------ View
 
-auto ::engine::graphic::opengl::ecs::component::Transformable::getView() const
+auto ::vksb::component::Transformable::getView() const
     -> ::glm::mat4
 {
     return ::glm::lookAt(m_position, m_position + m_direction, ::glm::vec3{ 0.0F, 1.0F, 0.0F });
@@ -537,7 +537,7 @@ auto ::engine::graphic::opengl::ecs::component::Transformable::getView() const
 
 // ------------------------------------------------------------------ Detail
 
-void ::engine::graphic::opengl::ecs::component::Transformable::adjustDirection()
+void ::vksb::component::Transformable::adjustDirection()
 {
     m_direction = ::glm::normalize(::glm::vec3(
         cos(::glm::radians(m_rotation.x)) * cos(::glm::radians(m_rotation.y)),
