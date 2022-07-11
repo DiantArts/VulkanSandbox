@@ -65,6 +65,15 @@ auto ::vksb::Renderer::getSwapChainRenderPass() const
 ///////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////
+auto ::vksb::Renderer::getAspectRatio() const
+    -> float
+{
+    return m_pSwapChain->extentAspectRatio();
+}
+
+///////////////////////////////////////////////////////////////////////////
+///
+///////////////////////////////////////////////////////////////////////////
 auto ::vksb::Renderer::isFrameInProgress() const
     -> bool
 {
@@ -138,12 +147,9 @@ void ::vksb::Renderer::endFrame()
     }
     if (
         auto result{ m_pSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex) };
-        result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR
+        result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.wasResized()
     ) {
-        m_window.setResizedFlag();
-        goto WINDOW_RESIZED;
-    } else if (m_window.wasResized()) {
-    WINDOW_RESIZED:
+        m_window.resetResizedFlag();
         recreateSwapChain();
     } else if (result != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to present swapChain image.\n" };
@@ -160,13 +166,6 @@ void ::vksb::Renderer::beginSwapChainRenderPass(
 {
     assert(this->isFrameInProgress() && "Cannot call beginSwapChainRenderPass() if frame is not in progress");
     assert(commandBuffer == getCurrentCommandBuffer() && "Cannot begin render pass on command buffer from a different frame");
-
-    ::VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (::vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to begin recording command buffer!\n" };
-    }
 
     ::VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

@@ -47,6 +47,7 @@
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 
 #define GLFW_INCLUDE_VULKAN
@@ -59,6 +60,10 @@ using ::std::chrono_literals::operator""ms;
 
 // #define PRINT_DEBUG
 // #include <Logger.hpp>
+#include <xrn/Ecs.hpp>
+#include <xrn/Meta.hpp>
+#include <xrn/Util.hpp>
+using ::xrn::util::literal::operator""_ms;
 
 
 

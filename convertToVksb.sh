@@ -18,6 +18,16 @@ moveFiles() {
 
     mv sources/lve_window.cpp sources/Window.cpp
     mv sources/lve_window.hpp sources/Window.hpp
+
+    mv sources/lve_renderer.cpp sources/Renderer.cpp
+    mv sources/lve_renderer.hpp sources/Renderer.hpp
+
+    mkdir -p sources/System
+    mv sources/simple_render_system.cpp sources/System/Render.cpp
+    mv sources/simple_render_system.hpp sources/System/Render.hpp
+
+    mv sources/lve_game_object.cpp sources/GameObject.cpp
+    mv sources/lve_game_object.hpp sources/GameObject.hpp
 }
 
 replaceInclude() {
@@ -27,6 +37,9 @@ replaceInclude() {
     sed -i "s/\"lve_pipeline.hpp\"/<Pipeline.hpp>/g" sources/**.cpp sources/**.hpp
     sed -i "s/\"lve_swap_chain.hpp\"/<SwapChain.hpp>/g" sources/**.cpp sources/**.hpp
     sed -i "s/\"lve_window.hpp\"/<Window.hpp>/g" sources/**.cpp sources/**.hpp
+    sed -i "s/\"lve_renderer.hpp\"/<Renderer.hpp>/g" sources/**.cpp sources/**.hpp
+    sed -i "s/\"simple_render_system.hpp\"/<System\/Render.hpp>/g" sources/**.cpp sources/**.hpp
+    sed -i "s/\"lwe_game_object.hpp\"/<GameObject.hpp>/g" sources/**.cpp sources/**.hpp
 }
 
 replaceNamespace() {
@@ -42,6 +55,9 @@ replaceClassName() {
     sed -i "s/LvePipeline/Pipeline/g" sources/**.cpp sources/**.hpp
     sed -i "s/LveSwapChain/SwapChain/g" sources/**.cpp sources/**.hpp
     sed -i "s/LveWindow/Window/g" sources/**.cpp sources/**.hpp
+    sed -i "s/LveRenderer/Renderer/g" sources/**.cpp sources/**.hpp
+    # sed -i "s/SimpleRenderSystem/system::Render/g" sources/**.cpp sources/**.hpp
+    sed -i "s/LveGameObject/GameObject/g" sources/**.cpp sources/**.hpp
 }
 
 replaceShaderPath() {
@@ -50,7 +66,7 @@ replaceShaderPath() {
 }
 
 changeFileContent() {
-    sed -i "s/Hello Vulkan!/GlfwMainWindow/g" sources/**.cpp sources/**.hpp
+    sed -i "s/Vulkan Tutorial/GlfwMainWindow/g" sources/**.cpp sources/**.hpp
     sed -i "1s/^/#include <pch.hpp>\n/g" sources/**.cpp
     sed -i "s/lveDevice/m_device/g" sources/**.cpp sources/**.hpp
     sed -i "s/lveWindow/m_window/g" sources/**.cpp sources/**.hpp

@@ -11,8 +11,7 @@
 
 
 struct SimplePushConstantData {
-    ::glm::mat2 transform{ 1.0f };
-    ::glm::vec2 offset;
+    ::glm::mat4 transform{ 1.0f };
     alignas(16) ::glm::vec3 color;
 };
 
@@ -95,19 +94,20 @@ void ::vksb::system::Render::createPipeline(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::Render::renderGameObject(
+void ::vksb::system::Render::renderGameObjects(
     ::VkCommandBuffer commandBuffer,
-    ::std::vector<::vksb::GameObject>& gameObjects
+    ::std::vector<::vksb::GameObject>& gameObjects,
+    const ::vksb::Camera& camera
 )
 {
     m_pPipeline->bind(commandBuffer);
-    for (auto& object : gameObjects) {
-        object.transform2d.rotation = ::glm::mod(object.transform2d.rotation + 0.01f, ::glm::two_pi<float>());
 
+    auto projectionView{ camera.getProjection() * camera.getView() };
+
+    for (auto& object : gameObjects) {
         ::SimplePushConstantData push{};
-        push.offset = object.transform2d.translation;
         push.color = object.color;
-        push.transform = object.transform2d.getMatrix();
+        push.transform = projectionView * object.transform.getMatrix();
 
         ::vkCmdPushConstants(
             commandBuffer,
