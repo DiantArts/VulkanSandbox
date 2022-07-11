@@ -77,6 +77,7 @@ void ::vksb::system::Render::createPipelineLayout()
 
     if (::vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to create pipeline layout.\n" };
+        // ::xrn::test("Failed to create pipeline layout.\n");
     }
 }
 

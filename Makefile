@@ -62,7 +62,7 @@ CXX_CPPFLAGS	:=
 LIBLOCATION		:=
 
 ## -l
-LIBBIN			:= vulkan glfw dl z
+LIBBIN			:= vulkan glfw dl z fmt
 
 
 # ============================================================================= Mode debug
