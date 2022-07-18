@@ -11,11 +11,7 @@ public:
     Transformable();
 
     Transformable(
-        const ::glm::vec3& position
-    );
-
-    Transformable(
-        ::glm::vec3&& position
+        ::glm::vec3 position
     );
 
     ~Transformable();
@@ -110,11 +106,7 @@ public:
 
 
     void setPosition(
-        const ::glm::vec3& position
-    );
-
-    void setPosition(
-        ::glm::vec3&& position
+        ::glm::vec3 position
     );
 
     void setPosition(
@@ -187,10 +179,6 @@ public:
     );
 
     void setScale(
-        ::glm::vec3&& scale
-    );
-
-    void setScale(
         float scaleX,
         float scaleY,
         float scaleZ
@@ -237,11 +225,7 @@ public:
 
 
     void setRotation(
-        const ::glm::vec2& rotation
-    );
-
-    void setRotation(
-        ::glm::vec2&& rotation
+        ::glm::vec2 rotation
     );
 
     void setRotation(
@@ -262,9 +246,6 @@ public:
     [[ nodiscard ]] auto getRotation() const
         -> const ::glm::vec2&;
 
-    [[ nodiscard ]] auto getDirection() const
-        -> const ::glm::vec3&;
-
 
 
     // ------------------------------------------------------------------ View
@@ -282,6 +263,9 @@ private:
 
 
 private:
+
+    bool m_isRotated{ false };
+    bool m_isModelChanged{ false };
 
     ::glm::mat4 m_model;
 

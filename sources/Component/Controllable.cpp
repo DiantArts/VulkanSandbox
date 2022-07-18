@@ -71,37 +71,37 @@ void ::vksb::component::Controllable::updatePosition(
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::startMovingForward()
 {
-    m_movementState[Controllable::MovementState::Forward] = true;
+    m_movementState[Controllable::MovementState::forward] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::startMovingBackward()
 {
-    m_movementState[Controllable::MovementState::Backward] = true;
+    m_movementState[Controllable::MovementState::backward] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::startMovingRight()
 {
-    m_movementState[Controllable::MovementState::Right] = true;
+    m_movementState[Controllable::MovementState::right] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::startMovingLeft()
 {
-    m_movementState[Controllable::MovementState::Left] = true;
+    m_movementState[Controllable::MovementState::left] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::startMovingUp()
 {
-    m_movementState[Controllable::MovementState::Up] = true;
+    m_movementState[Controllable::MovementState::up] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::startMovingDown()
 {
-    m_movementState[Controllable::MovementState::Down] = true;
+    m_movementState[Controllable::MovementState::down] = true;
 }
 
 
@@ -116,37 +116,37 @@ void ::vksb::component::Controllable::startMovingDown()
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::stopMovingForward()
 {
-    m_movementState[Controllable::MovementState::Forward] = false;
+    m_movementState[Controllable::MovementState::forward] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::stopMovingBackward()
 {
-    m_movementState[Controllable::MovementState::Backward] = false;
+    m_movementState[Controllable::MovementState::backward] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::stopMovingRight()
 {
-    m_movementState[Controllable::MovementState::Right] = false;
+    m_movementState[Controllable::MovementState::right] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::stopMovingLeft()
 {
-    m_movementState[Controllable::MovementState::Left] = false;
+    m_movementState[Controllable::MovementState::left] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::stopMovingUp()
 {
-    m_movementState[Controllable::MovementState::Up] = false;
+    m_movementState[Controllable::MovementState::up] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Controllable::stopMovingDown()
 {
-    m_movementState[Controllable::MovementState::Down] = false;
+    m_movementState[Controllable::MovementState::down] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -174,42 +174,42 @@ void ::vksb::component::Controllable::immobilize()
 auto ::vksb::component::Controllable::isMovingForward() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::Forward);
+    return m_movementState.test(Controllable::MovementState::forward);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::component::Controllable::isMovingBackward() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::Backward);
+    return m_movementState.test(Controllable::MovementState::backward);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::component::Controllable::isMovingRight() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::Right);
+    return m_movementState.test(Controllable::MovementState::right);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::component::Controllable::isMovingLeft() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::Left);
+    return m_movementState.test(Controllable::MovementState::left);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::component::Controllable::isMovingUp() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::Up);
+    return m_movementState.test(Controllable::MovementState::up);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::component::Controllable::isMovingDown() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::Down);
+    return m_movementState.test(Controllable::MovementState::down);
 }
 
 
@@ -308,6 +308,36 @@ void ::vksb::component::Controllable::updateFly(
     ::vksb::component::Transformable& transformable
 )
 {
+    // search the number of directions moving in and removing speed when multiple direction at once
+    auto speedDirectionDivider{ 2 };
+    if (this->isMovingForward() || this->isMovingBackward()) {
+        speedDirectionDivider /= 2;
+    }
+    if (this->isMovingLeft() || this->isMovingRight()) {
+
+        speedDirectionDivider /= 2;
+    }
+    if (this->isMovingUp() || this->isMovingDown()) {
+        speedDirectionDivider /= 2;
+    }
+    if (speedDirectionDivider == 2) {
+        return; // not any direction
+    }
+
+    auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
+    if (this->isMovingForward()) {
+        transformable.moveForward(velocity);
+    } else if (this->isMovingBackward()) {
+        transformable.moveBackward(velocity);
+    } else if (this->isMovingLeft()) {
+        transformable.moveLeft(velocity);
+    } else if (this->isMovingRight()) {
+        transformable.moveRight(velocity);
+    } else if (this->isMovingUp()) {
+        transformable.moveUp(velocity);
+    } else if (this->isMovingDown()) {
+        transformable.moveDown(velocity);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////

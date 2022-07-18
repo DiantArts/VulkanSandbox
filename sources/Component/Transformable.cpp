@@ -7,28 +7,13 @@
 
 ::vksb::component::Transformable::Transformable()
     : m_position{ 0.0F }
-{
-    this->adjustDirection();
-    this->generateModel();
-}
+{}
 
 ::vksb::component::Transformable::Transformable(
-    const ::glm::vec3& position
-)
-    : m_position{ position }
-{
-    this->adjustDirection();
-    this->generateModel();
-}
-
-::vksb::component::Transformable::Transformable(
-    ::glm::vec3&& position
+    ::glm::vec3 position
 )
     : m_position{ ::std::move(position) }
-{
-    this->adjustDirection();
-    this->generateModel();
-}
+{}
 
 ::vksb::component::Transformable::~Transformable() = default;
 
@@ -60,6 +45,12 @@ void ::vksb::component::Transformable::generateModel()
 [[ nodiscard ]] auto ::vksb::component::Transformable::getModel() const
     -> const ::glm::mat4&
 {
+    if (m_isRotated) {
+        this->generateModel();
+    }
+    if (m_isModelChanged) {
+        this->generateModel();
+    }
     return m_model;
 }
 
@@ -71,7 +62,7 @@ void ::vksb::component::Transformable::moveForward(
 )
 {
     m_position += velocity * m_direction;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveBackward(
@@ -79,7 +70,7 @@ void ::vksb::component::Transformable::moveBackward(
 )
 {
     m_position -= velocity * m_direction;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveRight(
@@ -87,7 +78,7 @@ void ::vksb::component::Transformable::moveRight(
 )
 {
     m_position += ::glm::normalize(::glm::cross(m_direction, ::glm::vec3{ 0.0F, 1.0F, 0.0F })) * velocity;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveLeft(
@@ -95,7 +86,7 @@ void ::vksb::component::Transformable::moveLeft(
 )
 {
     m_position -= ::glm::normalize(::glm::cross(m_direction, ::glm::vec3{ 0.0F, 1.0F, 0.0F })) * velocity;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveUp(
@@ -103,7 +94,7 @@ void ::vksb::component::Transformable::moveUp(
 )
 {
     m_position.y += velocity;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveDown(
@@ -111,7 +102,7 @@ void ::vksb::component::Transformable::moveDown(
 )
 {
     m_position.y -= velocity;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 
@@ -121,7 +112,7 @@ void ::vksb::component::Transformable::move(
 )
 {
     m_position += offset;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::move(
@@ -131,7 +122,7 @@ void ::vksb::component::Transformable::move(
 )
 {
     m_position += ::glm::vec3{ offsetX, offsetY, offsetZ };
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveX(
@@ -139,7 +130,7 @@ void ::vksb::component::Transformable::moveX(
 )
 {
     m_position.x += offset;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveY(
@@ -147,7 +138,7 @@ void ::vksb::component::Transformable::moveY(
 )
 {
     m_position.y += offset;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::moveZ(
@@ -155,25 +146,16 @@ void ::vksb::component::Transformable::moveZ(
 )
 {
     m_position.z += offset;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 
 
 void ::vksb::component::Transformable::setPosition(
-    const ::glm::vec3& position
-)
-{
-    m_position = position;
-    this->generateModel();
-}
-
-void ::vksb::component::Transformable::setPosition(
-    ::glm::vec3&& position
+    ::glm::vec3 position
 )
 {
     m_position = ::std::move(position);
-    this->generateModel();
 }
 
 void ::vksb::component::Transformable::setPosition(
@@ -183,7 +165,7 @@ void ::vksb::component::Transformable::setPosition(
 )
 {
     m_position = ::glm::vec3{ positionX, positionY, positionZ };
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setPositionX(
@@ -191,7 +173,7 @@ void ::vksb::component::Transformable::setPositionX(
 )
 {
     m_position.x += position;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setPositionY(
@@ -199,7 +181,7 @@ void ::vksb::component::Transformable::setPositionY(
 )
 {
     m_position.y += position;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setPositionZ(
@@ -207,7 +189,7 @@ void ::vksb::component::Transformable::setPositionZ(
 )
 {
     m_position.z += position;
-    this->generateModel();
+    m_isModelChanged = true;
 }
 
 
@@ -227,7 +209,7 @@ void ::vksb::component::Transformable::scale(
 )
 {
     m_scale += ::glm::vec3{ scale };
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::scale(
@@ -235,7 +217,7 @@ void ::vksb::component::Transformable::scale(
 )
 {
     m_scale += scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::scale(
@@ -245,7 +227,7 @@ void ::vksb::component::Transformable::scale(
 )
 {
     m_scale += ::glm::vec3{ scaleX, scaleY, scaleZ };
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::scaleX(
@@ -253,7 +235,7 @@ void ::vksb::component::Transformable::scaleX(
 )
 {
     m_scale.x += scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::scaleY(
@@ -261,7 +243,7 @@ void ::vksb::component::Transformable::scaleY(
 )
 {
     m_scale.y += scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::scaleZ(
@@ -269,7 +251,7 @@ void ::vksb::component::Transformable::scaleZ(
 )
 {
     m_scale.z += scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 
@@ -279,23 +261,15 @@ void ::vksb::component::Transformable::setScale(
 )
 {
     m_scale = ::glm::vec3{ scale };
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setScale(
     const ::glm::vec3& scale
 )
 {
-    m_scale = scale;
-    m_model = ::glm::scale(m_model, m_scale);
-}
-
-void ::vksb::component::Transformable::setScale(
-    ::glm::vec3&& scale
-)
-{
     m_scale = ::std::move(scale);
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setScale(
@@ -305,7 +279,7 @@ void ::vksb::component::Transformable::setScale(
 )
 {
     m_scale = ::glm::vec3{ scaleX, scaleY, scaleZ };
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setScaleX(
@@ -313,7 +287,7 @@ void ::vksb::component::Transformable::setScaleX(
 )
 {
     m_scale.x = scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setScaleY(
@@ -321,7 +295,7 @@ void ::vksb::component::Transformable::setScaleY(
 )
 {
     m_scale.y = scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setScaleZ(
@@ -329,7 +303,7 @@ void ::vksb::component::Transformable::setScaleZ(
 )
 {
     m_scale.z = scale;
-    m_model = ::glm::scale(m_model, m_scale);
+    m_isModelChanged = true;
 }
 
 
@@ -348,55 +322,16 @@ void ::vksb::component::Transformable::rotate(
     const ::glm::vec2& offset
 )
 {
-    m_rotation.x += offset.x;
-    m_rotation.y += offset.y;
-
-    if (m_rotation.x >= 360) {
-        m_rotation.x -= 360;
-    }
-    m_model = ::glm::rotate(m_model, -::glm::radians(offset.x), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
-    if (m_rotation.y > this->maxPitch) {
-        m_model = ::glm::rotate(
-            m_model, ::glm::radians(this->maxPitch - m_rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F }
-        );
-        m_rotation.y = this->maxPitch;
-    } else if (m_rotation.y < this->minPitch) {
-        m_model = ::glm::rotate(
-            m_model, ::glm::radians(this->minPitch - m_rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F }
-        );
-        m_rotation.y = this->minPitch;
-    } else {
-        m_model = ::glm::rotate(m_model, ::glm::radians(offset.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
-    }
-    this->adjustDirection();
-}
+    this->rotateYaw(offset.x);
+    this->rotatePitch(offset.y);
 
 void ::vksb::component::Transformable::rotate(
     const float yawOffset,
     const float pitchOffset
 )
 {
-    m_rotation.x += yawOffset;
-    m_rotation.y += pitchOffset;
-
-    if (m_rotation.x >= 360) {
-        m_rotation.x -= 360;
-    }
-    m_model = ::glm::rotate(m_model, -::glm::radians(yawOffset), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
-    if (m_rotation.y > this->maxPitch) {
-        m_model = ::glm::rotate(
-            m_model, ::glm::radians(this->maxPitch - m_rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F }
-        );
-        m_rotation.y = this->maxPitch;
-    } else if (m_rotation.y < this->minPitch) {
-        m_model = ::glm::rotate(
-            m_model, ::glm::radians(this->minPitch - m_rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F }
-        );
-        m_rotation.y = this->minPitch;
-    } else {
-        m_model = ::glm::rotate(m_model, ::glm::radians(pitchOffset), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
-    }
-    this->adjustDirection();
+    this->rotateYaw(yawOffset);
+    this->rotatePitch(pitchOffset);
 }
 
 void ::vksb::component::Transformable::rotateYaw(
@@ -408,8 +343,8 @@ void ::vksb::component::Transformable::rotateYaw(
     if (m_rotation.x >= 360) {
         m_rotation.x -= 360;
     }
-    m_model = ::glm::rotate(m_model, -::glm::radians(offset), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
-    this->adjustDirection();
+    m_isRotated = true;
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::rotatePitch(
@@ -419,51 +354,26 @@ void ::vksb::component::Transformable::rotatePitch(
     m_rotation.y += offset;
 
     if (m_rotation.y > this->maxPitch) {
-        m_model = ::glm::rotate(
-            m_model, ::glm::radians(this->maxPitch - m_rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F }
-        );
         m_rotation.y = this->maxPitch;
     } else if (m_rotation.y < this->minPitch) {
-        m_model = ::glm::rotate(
-            m_model, ::glm::radians(this->minPitch - m_rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F }
-        );
         m_rotation.y = this->minPitch;
-    } else {
-        m_model = ::glm::rotate(m_model, ::glm::radians(offset), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
     }
-    this->adjustDirection();
+    m_isRotated = true;
+    m_isModelChanged = true;
 }
 
 
 
 void ::vksb::component::Transformable::setRotation(
-    const ::glm::vec2& rotation
+    ::glm::vec2 rotation
 )
 {
     if (rotation.x >= 360 || rotation.y > this->maxPitch || rotation.y < this->minPitch) {
         throw::std::logic_error("invalid orientation");
     }
-    m_model =
-        ::glm::rotate(m_model, -::glm::radians(m_rotation.x - rotation.x), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
-    m_model =
-        ::glm::rotate(m_model, ::glm::radians(m_rotation.y - rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
-    m_rotation = rotation;
-    this->adjustDirection();
-}
-
-void ::vksb::component::Transformable::setRotation(
-    ::glm::vec2&& rotation
-)
-{
-    if (rotation.x >= 360 || rotation.y > this->maxPitch || rotation.y < this->minPitch) {
-        throw::std::logic_error("invalid orientation");
-    }
-    m_model =
-        ::glm::rotate(m_model, -::glm::radians(m_rotation.x - rotation.x), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
-    m_model =
-        ::glm::rotate(m_model, ::glm::radians(m_rotation.y - rotation.y), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
     m_rotation = ::std::move(rotation);
-    this->adjustDirection();
+    m_isRotated = true;
+    m_isModelChanged = true;
 }
 
 
@@ -477,11 +387,8 @@ void ::vksb::component::Transformable::setRotation(
     }
     m_rotation.x = yaw;
     m_rotation.y = pitch;
-    m_model =
-        ::glm::rotate(m_model, -::glm::radians(m_rotation.x - yaw), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
-    m_model =
-        ::glm::rotate(m_model, ::glm::radians(m_rotation.y - pitch), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
-    this->adjustDirection();
+    m_isRotated = true;
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setYaw(
@@ -491,9 +398,9 @@ void ::vksb::component::Transformable::setYaw(
     if (yaw >= 360) {
         throw::std::logic_error("invalid yaw");
     }
-    m_model = ::glm::rotate(m_model, -::glm::radians(m_rotation.x - yaw), ::glm::vec3{ 0.0F, 1.0F, 0.0F });
     m_rotation.x = yaw;
-    this->adjustDirection();
+    m_isRotated = true;
+    m_isModelChanged = true;
 }
 
 void ::vksb::component::Transformable::setPitch(
@@ -503,9 +410,9 @@ void ::vksb::component::Transformable::setPitch(
     if (pitch > this->maxPitch || pitch < this->minPitch) {
         throw::std::logic_error("invalid orientation");
     }
-    m_model = ::glm::rotate(m_model, ::glm::radians(m_rotation.y - pitch), ::glm::vec3{ 0.0F, 0.0F, 1.0F });
     m_rotation.y = pitch;
-    this->adjustDirection();
+    m_isRotated = true;
+    m_isModelChanged = true;
 }
 
 
@@ -515,12 +422,6 @@ void ::vksb::component::Transformable::setPitch(
     -> const ::glm::vec2&
 {
     return m_rotation;
-}
-
-[[ nodiscard ]] auto ::vksb::component::Transformable::getDirection() const
-    -> const ::glm::vec3&
-{
-    return m_direction;
 }
 
 

@@ -12,5 +12,6 @@
 auto main()
     -> int
 {
+    return 0;
     return ::vksb::App{}.run();
 }
