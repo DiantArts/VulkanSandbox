@@ -62,5 +62,5 @@ void ::vksb::event::WindowResize::resolve(
     ::vksb::App& app
 )
 {
-    app.getWindow().resize(::std::move(m_size));
+    // app.getWindow().resize(::std::move(m_size));
 }

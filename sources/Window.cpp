@@ -61,9 +61,9 @@ auto ::vksb::Window::Size::isValid()
 
     // setup callbacks
     glfwSetFramebufferSizeCallback(m_pWindow.get(), Window::framebufferResizeCallback);
-    glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
-    glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
-    glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
+    // glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
+    // glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
+    // glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
 }
 
 

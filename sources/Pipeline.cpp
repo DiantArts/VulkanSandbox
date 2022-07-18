@@ -10,7 +10,6 @@
 #include <Window.hpp>
 #include <Device.hpp>
 #include <Model.hpp>
-#include <Configuration.hpp>
 
 
 
@@ -107,17 +106,17 @@
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::Pipeline::Pipeline(
     ::vksb::Device& device,
-    const Pipeline::Configuration& pipelineConfig,
+    const Pipeline::Configuration& configuration,
     const ::std::string_view shaderFilenames
 )
     : m_device{ device }
 {
     assert(
-        pipelineConfig.pipelineLayout != VK_NULL_HANDLE &&
+        configuration.pipelineLayout != VK_NULL_HANDLE &&
         "Cannot create graphics pipeline: no pipelineLayout provided in the configuration"
     );
     assert(
-        pipelineConfig.renderPass != VK_NULL_HANDLE &&
+        configuration.renderPass != VK_NULL_HANDLE &&
         "Cannot create graphics pipeline: no renderPass provided in the configuration");
 
 
@@ -125,26 +124,24 @@
 
     // Vertex file
     filepath.reserve(
-        ::vksb::configuration.filepaths.shadersDirectory.size() +
-        ::vksb::configuration.filepaths.vertexDirectory.size() +
-        shaderFilenames.size() + ::vksb::configuration.filepaths.vertexExtension.size()
+        Pipeline::shadersDirectory.size() + Pipeline::vertexDirectory.size() +
+        shaderFilenames.size() + Pipeline::vertexExtension.size()
     );
-    filepath = ::vksb::configuration.filepaths.shadersDirectory;
-    filepath += ::vksb::configuration.filepaths.vertexDirectory;
+    filepath = Pipeline::shadersDirectory;
+    filepath += Pipeline::vertexDirectory;
     filepath += shaderFilenames;
-    filepath += ::vksb::configuration.filepaths.vertexExtension;
+    filepath += Pipeline::vertexExtension;
     this->createShaderModule(filepath, m_vertexShaderModule);
 
     // Fragment file
     filepath.reserve(
-        ::vksb::configuration.filepaths.shadersDirectory.size() +
-        ::vksb::configuration.filepaths.fragmentDirectory.size() +
-        shaderFilenames.size() + ::vksb::configuration.filepaths.fragmentExtension.size()
+        Pipeline::shadersDirectory.size() + Pipeline::fragmentDirectory.size() +
+        shaderFilenames.size() + Pipeline::fragmentExtension.size()
     );
-    filepath = ::vksb::configuration.filepaths.shadersDirectory;
-    filepath += ::vksb::configuration.filepaths.fragmentDirectory;
+    filepath = Pipeline::shadersDirectory;
+    filepath += Pipeline::fragmentDirectory;
     filepath += shaderFilenames;
-    filepath += ::vksb::configuration.filepaths.fragmentExtension;
+    filepath += Pipeline::fragmentExtension;
     this->createShaderModule(filepath, m_fragmentShaderModule);
 
     ::VkPipelineShaderStageCreateInfo shaderStages[2];
@@ -177,17 +174,17 @@
     pipelineInfo.stageCount = 2;
     pipelineInfo.pStages = shaderStages;
     pipelineInfo.pVertexInputState = &vertexInputInfo;
-    pipelineInfo.pInputAssemblyState = &pipelineConfig.inputAssemblyInfo;
-    pipelineInfo.pViewportState = &pipelineConfig.viewportInfo;
-    pipelineInfo.pRasterizationState = &pipelineConfig.rasterizationInfo;
-    pipelineInfo.pMultisampleState = &pipelineConfig.multisampleInfo;
-    pipelineInfo.pColorBlendState = &pipelineConfig.colorBlendInfo;
-    pipelineInfo.pDepthStencilState = &pipelineConfig.depthStencilInfo;
-    pipelineInfo.pDynamicState = &pipelineConfig.dynamicStateInfo;
+    pipelineInfo.pInputAssemblyState = &configuration.inputAssemblyInfo;
+    pipelineInfo.pViewportState = &configuration.viewportInfo;
+    pipelineInfo.pRasterizationState = &configuration.rasterizationInfo;
+    pipelineInfo.pMultisampleState = &configuration.multisampleInfo;
+    pipelineInfo.pColorBlendState = &configuration.colorBlendInfo;
+    pipelineInfo.pDepthStencilState = &configuration.depthStencilInfo;
+    pipelineInfo.pDynamicState = &configuration.dynamicStateInfo;
 
-    pipelineInfo.layout = pipelineConfig.pipelineLayout;
-    pipelineInfo.renderPass = pipelineConfig.renderPass;
-    pipelineInfo.subpass = pipelineConfig.subpass;
+    pipelineInfo.layout = configuration.pipelineLayout;
+    pipelineInfo.renderPass = configuration.renderPass;
+    pipelineInfo.subpass = configuration.subpass;
 
     pipelineInfo.basePipelineIndex = -1;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;

@@ -3,10 +3,10 @@
 ///////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////
-template <
-    typename ComponentType
-> [[ nodiscard ]] auto ::vksb::App::getPlayerComponent()
-    -> ComponentType&
-{
-    return m_registry.get<ComponentType>(m_player);
-}
+// template <
+    // typename ComponentType
+// > [[ nodiscard ]] auto ::vksb::App::getPlayerComponent()
+    // -> ComponentType&
+// {
+    // return m_registry.get<ComponentType>(m_player);
+// }

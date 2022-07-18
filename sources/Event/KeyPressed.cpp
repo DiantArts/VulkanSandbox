@@ -63,28 +63,28 @@ void ::vksb::event::KeyPressed::resolve(
     ::vksb::App& app
 )
 {
-    auto& player{ app.getPlayerComponent<::vksb::component::Controllable>() };
+    // auto& player{ app.getPlayerComponent<::vksb::component::Controllable>() };
 
     // move
-    if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveUp) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveDown) {
+    // if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveUp) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveDown) {
 
     // move arrows
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveForward2) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward2) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft2) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight2) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveForward2) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward2) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft2) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight2) {
 
     // look
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookUp) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookDown) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookLeft) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookRight) {
-    } else {
-        ::std::cout << "this key is not bound" << ::std::endl;
-    }
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.lookUp) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.lookDown) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.lookLeft) {
+    // } else if (m_keyCode == ::vksb::configuration.keyBindings.lookRight) {
+    // } else {
+        // ::std::cout << "this key is not bound" << ::std::endl;
+    // }
 }

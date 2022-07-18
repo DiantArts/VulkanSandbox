@@ -138,6 +138,7 @@ private:
     ::std::unique_ptr<::vksb::Pipeline> m_pPipeline;
     ::VkPipelineLayout m_pipelineLayout;
 
+
 };
 
 } // namespace vksb::system

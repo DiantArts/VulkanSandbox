@@ -21,7 +21,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::App::App()
-    : m_player{ m_registry.create() }
+    // : m_player{ m_registry.create() }
 {
     this->loadGameOjects();
 }
