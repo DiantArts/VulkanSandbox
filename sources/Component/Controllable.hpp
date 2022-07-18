@@ -1,7 +1,5 @@
 #pragma once
 
-#include <xrn/Ecs/Component.hpp>
-
 namespace vksb::component { class Transformable; }
 
 namespace vksb::component {
@@ -13,8 +11,7 @@ namespace vksb::component {
 /// \include Controllable.hpp <Component/Controllable.hpp>
 ///
 ///////////////////////////////////////////////////////////////////////////
-COMPONENT_IN_NAMESPACE(vksb::component, Controllable)
-{
+class Controllable {
 
 public:
 

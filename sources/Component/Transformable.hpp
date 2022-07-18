@@ -1,11 +1,8 @@
 #pragma once
 
-#include <xrn/Ecs/Component.hpp>
-
 namespace vksb::component {
 
-COMPONENT_IN_NAMESPACE(vksb::component, Transformable)
-{
+class Transformable {
 
 public:
 
