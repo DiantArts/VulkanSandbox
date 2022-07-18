@@ -153,8 +153,8 @@ private:
     ::vksb::Renderer m_renderer{ m_window, m_device };
 
     // ECS
-    // ::entt::registry m_registry;
-    // ::entt::entity m_player;
+    ::entt::registry m_registry;
+    ::entt::entity m_player;
 
     // Others
     ::std::vector<::vksb::GameObject> m_gameObjects;
