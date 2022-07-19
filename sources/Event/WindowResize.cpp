@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <Event/WindowResize.hpp>
 #include <Configuration.hpp>
-#include <App.hpp>
+#include <AScene.hpp>
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,8 +59,8 @@ auto ::vksb::event::WindowResize::operator=(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::event::WindowResize::resolve(
-    ::vksb::App& app
+    ::vksb::AScene& scene
 )
 {
-    // app.getWindow().resize(::std::move(m_size));
+    scene.getWindow().resize(::std::move(m_size));
 }

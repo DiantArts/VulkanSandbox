@@ -9,7 +9,7 @@
 #include <Event/KeyPressed.hpp>
 #include <Component/Controllable.hpp>
 #include <Configuration.hpp>
-#include <App.hpp>
+#include <AScene.hpp>
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,10 +60,10 @@ auto ::vksb::event::KeyPressed::operator=(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::event::KeyPressed::resolve(
-    ::vksb::App& app
+    ::vksb::AScene& scene
 )
 {
-    auto& player{ app.getPlayerComponent<::vksb::component::Controllable>() };
+    auto& player{ scene.getPlayerComponent<::vksb::component::Controllable>() };
 
     // move
     if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {

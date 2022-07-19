@@ -1,6 +1,6 @@
 #pragma once
 
-namespace vksb { class App; }
+namespace vksb { class AScene; }
 
 namespace vksb::event {
 
@@ -92,7 +92,7 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     virtual void resolve(
-        ::vksb::App& app
+        ::vksb::AScene& app
     ) = 0;
 
 

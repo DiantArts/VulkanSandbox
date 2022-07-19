@@ -13,5 +13,6 @@ auto main()
     -> int
 {
     return 0;
-    return ::vksb::App{}.run();
+    ::vksb::App{}.run();
+    return EXIT_SUCCESS;
 }

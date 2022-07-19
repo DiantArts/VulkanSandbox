@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////
 template <
     typename ComponentType
-> [[ nodiscard ]] auto ::vksb::App::getPlayerComponent()
+> [[ nodiscard ]] auto ::vksb::AScene::getPlayerComponent()
     -> ComponentType&
 {
     assert(

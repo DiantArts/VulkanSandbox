@@ -3,8 +3,6 @@
 #include <Event/AEvent.hpp>
 #include <Window.hpp>
 
-namespace vksb { class App; }
-
 namespace vksb::event {
 
 ///////////////////////////////////////////////////////////////////////////
@@ -99,7 +97,7 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     virtual void resolve(
-        ::vksb::App& app
+        ::vksb::AScene& app
     ) override;
 
 

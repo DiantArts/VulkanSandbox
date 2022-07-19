@@ -48,7 +48,7 @@ public:
 
     void generateModel();
 
-    [[ nodiscard ]] auto getModel() const
+    [[ nodiscard ]] auto getModel()
         -> const ::glm::mat4&;
 
 

@@ -42,7 +42,7 @@ void ::vksb::component::Transformable::generateModel()
     m_model = ::glm::scale(m_model, m_scale);
 }
 
-[[ nodiscard ]] auto ::vksb::component::Transformable::getModel() const
+[[ nodiscard ]] auto ::vksb::component::Transformable::getModel()
     -> const ::glm::mat4&
 {
     if (m_isRotated) {
@@ -324,6 +324,7 @@ void ::vksb::component::Transformable::rotate(
 {
     this->rotateYaw(offset.x);
     this->rotatePitch(offset.y);
+}
 
 void ::vksb::component::Transformable::rotate(
     const float yawOffset,

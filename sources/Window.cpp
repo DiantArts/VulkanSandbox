@@ -112,6 +112,12 @@ void ::vksb::Window::clear() const
 }
 
 ///////////////////////////////////////////////////////////////////////////
+void ::vksb::Window::close()
+{
+    ::glfwSetWindowShouldClose(m_pWindow.get(), GLFW_TRUE);
+}
+
+///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::display() const
 {
     // ::glfwSwapBuffers(m_pWindow.get());
@@ -119,7 +125,7 @@ void ::vksb::Window::display() const
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::Window::handleEvents(
-    ::vksb::App& app
+    ::vksb::AScene& app
 )
 {
     ::glfwPollEvents();

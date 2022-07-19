@@ -97,9 +97,9 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void renderGameObjects(
         ::VkCommandBuffer commandBuffer,
-        ::std::vector<::vksb::GameObject>& gameObjects,
+        const ::std::vector<::vksb::GameObject>& gameObjects,
         const ::vksb::Camera& camera
-    );
+    ) const;
 
 
 
