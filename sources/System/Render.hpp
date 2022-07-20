@@ -95,10 +95,10 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    void renderGameObjects(
+    void operator()(
         ::VkCommandBuffer commandBuffer,
-        const ::std::vector<::vksb::GameObject>& gameObjects,
-        const ::vksb::Camera& camera
+        const ::vksb::GameObject& object,
+        const ::glm::mat4& projectionView
     ) const;
 
 

@@ -7,7 +7,6 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <App.hpp>
-#include <System/Render.hpp>
 #include <xrn/Util.hpp>
 
 
@@ -54,14 +53,6 @@ auto ::vksb::App::update()
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::App::draw(
-    ::VkCommandBuffer commandBuffer
-) const
-{
-    m_renderSystem.renderGameObjects(commandBuffer, m_gameObjects, m_camera);
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,11 +63,11 @@ void ::vksb::App::draw(
 
 static auto createCubeModel(
     ::vksb::Device& device,
-    glm::vec3 offset
+    ::glm::vec3 offset
 )
-    -> std::unique_ptr<::vksb::Model>
+    -> ::std::unique_ptr<::vksb::Model>
 {
-    std::vector<::vksb::Model::Vertex> vertices{
+    ::std::vector<::vksb::Model::Vertex> vertices{
 
         // left face (white)
         {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
@@ -130,7 +121,7 @@ static auto createCubeModel(
     for (auto& v : vertices) {
         v.position += offset;
     }
-    return std::make_unique<::vksb::Model>(device, vertices);
+    return ::std::make_unique<::vksb::Model>(device, vertices);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -139,5 +130,5 @@ void ::vksb::App::loadGameOjects()
     ::vksb::GameObject cube{ createCubeModel(m_device, { 0.0f, 0.0f, 0.0f }) };
     cube.transform.translation = { 0.0f, 0.0f, 2.5f };
     cube.transform.scale = { 0.5f, 0.5f, 0.5f };
-    m_gameObjects.push_back(::std::move(cube));
+    // m_registry.emplace<::vksb::GameObject>(m_registry.create(), cube);
 }

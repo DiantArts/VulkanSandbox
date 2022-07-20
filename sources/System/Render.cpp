@@ -93,30 +93,25 @@ void ::vksb::system::Render::createPipeline(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::Render::renderGameObjects(
+void ::vksb::system::Render::operator()(
     ::VkCommandBuffer commandBuffer,
-    const ::std::vector<::vksb::GameObject>& gameObjects,
-    const ::vksb::Camera& camera
+    const ::vksb::GameObject& object,
+    const ::glm::mat4& projectionView
 ) const
 {
     m_pPipeline->bind(commandBuffer);
+    ::SimplePushConstantData push{};
+    push.color = object.color;
+    push.transform = projectionView * object.transform.getMatrix();
 
-    auto projectionView{ camera.getProjection() * camera.getView() };
-
-    for (auto& object : gameObjects) {
-        ::SimplePushConstantData push{};
-        push.color = object.color;
-        push.transform = projectionView * object.transform.getMatrix();
-
-        ::vkCmdPushConstants(
-            commandBuffer,
-            m_pipelineLayout,
-            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-            0,
-            sizeof(::SimplePushConstantData),
-            &push
-        );
-        object.model->bind(commandBuffer);
-        object.model->draw(commandBuffer);
-    }
+    ::vkCmdPushConstants(
+        commandBuffer,
+        m_pipelineLayout,
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+        0,
+        sizeof(::SimplePushConstantData),
+        &push
+    );
+    object.model->bind(commandBuffer);
+    object.model->draw(commandBuffer);
 }

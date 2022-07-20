@@ -3,6 +3,7 @@
 #include <Window.hpp>
 #include <Device.hpp>
 #include <Renderer.hpp>
+#include <System/Render.hpp>
 #include <GameObject.hpp>
 #include <Camera.hpp>
 #include <entt.hpp>
@@ -97,13 +98,6 @@ public:
     [[ nodiscard ]] virtual auto update()
         -> bool = 0;
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// if return false, scene exits
-    ///////////////////////////////////////////////////////////////////////////
-    virtual void draw(
-        ::VkCommandBuffer commandBuffer
-    ) const = 0;
-
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +135,13 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void run();
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void draw(
+        ::VkCommandBuffer commandBuffer
+    ) const;
+
 
 
 protected:
@@ -156,6 +157,7 @@ protected:
     ::vksb::Window m_window{ false };
     ::vksb::Device m_device{ m_window };
     ::vksb::Renderer m_renderer{ m_window, m_device };
+    ::vksb::system::Render m_renderSystem{ m_device, m_renderer.getSwapChainRenderPass() };
 
     // ECS
     ::entt::registry m_registry;
@@ -163,7 +165,6 @@ protected:
 
     // Others
     ::vksb::Camera m_camera;
-    ::std::vector<::vksb::GameObject> m_gameObjects;
 
 
 };

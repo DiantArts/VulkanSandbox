@@ -90,3 +90,14 @@ void ::vksb::AScene::run()
 
     ::vkDeviceWaitIdle(m_device.device());
 }
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::AScene::draw(
+    ::VkCommandBuffer commandBuffer
+) const
+{
+    auto projectionView{ m_camera.getProjection() * m_camera.getView() };
+    for (const auto& [ entity, object ] : m_registry.view<const ::vksb::GameObject>().each()) {
+        m_renderSystem(commandBuffer, object, projectionView);
+    }
+}

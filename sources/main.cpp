@@ -12,7 +12,6 @@
 auto main()
     -> int
 {
-    return 0;
     ::vksb::App{}.run();
     return EXIT_SUCCESS;
 }
