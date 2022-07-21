@@ -26,60 +26,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// Model
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Transform3d::updateMatrix()
-{
-    const float c3{ glm::cos(m_rotation.z) };
-    const float s3{ glm::sin(m_rotation.z) };
-    const float c2{ glm::cos(m_rotation.x) };
-    const float s2{ glm::sin(m_rotation.x) };
-    const float c1{ glm::cos(m_rotation.y) };
-    const float s1{ glm::sin(m_rotation.y) };
-    m_matrix = glm::mat4{
-        {
-            m_scale.x * (c1 * c3 + s1 * s2 * s3),
-            m_scale.x * (c2 * s3),
-            m_scale.x * (c1 * s2 * s3 - c3 * s1),
-            0.0f,
-        },
-        {
-            m_scale.y * (c3 * s1 * s2 - c1 * s3),
-            m_scale.y * (c2 * c3),
-            m_scale.y * (c1 * c3 * s2 + s1 * s3),
-            0.0f,
-        },
-        {
-            m_scale.z * (c2 * s1),
-            m_scale.z * (-s2),
-            m_scale.z * (c1 * c2),
-            0.0f,
-        },
-        { m_position.x, m_position.y, m_position.z, 1.0f }
-    };
-}
-
-///////////////////////////////////////////////////////////////////////////
-[[ nodiscard ]] auto ::vksb::component::Transform3d::getMatrix()
-    -> const ::glm::mat4&
-{
-    if (m_isRotated) {
-        this->updateMatrix();
-    }
-    if (m_isModelChanged) {
-        this->updateMatrix();
-    }
-    return m_matrix;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
 // Position
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,8 +36,8 @@ void ::vksb::component::Transform3d::moveForward(
     const float velocity
 )
 {
-    m_position += velocity * m_direction;
-    m_isModelChanged = true;
+    m_position += velocity * this->getDirection();
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -99,8 +45,8 @@ void ::vksb::component::Transform3d::moveBackward(
     const float velocity
 )
 {
-    m_position -= velocity * m_direction;
-    m_isModelChanged = true;
+    m_position -= velocity * this->getDirection();
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -108,8 +54,8 @@ void ::vksb::component::Transform3d::moveRight(
     const float velocity
 )
 {
-    m_position += ::glm::normalize(::glm::cross(m_direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
-    m_isModelChanged = true;
+    m_position += ::glm::normalize(::glm::cross(this->getDirection(), ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -117,8 +63,8 @@ void ::vksb::component::Transform3d::moveLeft(
     const float velocity
 )
 {
-    m_position -= ::glm::normalize(::glm::cross(m_direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
-    m_isModelChanged = true;
+    m_position -= ::glm::normalize(::glm::cross(this->getDirection(), ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -127,7 +73,7 @@ void ::vksb::component::Transform3d::moveUp(
 )
 {
     m_position.y += velocity;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -136,7 +82,7 @@ void ::vksb::component::Transform3d::moveDown(
 )
 {
     m_position.y -= velocity;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -145,7 +91,7 @@ void ::vksb::component::Transform3d::move(
 )
 {
     m_position += offset;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -156,7 +102,7 @@ void ::vksb::component::Transform3d::move(
 )
 {
     m_position += ::glm::vec3{ offsetX, offsetY, offsetZ };
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -165,7 +111,7 @@ void ::vksb::component::Transform3d::moveX(
 )
 {
     m_position.x += offset;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -174,7 +120,7 @@ void ::vksb::component::Transform3d::moveY(
 )
 {
     m_position.y += offset;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -183,7 +129,7 @@ void ::vksb::component::Transform3d::moveZ(
 )
 {
     m_position.z += offset;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 
@@ -204,7 +150,7 @@ void ::vksb::component::Transform3d::setPosition(
 )
 {
     m_position = ::glm::vec3{ positionX, positionY, positionZ };
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -213,7 +159,7 @@ void ::vksb::component::Transform3d::setPositionX(
 )
 {
     m_position.x += position;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -222,7 +168,7 @@ void ::vksb::component::Transform3d::setPositionY(
 )
 {
     m_position.y += position;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -231,7 +177,7 @@ void ::vksb::component::Transform3d::setPositionZ(
 )
 {
     m_position.z += position;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 
@@ -258,7 +204,7 @@ void ::vksb::component::Transform3d::scale(
 )
 {
     m_scale += ::glm::vec3{ scale };
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -267,7 +213,7 @@ void ::vksb::component::Transform3d::scale(
 )
 {
     m_scale += scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -278,7 +224,7 @@ void ::vksb::component::Transform3d::scale(
 )
 {
     m_scale += ::glm::vec3{ scaleX, scaleY, scaleZ };
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -287,7 +233,7 @@ void ::vksb::component::Transform3d::scaleX(
 )
 {
     m_scale.x += scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -296,7 +242,7 @@ void ::vksb::component::Transform3d::scaleY(
 )
 {
     m_scale.y += scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -305,7 +251,7 @@ void ::vksb::component::Transform3d::scaleZ(
 )
 {
     m_scale.z += scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -314,7 +260,7 @@ void ::vksb::component::Transform3d::setScale(
 )
 {
     m_scale = ::glm::vec3{ scale };
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -323,7 +269,7 @@ void ::vksb::component::Transform3d::setScale(
 )
 {
     m_scale = ::std::move(scale);
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -334,7 +280,7 @@ void ::vksb::component::Transform3d::setScale(
 )
 {
     m_scale = ::glm::vec3{ scaleX, scaleY, scaleZ };
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -343,7 +289,7 @@ void ::vksb::component::Transform3d::setScaleX(
 )
 {
     m_scale.x = scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -352,7 +298,7 @@ void ::vksb::component::Transform3d::setScaleY(
 )
 {
     m_scale.y = scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -361,7 +307,7 @@ void ::vksb::component::Transform3d::setScaleZ(
 )
 {
     m_scale.z = scale;
-    m_isModelChanged = true;
+    m_isMatrixChanged = true;
 }
 
 
@@ -413,8 +359,8 @@ void ::vksb::component::Transform3d::rotateX(
     while (m_rotation.x >= 360) {
         m_rotation.x -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -426,8 +372,8 @@ void ::vksb::component::Transform3d::rotateY(
     while (m_rotation.y >= 360) {
         m_rotation.y -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -439,8 +385,8 @@ void ::vksb::component::Transform3d::rotateZ(
     while (m_rotation.z >= 360) {
         m_rotation.z -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -458,8 +404,8 @@ void ::vksb::component::Transform3d::setRotation(
     while (m_rotation.z >= 360) {
         m_rotation.z -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 
@@ -482,8 +428,8 @@ void ::vksb::component::Transform3d::setRotation(
     while (m_rotation.z >= 360) {
         m_rotation.z -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -495,8 +441,8 @@ void ::vksb::component::Transform3d::setRotationX(
     while (m_rotation.x >= 360) {
         m_rotation.x -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -508,8 +454,8 @@ void ::vksb::component::Transform3d::setRotationY(
     while (m_rotation.y >= 360) {
         m_rotation.y -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -521,8 +467,8 @@ void ::vksb::component::Transform3d::setRotationZ(
     while (m_rotation.z >= 360) {
         m_rotation.z -= 360;
     }
-    m_isRotated = true;
-    m_isModelChanged = true;
+    m_isDirectionChanged = true;
+    m_isMatrixChanged = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -542,27 +488,90 @@ void ::vksb::component::Transform3d::setRotationZ(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Transform3d::getView() const
-    -> ::glm::mat4
+void ::vksb::component::Transform3d::updateMatrix()
 {
-    return ::glm::lookAt(m_position, m_position + m_direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f });
+    const float c3{ glm::cos(m_rotation.z) };
+    const float s3{ glm::sin(m_rotation.z) };
+    const float c2{ glm::cos(m_rotation.x) };
+    const float s2{ glm::sin(m_rotation.x) };
+    const float c1{ glm::cos(m_rotation.y) };
+    const float s1{ glm::sin(m_rotation.y) };
+    m_matrix = glm::mat4{
+        {
+            m_scale.x * (c1 * c3 + s1 * s2 * s3),
+            m_scale.x * (c2 * s3),
+            m_scale.x * (c1 * s2 * s3 - c3 * s1),
+            0.0f,
+        },
+        {
+            m_scale.y * (c3 * s1 * s2 - c1 * s3),
+            m_scale.y * (c2 * c3),
+            m_scale.y * (c1 * c3 * s2 + s1 * s3),
+            0.0f,
+        },
+        {
+            m_scale.z * (c2 * s1),
+            m_scale.z * (-s2),
+            m_scale.z * (c1 * c2),
+            0.0f,
+        },
+        { m_position.x, m_position.y, m_position.z, 1.0f }
+    };
+    m_isMatrixChanged = false;
+}
+
+///////////////////////////////////////////////////////////////////////////
+[[ nodiscard ]] auto ::vksb::component::Transform3d::getMatrix()
+    -> const ::glm::mat4&
+{
+    if (m_isMatrixChanged) {
+        this->updateMatrix();
+    }
+    return m_matrix;
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// Helpers
+// Direction
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Transform3d::adjustDirection()
+void ::vksb::component::Transform3d::updateDirection()
 {
     m_direction = ::glm::normalize(::glm::vec3(
         cos(::glm::radians(m_rotation.x)) * cos(::glm::radians(m_rotation.y)),
         sin(::glm::radians(m_rotation.y)),
         sin(::glm::radians(m_rotation.x)) * cos(::glm::radians(m_rotation.y))
     ));
+    m_isDirectionChanged = false;
+}
+
+///////////////////////////////////////////////////////////////////////////
+auto ::vksb::component::Transform3d::getDirection()
+    -> const ::glm::vec3&
+{
+    if (m_isDirectionChanged) {
+        this->updateDirection();
+    }
+    return m_direction;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// View
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+auto ::vksb::component::Transform3d::getView()
+    -> ::glm::mat4
+{
+    return ::glm::lookAt(m_position, m_position + this->getDirection(), ::glm::vec3{ 0.0f, 1.0f, 0.0f });
 }
