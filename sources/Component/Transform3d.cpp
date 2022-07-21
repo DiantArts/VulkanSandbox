@@ -416,9 +416,7 @@ void ::vksb::component::Transform3d::setRotation(
     const float rotationZ
 )
 {
-    m_rotation.x = rotationX;
-    m_rotation.y = rotationY;
-    m_rotation.z = rotationZ;
+    m_rotation = ::glm::vec3{ rotationX, rotationY, rotationZ };
     while (m_rotation.x >= 360) {
         m_rotation.x -= 360;
     }

@@ -52,11 +52,84 @@ void ::vksb::component::Control::updatePosition(
     ::vksb::component::Transform3d& transform
 )
 {
+    // search the number of directions moving in and removing speed when multiple direction at once
+    auto speedDirectionDivider{ 2 };
+
+    // bot top
     if (m_ableToFly) {
-        this->updateFly(deltaTime, transform);
-    } else {
-        this->updateRun(deltaTime, transform);
+        if (this->isMovingUp()) {
+            if (!this->isMovingDown()) {
+                speedDirectionDivider /= 2;
+            }
+            speedDirectionDivider /= 2;
+        } else if (this->isMovingDown()) {
+            speedDirectionDivider /= 2;
+        }
     }
+
+    // left right
+    if (this->isMovingLeft()) {
+        if (!this->isMovingRight()) {
+            speedDirectionDivider /= 2;
+        }
+    } else if (this->isMovingRight()) {
+        speedDirectionDivider /= 2;
+    }
+
+    // forward backward
+    if (this->isMovingForward()) {
+        if (!this->isMovingBackward()) {
+            speedDirectionDivider /= 2;
+        }
+    } else if (this->isMovingBackward()) {
+        speedDirectionDivider /= 2;
+    } else if (speedDirectionDivider == 2) {
+        return; // not any direction
+    }
+
+
+
+    // apply movement
+    auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
+
+    // bot top
+    if (m_ableToFly) {
+        if (this->isMovingUp()) {
+            if (!this->isMovingDown()) {
+                transform.moveUp(velocity);
+            }
+            speedDirectionDivider /= 2;
+        } else if (this->isMovingDown()) {
+            transform.moveDown(velocity);
+        }
+    }
+
+    // left right
+    if (this->isMovingLeft()) {
+        if (!this->isMovingRight()) {
+            transform.moveLeft(velocity);
+        }
+    } else if (this->isMovingRight()) {
+        transform.moveRight(velocity);
+    }
+
+    // forward backward
+    if (this->isMovingForward()) {
+        if (!this->isMovingBackward()) {
+            transform.moveForward(velocity);
+        }
+    } else if (this->isMovingBackward()) {
+        transform.moveBackward(velocity);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::component::Control::updateRotation(
+    ::vksb::component::Transform3d& transform
+)
+{
+    transform.rotate(::std::move(m_rotation));
+    m_rotation = ::glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
 
 
@@ -222,164 +295,52 @@ auto ::vksb::component::Control::isMovingDown() const
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Control::performRotation(
-    ::vksb::component::Transform3d& transform
+void ::vksb::component::Control::rotate(
+    const ::glm::vec3& offset
 )
 {
-    while (::vksb::configuration.rotateSpeed.x >= 360) {
-        ::vksb::configuration.rotateSpeed.x -= 360;
-    }
-    transform.rotate(::std::move(::vksb::configuration.rotateSpeed));
-    ::vksb::configuration.rotateSpeed = ::glm::vec3{ 0.0f, 0.0f, 0.0f };
+    m_rotation += offset;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Control::rotate(
-    const ::glm::vec2& offset
+    const float rotationXOffset,
+    const float rotationYOffset,
+    const float rotationZOffset
 )
 {
-    ::vksb::configuration.rotateSpeed.x += offset.x * ::vksb::configuration.mouseSensitivity.x;
-    ::vksb::configuration.rotateSpeed.y += offset.y * ::vksb::configuration.mouseSensitivity.y;
-
-    if (::vksb::configuration.rotateSpeed.y > ::vksb::configuration.maxPitch) {
-        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.maxPitch;
-    } else if (::vksb::configuration.rotateSpeed.y < ::vksb::configuration.minPitch) {
-        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.minPitch;
-    }
+    m_rotation.x += rotationXOffset * ::vksb::configuration.sensitivity.x;
+    m_rotation.y += rotationYOffset * ::vksb::configuration.sensitivity.y;
+    m_rotation.z += rotationZOffset * ::vksb::configuration.sensitivity.z;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Control::rotate(
-    const float yawOffset,
-    const float pitchOffset
-)
-{
-    ::vksb::configuration.rotateSpeed.x += yawOffset * ::vksb::configuration.mouseSensitivity.x;
-    ::vksb::configuration.rotateSpeed.y += pitchOffset * ::vksb::configuration.mouseSensitivity.y;
-
-    if (::vksb::configuration.rotateSpeed.y > ::vksb::configuration.maxPitch) {
-        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.maxPitch;
-    } else if (::vksb::configuration.rotateSpeed.y < ::vksb::configuration.minPitch) {
-        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.minPitch;
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Control::rotateYaw(
+void ::vksb::component::Control::rotateX(
     const float offset
 )
 {
-    ::vksb::configuration.rotateSpeed.x += offset * ::vksb::configuration.mouseSensitivity.x;
+    m_rotation.x += offset * ::vksb::configuration.sensitivity.x;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Control::rotatePitch(
+void ::vksb::component::Control::rotateY(
     const float offset
 )
 {
-    ::vksb::configuration.rotateSpeed.y += offset * ::vksb::configuration.mouseSensitivity.y;
+    m_rotation.y += offset * ::vksb::configuration.sensitivity.y;
+}
 
-    if (::vksb::configuration.rotateSpeed.y > ::vksb::configuration.maxPitch) {
-        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.maxPitch;
-    } else if (::vksb::configuration.rotateSpeed.y < ::vksb::configuration.minPitch) {
-        ::vksb::configuration.rotateSpeed.y = ::vksb::configuration.minPitch;
-    }
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::component::Control::rotateZ(
+    const float offset
+)
+{
+    m_rotation.y += offset * ::vksb::configuration.sensitivity.z;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 [[ nodiscard ]] auto ::vksb::component::Control::getRotation() const
     -> const ::glm::vec3&
 {
-    return ::vksb::configuration.rotateSpeed;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Helpers
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Control::updateFly(
-    float deltaTime,
-    ::vksb::component::Transform3d& transform
-)
-{
-    // search the number of directions moving in and removing speed when multiple direction at once
-    auto speedDirectionDivider{ 2 };
-
-    if (this->isMovingUp()) {
-        if (!this->isMovingDown()) {
-            speedDirectionDivider /= 2;
-        }
-        speedDirectionDivider /= 2;
-    } else if (this->isMovingDown()) {
-        speedDirectionDivider /= 2;
-    }
-
-    if (this->isMovingLeft()) {
-        if (!this->isMovingRight()) {
-            speedDirectionDivider /= 2;
-        }
-    } else if (this->isMovingRight()) {
-        speedDirectionDivider /= 2;
-    }
-
-    if (this->isMovingForward()) {
-        if (!this->isMovingBackward()) {
-            speedDirectionDivider /= 2;
-        }
-    } else if (this->isMovingBackward()) {
-        speedDirectionDivider /= 2;
-    } else if (speedDirectionDivider == 2) {
-        return; // not any direction
-    }
-
-    // apply movement
-    auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
-    if (this->isMovingForward()) {
-        transform.moveForward(velocity);
-    } else if (this->isMovingBackward()) {
-        transform.moveBackward(velocity);
-    } else if (this->isMovingLeft()) {
-        transform.moveLeft(velocity);
-    } else if (this->isMovingRight()) {
-        transform.moveRight(velocity);
-    } else if (this->isMovingUp()) {
-        transform.moveUp(velocity);
-    } else if (this->isMovingDown()) {
-        transform.moveDown(velocity);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Control::updateRun(
-    float deltaTime,
-    ::vksb::component::Transform3d& transform
-)
-{
-    // search the number of directions moving in and removing speed when multiple direction at once
-    auto speedDirectionDivider{ 2 };
-    if (this->isMovingForward() || this->isMovingBackward()) {
-        speedDirectionDivider /= 2;
-    }
-    if (this->isMovingLeft() || this->isMovingRight()) {
-        speedDirectionDivider /= 2;
-    } else if (speedDirectionDivider == 2) {
-        return; // not any direction
-    }
-
-    auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
-    if (this->isMovingForward()) {
-        transform.moveForward(velocity);
-    } else if (this->isMovingBackward()) {
-        transform.moveBackward(velocity);
-    } else if (this->isMovingLeft()) {
-        transform.moveLeft(velocity);
-    } else if (this->isMovingRight()) {
-        transform.moveRight(velocity);
-    }
+    return m_rotation;
 }
