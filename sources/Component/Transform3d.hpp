@@ -418,15 +418,12 @@ private:
     bool m_isDirectionChanged{ false };
     bool m_isMatrixChanged{ false };
 
-    ::glm::mat4 m_matrix;
-
     ::glm::vec3 m_position;
-
     ::glm::vec3 m_scale{ 1.0f, 1.0f, 1.0f };
-
     ::glm::vec3 m_rotation{ 0.0f, 0.0f, 0.0f };
+
+    ::glm::mat4 m_matrix;
     ::glm::vec3 m_direction;
-    static inline constexpr ::glm::vec3 m_up{ 0.0f, 1.0f, 0.0f };
 
 };
 
