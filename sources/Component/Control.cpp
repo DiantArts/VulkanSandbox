@@ -1,13 +1,13 @@
 #include <pch.hpp>
-#include <Component/Controllable.hpp>
-#include <Component/Transformable.hpp>
+#include <Component/Control.hpp>
+#include <Component/Transform3d.hpp>
 #include <Configuration.hpp>
 
 
 // ------------------------------------------------------------------ *structors
 
 ///////////////////////////////////////////////////////////////////////////
-::vksb::component::Controllable::Controllable(
+::vksb::component::Control::Control(
     bool ableToFly
 )
     : m_ableToFly{ ableToFly }
@@ -23,14 +23,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::getSpeed() const
+auto ::vksb::component::Control::getSpeed() const
     -> float
 {
     return m_moveSpeed;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::setSpeed(
+void ::vksb::component::Control::setSpeed(
     float speed
 )
 {
@@ -47,15 +47,15 @@ void ::vksb::component::Controllable::setSpeed(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::updatePosition(
+void ::vksb::component::Control::updatePosition(
     float deltaTime,
-    ::vksb::component::Transformable& transformable
+    ::vksb::component::Transform3d& transform
 )
 {
     if (m_ableToFly) {
-        this->updateFly(deltaTime, transformable);
+        this->updateFly(deltaTime, transform);
     } else {
-        this->updateRun(deltaTime, transformable);
+        this->updateRun(deltaTime, transform);
     }
 }
 
@@ -69,39 +69,39 @@ void ::vksb::component::Controllable::updatePosition(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::startMovingForward()
+void ::vksb::component::Control::startMovingForward()
 {
-    m_movementState[Controllable::MovementState::forward] = true;
+    m_movementState[Control::MovementState::forward] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::startMovingBackward()
+void ::vksb::component::Control::startMovingBackward()
 {
-    m_movementState[Controllable::MovementState::backward] = true;
+    m_movementState[Control::MovementState::backward] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::startMovingRight()
+void ::vksb::component::Control::startMovingRight()
 {
-    m_movementState[Controllable::MovementState::right] = true;
+    m_movementState[Control::MovementState::right] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::startMovingLeft()
+void ::vksb::component::Control::startMovingLeft()
 {
-    m_movementState[Controllable::MovementState::left] = true;
+    m_movementState[Control::MovementState::left] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::startMovingUp()
+void ::vksb::component::Control::startMovingUp()
 {
-    m_movementState[Controllable::MovementState::up] = true;
+    m_movementState[Control::MovementState::up] = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::startMovingDown()
+void ::vksb::component::Control::startMovingDown()
 {
-    m_movementState[Controllable::MovementState::down] = true;
+    m_movementState[Control::MovementState::down] = true;
 }
 
 
@@ -114,49 +114,49 @@ void ::vksb::component::Controllable::startMovingDown()
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMovingForward()
+void ::vksb::component::Control::stopMovingForward()
 {
-    m_movementState[Controllable::MovementState::forward] = false;
+    m_movementState[Control::MovementState::forward] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMovingBackward()
+void ::vksb::component::Control::stopMovingBackward()
 {
-    m_movementState[Controllable::MovementState::backward] = false;
+    m_movementState[Control::MovementState::backward] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMovingRight()
+void ::vksb::component::Control::stopMovingRight()
 {
-    m_movementState[Controllable::MovementState::right] = false;
+    m_movementState[Control::MovementState::right] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMovingLeft()
+void ::vksb::component::Control::stopMovingLeft()
 {
-    m_movementState[Controllable::MovementState::left] = false;
+    m_movementState[Control::MovementState::left] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMovingUp()
+void ::vksb::component::Control::stopMovingUp()
 {
-    m_movementState[Controllable::MovementState::up] = false;
+    m_movementState[Control::MovementState::up] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMovingDown()
+void ::vksb::component::Control::stopMovingDown()
 {
-    m_movementState[Controllable::MovementState::down] = false;
+    m_movementState[Control::MovementState::down] = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::stopMoving()
+void ::vksb::component::Control::stopMoving()
 {
     m_movementState.reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::immobilize()
+void ::vksb::component::Control::immobilize()
 {
     m_movementState.reset();
 }
@@ -171,45 +171,45 @@ void ::vksb::component::Controllable::immobilize()
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::isMovingForward() const
+auto ::vksb::component::Control::isMovingForward() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::forward);
+    return m_movementState.test(Control::MovementState::forward);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::isMovingBackward() const
+auto ::vksb::component::Control::isMovingBackward() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::backward);
+    return m_movementState.test(Control::MovementState::backward);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::isMovingRight() const
+auto ::vksb::component::Control::isMovingRight() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::right);
+    return m_movementState.test(Control::MovementState::right);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::isMovingLeft() const
+auto ::vksb::component::Control::isMovingLeft() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::left);
+    return m_movementState.test(Control::MovementState::left);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::isMovingUp() const
+auto ::vksb::component::Control::isMovingUp() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::up);
+    return m_movementState.test(Control::MovementState::up);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::component::Controllable::isMovingDown() const
+auto ::vksb::component::Control::isMovingDown() const
     -> bool
 {
-    return m_movementState.test(Controllable::MovementState::down);
+    return m_movementState.test(Control::MovementState::down);
 }
 
 
@@ -222,19 +222,19 @@ auto ::vksb::component::Controllable::isMovingDown() const
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::performRotation(
-    ::vksb::component::Transformable& transformable
+void ::vksb::component::Control::performRotation(
+    ::vksb::component::Transform3d& transform
 )
 {
     while (::vksb::configuration.rotateSpeed.x >= 360) {
         ::vksb::configuration.rotateSpeed.x -= 360;
     }
-    transformable.rotate(::std::move(::vksb::configuration.rotateSpeed));
-    ::vksb::configuration.rotateSpeed = ::glm::vec3{ 0.0F, 0.0F, 0.0F };
+    transform.rotate(::std::move(::vksb::configuration.rotateSpeed));
+    ::vksb::configuration.rotateSpeed = ::glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::rotate(
+void ::vksb::component::Control::rotate(
     const ::glm::vec2& offset
 )
 {
@@ -249,7 +249,7 @@ void ::vksb::component::Controllable::rotate(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::rotate(
+void ::vksb::component::Control::rotate(
     const float yawOffset,
     const float pitchOffset
 )
@@ -265,7 +265,7 @@ void ::vksb::component::Controllable::rotate(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::rotateYaw(
+void ::vksb::component::Control::rotateYaw(
     const float offset
 )
 {
@@ -273,7 +273,7 @@ void ::vksb::component::Controllable::rotateYaw(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::rotatePitch(
+void ::vksb::component::Control::rotatePitch(
     const float offset
 )
 {
@@ -287,7 +287,7 @@ void ::vksb::component::Controllable::rotatePitch(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-[[ nodiscard ]] auto ::vksb::component::Controllable::getRotation() const
+[[ nodiscard ]] auto ::vksb::component::Control::getRotation() const
     -> const ::glm::vec3&
 {
     return ::vksb::configuration.rotateSpeed;
@@ -303,9 +303,62 @@ void ::vksb::component::Controllable::rotatePitch(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::updateFly(
+void ::vksb::component::Control::updateFly(
     float deltaTime,
-    ::vksb::component::Transformable& transformable
+    ::vksb::component::Transform3d& transform
+)
+{
+    // search the number of directions moving in and removing speed when multiple direction at once
+    auto speedDirectionDivider{ 2 };
+
+    if (this->isMovingUp()) {
+        if (!this->isMovingDown()) {
+            speedDirectionDivider /= 2;
+        }
+        speedDirectionDivider /= 2;
+    } else if (this->isMovingDown()) {
+        speedDirectionDivider /= 2;
+    }
+
+    if (this->isMovingLeft()) {
+        if (!this->isMovingRight()) {
+            speedDirectionDivider /= 2;
+        }
+    } else if (this->isMovingRight()) {
+        speedDirectionDivider /= 2;
+    }
+
+    if (this->isMovingForward()) {
+        if (!this->isMovingBackward()) {
+            speedDirectionDivider /= 2;
+        }
+    } else if (this->isMovingBackward()) {
+        speedDirectionDivider /= 2;
+    } else if (speedDirectionDivider == 2) {
+        return; // not any direction
+    }
+
+    // apply movement
+    auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
+    if (this->isMovingForward()) {
+        transform.moveForward(velocity);
+    } else if (this->isMovingBackward()) {
+        transform.moveBackward(velocity);
+    } else if (this->isMovingLeft()) {
+        transform.moveLeft(velocity);
+    } else if (this->isMovingRight()) {
+        transform.moveRight(velocity);
+    } else if (this->isMovingUp()) {
+        transform.moveUp(velocity);
+    } else if (this->isMovingDown()) {
+        transform.moveDown(velocity);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::component::Control::updateRun(
+    float deltaTime,
+    ::vksb::component::Transform3d& transform
 )
 {
     // search the number of directions moving in and removing speed when multiple direction at once
@@ -314,36 +367,19 @@ void ::vksb::component::Controllable::updateFly(
         speedDirectionDivider /= 2;
     }
     if (this->isMovingLeft() || this->isMovingRight()) {
-
         speedDirectionDivider /= 2;
-    }
-    if (this->isMovingUp() || this->isMovingDown()) {
-        speedDirectionDivider /= 2;
-    }
-    if (speedDirectionDivider == 2) {
+    } else if (speedDirectionDivider == 2) {
         return; // not any direction
     }
 
     auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
     if (this->isMovingForward()) {
-        transformable.moveForward(velocity);
+        transform.moveForward(velocity);
     } else if (this->isMovingBackward()) {
-        transformable.moveBackward(velocity);
+        transform.moveBackward(velocity);
     } else if (this->isMovingLeft()) {
-        transformable.moveLeft(velocity);
+        transform.moveLeft(velocity);
     } else if (this->isMovingRight()) {
-        transformable.moveRight(velocity);
-    } else if (this->isMovingUp()) {
-        transformable.moveUp(velocity);
-    } else if (this->isMovingDown()) {
-        transformable.moveDown(velocity);
+        transform.moveRight(velocity);
     }
-}
-
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Controllable::updateRun(
-    float deltaTime,
-    ::vksb::component::Transformable& transformable
-)
-{
 }

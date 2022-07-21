@@ -7,7 +7,7 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <Event/KeyPressed.hpp>
-#include <Component/Controllable.hpp>
+#include <Component/Control.hpp>
 #include <Configuration.hpp>
 #include <AScene.hpp>
 
@@ -63,7 +63,7 @@ void ::vksb::event::KeyPressed::resolve(
     ::vksb::AScene& scene
 )
 {
-    auto& player{ scene.getPlayerComponent<::vksb::component::Controllable>() };
+    auto& player{ scene.getPlayerComponent<::vksb::component::Control>() };
 
     // move
     if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {

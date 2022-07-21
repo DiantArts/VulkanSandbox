@@ -1,6 +1,6 @@
 #pragma once
 
-namespace vksb::component { class Transformable; }
+namespace vksb::component { class Transform3d; }
 
 namespace vksb::component {
 
@@ -8,10 +8,10 @@ namespace vksb::component {
 /// \brief Window wrapper for GLFW
 /// \ingroup vulkan
 ///
-/// \include Controllable.hpp <Component/Controllable.hpp>
+/// \include Control.hpp <Component/Control.hpp>
 ///
 ///////////////////////////////////////////////////////////////////////////
-class Controllable {
+class Control {
 
 public:
 
@@ -26,7 +26,7 @@ public:
     /// \brief Default constructor
     ///
     ///////////////////////////////////////////////////////////////////////////
-    explicit Controllable(
+    explicit Control(
         bool ableToFly = false
     );
 
@@ -66,7 +66,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void updatePosition(
         float deltaTime,
-        ::vksb::component::Transformable& transformable
+        ::vksb::component::Transform3d& transform
     );
 
 
@@ -262,7 +262,7 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     void updateFly(
         float deltaTime,
-        ::vksb::component::Transformable& transformable
+        ::vksb::component::Transform3d& transform
     );
 
     ///////////////////////////////////////////////////////////////////////////
@@ -270,14 +270,14 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     void updateRun(
         float deltaTime,
-        ::vksb::component::Transformable& transformable
+        ::vksb::component::Transform3d& transform
     );
 
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
     void performRotation(
-        ::vksb::component::Transformable& transformable
+        ::vksb::component::Transform3d& transform
     );
 
 

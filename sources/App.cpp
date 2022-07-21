@@ -22,7 +22,7 @@
 ::vksb::App::App()
     : ::vksb::AScene::AScene{}
 {
-    this->loadGameOjects();
+    this->createGameOjects();
 }
 
 
@@ -125,7 +125,7 @@ static auto createCubeModel(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::App::loadGameOjects()
+void ::vksb::App::createGameOjects()
 {
     ::vksb::GameObject cube{ createCubeModel(m_device, { 0.0f, 0.0f, 0.0f }) };
     cube.transform.translation = { 0.0f, 0.0f, 2.5f };
