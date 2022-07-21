@@ -130,5 +130,5 @@ void ::vksb::App::loadGameOjects()
     ::vksb::GameObject cube{ createCubeModel(m_device, { 0.0f, 0.0f, 0.0f }) };
     cube.transform.translation = { 0.0f, 0.0f, 2.5f };
     cube.transform.scale = { 0.5f, 0.5f, 0.5f };
-    // m_registry.emplace<::vksb::GameObject>(m_registry.create(), cube);
+    m_registry.emplace<::vksb::GameObject>(m_registry.create(), ::std::move(cube));
 }
