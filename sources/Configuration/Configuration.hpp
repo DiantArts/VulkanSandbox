@@ -14,10 +14,10 @@ namespace vksb::detail::configuration {
 ///////////////////////////////////////////////////////////////////////////
 struct Configuration
 {
-    ::vksb::detail::configuration::Filepaths filepaths{};
+    ::vksb::detail::configuration::Filepaths filepath{};
 
     // Keys
-    ::vksb::detail::configuration::KeyBindings keyBindings{};
+    ::vksb::detail::configuration::KeyBindings keyBinding{};
     float moveSpeed{ 3.0f };
     ::glm::vec3 sensitivity{ 0.1f, 0.1f, 1.0f }; // used for mouse especially
 

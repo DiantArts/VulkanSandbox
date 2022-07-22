@@ -43,34 +43,34 @@ void ::vksb::event::KeyPressed::resolve(
     auto& playerController{ scene.getPlayerComponent<::vksb::component::Control>() };
 
     // move
-    if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {
+    if (m_keyCode == ::vksb::configuration.keyBinding.moveForward) {
         playerController.startMovingForward();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward) {
         playerController.startMovingBackward();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveLeft) {
         playerController.startMovingLeft();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveRight) {
         playerController.startMovingRight();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveUp) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveUp) {
         playerController.startMovingUp();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveDown) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveDown) {
         playerController.startMovingDown();
 
     // move arrows
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveForward2) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveForward2) {
         playerController.startMovingForward();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward2) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward2) {
         playerController.startMovingBackward();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft2) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveLeft2) {
         playerController.startMovingLeft();
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight2) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveRight2) {
         playerController.startMovingRight();
 
     // look
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookUp) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookDown) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookLeft) {
-    } else if (m_keyCode == ::vksb::configuration.keyBindings.lookRight) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookUp) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookDown) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookLeft) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookRight) {
     } else {
         ::std::cout << "this key is not bound" << ::std::endl;
     }

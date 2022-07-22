@@ -10,6 +10,7 @@
 #include <Window.hpp>
 #include <Device.hpp>
 #include <Model.hpp>
+#include <Configuration.hpp>
 
 
 
@@ -124,24 +125,26 @@
 
     // Vertex file
     filepath.reserve(
-        Pipeline::shadersDirectory.size() + Pipeline::vertexDirectory.size() +
-        shaderFilenames.size() + Pipeline::vertexExtension.size()
+        ::vksb::configuration.filepath.shadersDirectory.size() +
+        ::vksb::configuration.filepath.vertexDirectory.size() +
+        shaderFilenames.size() + ::vksb::configuration.filepath.vertexExtension.size()
     );
-    filepath = Pipeline::shadersDirectory;
-    filepath += Pipeline::vertexDirectory;
+    filepath = ::vksb::configuration.filepath.shadersDirectory;
+    filepath += ::vksb::configuration.filepath.vertexDirectory;
     filepath += shaderFilenames;
-    filepath += Pipeline::vertexExtension;
+    filepath += ::vksb::configuration.filepath.vertexExtension;
     this->createShaderModule(filepath, m_vertexShaderModule);
 
     // Fragment file
     filepath.reserve(
-        Pipeline::shadersDirectory.size() + Pipeline::fragmentDirectory.size() +
-        shaderFilenames.size() + Pipeline::fragmentExtension.size()
+        ::vksb::configuration.filepath.shadersDirectory.size() +
+        ::vksb::configuration.filepath.fragmentDirectory.size() +
+        shaderFilenames.size() + ::vksb::configuration.filepath.fragmentExtension.size()
     );
-    filepath = Pipeline::shadersDirectory;
-    filepath += Pipeline::fragmentDirectory;
+    filepath = ::vksb::configuration.filepath.shadersDirectory;
+    filepath += ::vksb::configuration.filepath.fragmentDirectory;
     filepath += shaderFilenames;
-    filepath += Pipeline::fragmentExtension;
+    filepath += ::vksb::configuration.filepath.fragmentExtension;
     this->createShaderModule(filepath, m_fragmentShaderModule);
 
     ::VkPipelineShaderStageCreateInfo shaderStages[2];

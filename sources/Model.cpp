@@ -4,19 +4,27 @@
 #include <pch.hpp>
 
 ///////////////////////////////////////////////////////////////////////////
+// extern
+///////////////////////////////////////////////////////////////////////////
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+
+///////////////////////////////////////////////////////////////////////////
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <Model.hpp>
+#include <Configuration.hpp>
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// Helper
+// Static
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////
 auto ::vksb::Model::Vertex::getBindingDescriptions()
     -> ::std::vector<::VkVertexInputBindingDescription>
 {
@@ -27,6 +35,7 @@ auto ::vksb::Model::Vertex::getBindingDescriptions()
     } };
 }
 
+///////////////////////////////////////////////////////////////////////////
 auto ::vksb::Model::Vertex::getAttributeDescriptions()
     -> ::std::vector<::VkVertexInputAttributeDescription>
 {
@@ -41,6 +50,87 @@ auto ::vksb::Model::Vertex::getAttributeDescriptions()
         .format = VK_FORMAT_R32G32B32_SFLOAT,
         .offset = offsetof(::vksb::Model::Vertex, color)
     } };
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::Model::Builder::loadFromFile(
+    ::std::string_view filename
+)
+{
+    ::tinyobj::attrib_t attrib;
+    ::std::vector<::tinyobj::shape_t> shapes;
+    ::std::vector<::tinyobj::material_t> materials;
+    ::std::string warning, error;
+
+    ::std::string filepath;
+    filepath.reserve(
+        ::vksb::configuration.filepath.modelDirectory.size() + filename.size() +
+        ::vksb::configuration.filepath.modelExtension.size()
+    );
+    filepath = ::vksb::configuration.filepath.modelDirectory;
+    filepath += filename;
+    filepath += ::vksb::configuration.filepath.modelExtension;
+
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, filepath.c_str())) {
+        throw ::std::runtime_error(warning + error);
+    }
+
+    vertices.clear();
+    indices.clear();
+
+    for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            ::vksb::Model::Vertex vertex{};
+
+            if (index.vertex_index >= 0) {
+                vertex.position = {
+                    attrib.vertices[3 * index.vertex_index + 0],
+                    attrib.vertices[3 * index.vertex_index + 1],
+                    attrib.vertices[3 * index.vertex_index + 2]
+                };
+            }
+
+            auto colorIndex{ 3 * index.vertex_index + 2 };
+            if (static_cast<::std::size_t>(colorIndex) < attrib.colors.size()) {
+                vertex.color = {
+                    attrib.colors[index.vertex_index - 2],
+                    attrib.colors[index.vertex_index - 1],
+                    attrib.colors[index.vertex_index - 0]
+                };
+            } else {
+                vertex.color = { 1.0f, 1.0f, 1.0f }; // default color
+            }
+
+            if (index.normal_index >= 0) {
+                vertex.normal = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+            }
+
+            if (index.texcoord_index >= 0) {
+                vertex.uv = {
+                    attrib.texcoords[2 * index.texcoord_index + 0],
+                    attrib.texcoords[2 * index.texcoord_index + 1]
+                };
+            }
+
+            vertices.push_back(::std::move(vertex));
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+auto ::vksb::Model::createFromFile(
+    ::vksb::Device& device,
+    ::std::string_view filename
+) -> ::std::unique_ptr<::vksb::Model>
+{
+    Model::Builder modelBuilder;
+    modelBuilder.loadFromFile(filename);
+    ::std::cout << "Vertex count: " << modelBuilder.vertices.size() << ::std::endl;
+    return ::std::make_unique<::vksb::Model>(device, modelBuilder);
 }
 
 
