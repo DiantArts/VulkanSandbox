@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <Window.hpp>
 #include <Event/KeyPressed.hpp>
+#include <Event/KeyReleased.hpp>
 #include <Event/WindowResize.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,8 +231,8 @@ void ::vksb::Window::keyCallback(
     auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
     if (action == GLFW_PRESS) {
         events.emplace<::vksb::event::KeyPressed>(keyCode);
-    // } else if (action == GLFW_RELEASE) {
-        // events.emplace<::vksb::event::KeyReleased>(keyCode);
+    } else if (action == GLFW_RELEASE) {
+        events.emplace<::vksb::event::KeyReleased>(keyCode);
     }
 }
 

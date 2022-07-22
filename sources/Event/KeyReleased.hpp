@@ -8,10 +8,10 @@ namespace vksb::event {
 /// \brief No clue what it does xD
 /// \ingroup vulkan
 ///
-/// \include KeyPressed.hpp <KeyPressed.hpp>
+/// \include KeyReleased.hpp <KeyReleased.hpp>
 ///
 ///////////////////////////////////////////////////////////////////////////
-class KeyPressed
+class KeyReleased
     : public ::vksb::AEvent
 {
 
@@ -28,9 +28,10 @@ public:
     /// \brief Default constructor
     ///
     ///////////////////////////////////////////////////////////////////////////
-    explicit KeyPressed(
+    explicit KeyReleased(
         ::std::int16_t keyCode
     );
+
 
 
 
