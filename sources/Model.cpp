@@ -139,17 +139,33 @@ void ::vksb::Model::createVertexBuffers(
         throw ::std::runtime_error{ "Vertex count must be at least 3" };
     }
     auto bufferSize{ sizeof(vertices[0]) * m_vertexCount };
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
     m_device.createBuffer(
         bufferSize,
-        ::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        ::VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        stagingBuffer,
+        stagingBufferMemory
+    );
+    void* pData;
+    ::vkMapMemory(m_device.device(), stagingBufferMemory, 0, bufferSize, 0, &pData);
+    ::memcpy(pData, vertices.data(), static_cast<::std::size_t>(bufferSize));
+    ::vkUnmapMemory(m_device.device(), stagingBufferMemory);
+
+    m_device.createBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         m_vertexBuffer,
         m_vertexBufferMemory
     );
-    void* pData;
-    ::vkMapMemory(m_device.device(), m_vertexBufferMemory, 0, bufferSize, 0, &pData);
-    ::memcpy(pData, vertices.data(), static_cast<::std::size_t>(bufferSize));
-    ::vkUnmapMemory(m_device.device(), m_vertexBufferMemory);
+
+    m_device.copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
+
+    ::vkDestroyBuffer(m_device.device(), stagingBuffer, nullptr);
+    ::vkFreeMemory(m_device.device(), stagingBufferMemory, nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -162,15 +178,31 @@ void ::vksb::Model::createIndexBuffers(
         return;
     }
     auto bufferSize{ sizeof(indices[0]) * m_indexCount };
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
     m_device.createBuffer(
         bufferSize,
-        ::VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        ::VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        stagingBuffer,
+        stagingBufferMemory
+    );
+    void* pData;
+    ::vkMapMemory(m_device.device(), stagingBufferMemory, 0, bufferSize, 0, &pData);
+    ::memcpy(pData, indices.data(), static_cast<::std::size_t>(bufferSize));
+    ::vkUnmapMemory(m_device.device(), stagingBufferMemory);
+
+    m_device.createBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         m_indexBuffer,
         m_indexBufferMemory
     );
-    void* pData;
-    ::vkMapMemory(m_device.device(), m_indexBufferMemory, 0, bufferSize, 0, &pData);
-    ::memcpy(pData, indices.data(), static_cast<::std::size_t>(bufferSize));
-    ::vkUnmapMemory(m_device.device(), m_indexBufferMemory);
+
+    m_device.copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
+
+    ::vkDestroyBuffer(m_device.device(), stagingBuffer, nullptr);
+    ::vkFreeMemory(m_device.device(), stagingBufferMemory, nullptr);
 }
