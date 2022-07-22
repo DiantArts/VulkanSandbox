@@ -53,7 +53,7 @@ void ::vksb::component::Control::updatePosition(
 )
 {
     // search the number of directions moving in and removing speed when multiple direction at once
-    auto speedDirectionDivider{ 2.0f };
+    auto speedDirectionDivider{ 1.0f };
 
     // bot top
     if (m_ableToFly) {
@@ -90,7 +90,7 @@ void ::vksb::component::Control::updatePosition(
 
 
     // apply movement
-    auto velocity{ this->getSpeed() * deltaTime / speedDirectionDivider };
+    auto velocity{ this->getSpeed() * deltaTime * speedDirectionDivider / 10000 };
 
     // bot top
     if (m_ableToFly) {
