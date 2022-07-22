@@ -51,7 +51,7 @@ void ::vksb::component::Transform3d::moveUp(
     const float velocity
 )
 {
-    m_position.y += velocity;
+    m_position.y -= velocity;
     m_isMatrixChanged = true;
 }
 
@@ -60,7 +60,7 @@ void ::vksb::component::Transform3d::moveDown(
     const float velocity
 )
 {
-    m_position.y -= velocity;
+    m_position.y += velocity;
     m_isMatrixChanged = true;
 }
 
@@ -98,7 +98,7 @@ void ::vksb::component::Transform3d::moveY(
     const float offset
 )
 {
-    m_position.y += offset;
+    m_position.y -= offset;
     m_isMatrixChanged = true;
 }
 
@@ -137,7 +137,7 @@ void ::vksb::component::Transform3d::setPositionX(
     const float position
 )
 {
-    m_position.x += position;
+    m_position.x = position;
     m_isMatrixChanged = true;
 }
 
@@ -146,7 +146,7 @@ void ::vksb::component::Transform3d::setPositionY(
     const float position
 )
 {
-    m_position.y += position;
+    m_position.y = position;
     m_isMatrixChanged = true;
 }
 
@@ -155,7 +155,7 @@ void ::vksb::component::Transform3d::setPositionZ(
     const float position
 )
 {
-    m_position.z += position;
+    m_position.z = position;
     m_isMatrixChanged = true;
 }
 
