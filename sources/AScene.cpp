@@ -70,22 +70,14 @@ void ::vksb::AScene::run()
     while (!m_window.shouldClose()) {
         m_window.handleEvents(*this);
 
-        auto dt{ m_clock.restart() };
-
-        float aspect{ m_renderer.getAspectRatio() };
-        // m_camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
-        m_camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 10.0f);
-
-        if (auto commandBuffer{ m_renderer.beginFrame() }) {
-            if (!this->onUpdate(dt) || !this->update(dt) || !this->postUpdate(dt)) {
-                m_window.close();
-                break;
-            }
-            m_renderer.beginSwapChainRenderPass(commandBuffer);
-            this->draw(commandBuffer);
-            m_renderer.endSwapChainRenderPass(commandBuffer);
-            m_renderer.endFrame();
+        const auto dt{ m_clock.restart() };
+        if (!this->onUpdate(dt) || !this->update(dt) || !this->postUpdate(dt)) {
+            m_window.close();
+            break;
         }
+
+        this->draw();
+        this->limitFrameRate(dt);
     }
 
     ::vkDeviceWaitIdle(m_device.device());
@@ -93,12 +85,12 @@ void ::vksb::AScene::run()
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::AScene::update(
-    ::xrn::Time time
+    ::xrn::Time dt
 ) -> bool
 {
     m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
-        [time](auto& transform, auto& control){
-            control.updatePosition(time, transform);
+        [dt](auto& transform, auto& control){
+            control.updatePosition(dt, transform);
             control.updateRotation(transform);
         }
     );
@@ -106,15 +98,34 @@ auto ::vksb::AScene::update(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::AScene::draw(
-    ::VkCommandBuffer commandBuffer
+void ::vksb::AScene::draw()
+{
+    const float aspect{ m_renderer.getAspectRatio() };
+    // m_camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
+    m_camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 10.0f);
+
+    if (auto commandBuffer{ m_renderer.beginFrame() }) {
+        m_renderer.beginSwapChainRenderPass(commandBuffer);
+
+        auto projectionView{ m_camera.getProjection() * m_camera.getView() };
+        m_registry.view<::vksb::component::Transform3d>().each(
+            [&](auto& transform){
+                m_renderSystem(commandBuffer, transform, projectionView);
+            }
+        );
+
+        m_renderer.endSwapChainRenderPass(commandBuffer);
+        m_renderer.endFrame();
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::AScene::limitFrameRate(
+    ::xrn::Time dt
 )
 {
-    auto projectionView{ m_camera.getProjection() * m_camera.getView() };
-
-    m_registry.view<::vksb::component::Transform3d>().each(
-        [&](auto& transform){
-            m_renderSystem(commandBuffer, transform, projectionView);
-        }
-    );
+    auto t{ ::xrn::Time::createAsSeconds(1) / m_maxFrameRate };
+    if (t > dt) {
+        ::std::this_thread::sleep_for(::std::chrono::milliseconds(t - dt));
+    }
 }

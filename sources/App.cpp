@@ -49,7 +49,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::App::onUpdate(
-    ::xrn::Time time
+    ::xrn::Time dt
 ) -> bool
 {
     return true;
@@ -57,7 +57,7 @@ auto ::vksb::App::onUpdate(
 
 ///////////////////////////////////////////////////////////////////////////
 auto ::vksb::App::postUpdate(
-    ::xrn::Time time
+    ::xrn::Time dt
 ) -> bool
 {
     return true;

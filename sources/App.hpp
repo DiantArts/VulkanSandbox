@@ -93,14 +93,14 @@ public:
     /// if return false, scene exits
     ///////////////////////////////////////////////////////////////////////////
     [[ nodiscard ]] auto onUpdate(
-        ::xrn::Time time
+        ::xrn::Time dt
     ) -> bool override;
 
     ///////////////////////////////////////////////////////////////////////////
     /// if return false, scene exits
     ///////////////////////////////////////////////////////////////////////////
     [[ nodiscard ]] auto postUpdate(
-        ::xrn::Time time
+        ::xrn::Time dt
     ) -> bool override;
 
 
