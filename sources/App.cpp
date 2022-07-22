@@ -77,7 +77,8 @@ static auto createCubeModel(
 )
     -> ::std::unique_ptr<::vksb::Model>
 {
-    ::std::vector<::vksb::Model::Vertex> vertices{
+    ::vksb::Model::Builder builder;
+    builder.vertices = {
 
         // left face (white)
         {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
@@ -128,10 +129,10 @@ static auto createCubeModel(
         {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
 
     };
-    for (auto& v : vertices) {
+    for (auto& v : builder.vertices) {
         v.position += offset;
     }
-    return ::std::make_unique<::vksb::Model>(device, vertices);
+    return ::std::make_unique<::vksb::Model>(device, builder);
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -33,6 +33,11 @@ public:
             -> ::std::vector<::VkVertexInputAttributeDescription>;
     };
 
+    struct Builder {
+        ::std::vector<Vertex> vertices;
+        ::std::vector<::std::uint32_t> indices;
+    };
+
 public:
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +53,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     explicit Model(
         ::vksb::Device& m_device,
-        const ::std::vector<Model::Vertex>& vertices
+        const Model::Builder& builder
     );
 
 
@@ -124,7 +129,6 @@ public:
     );
 
 
-
 private:
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,9 +141,16 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     ///
     ///////////////////////////////////////////////////////////////////////////
-    // void createVertexBuffers(
-        // const ::std::vector<Model::Vertex>& vertices
-    // );
+    void createVertexBuffers(
+        const ::std::vector<Model::Vertex>& vertices
+    );
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void createIndexBuffers(
+        const ::std::vector<::std::uint32_t>& vertices
+    );
 
 
 
@@ -153,9 +164,17 @@ private:
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     ::vksb::Device& m_device;
+
+    // vertex
     ::VkBuffer m_vertexBuffer;
     ::VkDeviceMemory m_vertexBufferMemory;
     ::std::uint32_t m_vertexCount;
+
+    // index
+    bool m_hasIndexBuffer{ false };
+    ::VkBuffer m_indexBuffer;
+    ::VkDeviceMemory m_indexBufferMemory;
+    ::std::uint32_t m_indexCount;
 
 };
 
