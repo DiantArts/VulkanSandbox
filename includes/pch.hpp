@@ -62,5 +62,24 @@ using ::std::chrono_literals::operator""ms;
 // #include <Logger.hpp>
 
 
+inline auto operator<<(
+    ::std::ostream& os,
+    const ::glm::vec2& vec
+) -> ::std::ostream&
+{
+    os << '[' << vec.x << ", " << vec.y << ']';
+    return os;
+}
+
+inline auto operator<<(
+    ::std::ostream& os,
+    const ::glm::vec3& vec
+) -> ::std::ostream&
+{
+    os << '[' << vec.x << ", " << vec.y << ", " << vec.z << ']';
+    return os;
+}
+
+
 
 #endif // ___INCLUDE_GUARD_INCLUDES_PCH_HPP___

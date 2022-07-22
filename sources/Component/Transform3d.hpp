@@ -403,8 +403,8 @@ public:
 
 private:
 
-    bool m_isDirectionChanged{ false };
-    bool m_isMatrixChanged{ false };
+    bool m_isDirectionChanged{ true };
+    bool m_isMatrixChanged{ true };
 
     ::glm::vec3 m_position{ 0.0f, 0.0f, 0.0f };
     ::glm::vec3 m_scale{ 1.0f, 1.0f, 1.0f };

@@ -63,21 +63,31 @@ void ::vksb::event::KeyPressed::resolve(
     ::vksb::AScene& scene
 )
 {
-    auto& player{ scene.getPlayerComponent<::vksb::component::Control>() };
+    auto& playerController{ scene.getPlayerComponent<::vksb::component::Control>() };
 
     // move
     if (m_keyCode == ::vksb::configuration.keyBindings.moveForward) {
+        playerController.startMovingForward();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward) {
+        playerController.startMovingBackward();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft) {
+        playerController.startMovingLeft();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight) {
+        playerController.startMovingRight();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveUp) {
+        playerController.startMovingUp();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveDown) {
+        playerController.startMovingDown();
 
     // move arrows
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveForward2) {
+        playerController.startMovingForward();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveBackward2) {
+        playerController.startMovingBackward();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveLeft2) {
+        playerController.startMovingLeft();
     } else if (m_keyCode == ::vksb::configuration.keyBindings.moveRight2) {
+        playerController.startMovingRight();
 
     // look
     } else if (m_keyCode == ::vksb::configuration.keyBindings.lookUp) {

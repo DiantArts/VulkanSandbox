@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <App.hpp>
 #include <xrn/Util.hpp>
+#include <Component/Control.hpp>
 
 
 
@@ -22,7 +23,7 @@
 ::vksb::App::App()
     : ::vksb::AScene::AScene{}
 {
-    this->createGameOjects();
+    this->loadPlayer();
 }
 
 
@@ -134,11 +135,12 @@ static auto createCubeModel(
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::App::createGameOjects()
+void ::vksb::App::loadPlayer()
 {
     ::vksb::component::Transform3d cube;
     cube.model = createCubeModel(m_device, { 0.0f, 0.0f, 0.0f });
     cube.setPositionZ(2.5f);
     cube.setScale(0.5f);
-    m_registry.emplace<::vksb::component::Transform3d>(m_registry.create(), ::std::move(cube));
+    m_registry.emplace<::vksb::component::Transform3d>(m_player, ::std::move(cube));
+    m_registry.emplace<::vksb::component::Control>(m_player);
 }
