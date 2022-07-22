@@ -19,7 +19,7 @@ struct Filepaths
     ::std::string_view vertexExtension{ ".spv" };
 
     // models
-    ::std::string_view modelDirectory{ "./.data/Visual/Model" };
+    ::std::string_view modelDirectory{ "./.data/Visual/Model/" };
     ::std::string_view modelExtension{ ".obj" };
 };
 

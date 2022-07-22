@@ -42,8 +42,12 @@ void ::vksb::event::KeyPressed::resolve(
 {
     auto& playerController{ scene.getPlayerComponent<::vksb::component::Control>() };
 
+    // default
+    if (m_keyCode == ::vksb::configuration.keyBinding.closeWindow) {
+        scene.getWindow().close();
+
     // move
-    if (m_keyCode == ::vksb::configuration.keyBinding.moveForward) {
+    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveForward) {
         playerController.startMovingForward();
     } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward) {
         playerController.startMovingBackward();

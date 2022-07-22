@@ -86,7 +86,7 @@ void ::vksb::App::loadObjects()
         ::vksb::component::Transform3d cube;
         cube.model = ::vksb::Model::createFromFile(m_device, "SmoothVase");
         cube.setPosition(1.0f, 1.0f, 2.5f);
-        cube.setScale(0.5f);
+        cube.setScale(4.0f);
         m_registry.emplace<::vksb::component::Transform3d>(m_registry.create(), ::std::move(cube));
     }
 }

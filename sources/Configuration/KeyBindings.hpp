@@ -11,6 +11,9 @@ namespace vksb::detail::configuration {
 ///////////////////////////////////////////////////////////////////////////
 struct KeyBindings
 {
+    // default
+    ::std::int16_t closeWindow = GLFW_KEY_ESCAPE;
+
     // move
     ::std::int16_t moveForward = GLFW_KEY_W;
     ::std::int16_t moveBackward = GLFW_KEY_S;

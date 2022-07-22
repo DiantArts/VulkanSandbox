@@ -93,9 +93,9 @@ void ::vksb::Model::Builder::loadFromFile(
             auto colorIndex{ 3 * index.vertex_index + 2 };
             if (static_cast<::std::size_t>(colorIndex) < attrib.colors.size()) {
                 vertex.color = {
-                    attrib.colors[index.vertex_index - 2],
-                    attrib.colors[index.vertex_index - 1],
-                    attrib.colors[index.vertex_index - 0]
+                    attrib.colors[colorIndex - 2],
+                    attrib.colors[colorIndex - 1],
+                    attrib.colors[colorIndex - 0]
                 };
             } else {
                 vertex.color = { 1.0f, 1.0f, 1.0f }; // default color
