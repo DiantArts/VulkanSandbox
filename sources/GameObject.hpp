@@ -158,11 +158,12 @@ public:
     ::glm::vec3 color;
     ::std::shared_ptr<::vksb::Model> model;
 
+
+
 private:
 
     static inline ::std::size_t idGiver{ 0 };
     ::std::size_t m_id{ ++idGiver };
-
 
 };
 

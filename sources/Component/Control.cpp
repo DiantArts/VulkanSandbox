@@ -337,10 +337,3 @@ void ::vksb::component::Control::rotateZ(
 {
     m_rotation.y += offset * ::vksb::configuration.sensitivity.z;
 }
-
-///////////////////////////////////////////////////////////////////////////
-[[ nodiscard ]] auto ::vksb::component::Control::getRotation() const
-    -> const ::glm::vec3&
-{
-    return m_rotation;
-}

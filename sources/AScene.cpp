@@ -7,7 +7,7 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <AScene.hpp>
-#include <xrn/Util.hpp>
+#include <Component/Control.hpp>
 
 
 
@@ -70,14 +70,14 @@ void ::vksb::AScene::run()
     while (!m_window.shouldClose()) {
         m_window.handleEvents(*this);
 
-        auto newTime{ m_clock.restart() };
+        auto dt{ m_clock.restart() };
 
         float aspect{ m_renderer.getAspectRatio() };
         // m_camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
         m_camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
         if (auto commandBuffer{ m_renderer.beginFrame() }) {
-            if (!this->update()) {
+            if (!this->onUpdate(dt) || !this->update(dt) || !this->postUpdate(dt)) {
                 m_window.close();
                 break;
             }
@@ -92,12 +92,29 @@ void ::vksb::AScene::run()
 }
 
 ///////////////////////////////////////////////////////////////////////////
+auto ::vksb::AScene::update(
+    ::xrn::Time time
+) -> bool
+{
+    m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
+        [time](auto& transform, auto& control){
+            control.updatePosition(time, transform);
+            control.updateRotation(transform);
+        }
+    );
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////
 void ::vksb::AScene::draw(
     ::VkCommandBuffer commandBuffer
-) const
+)
 {
     auto projectionView{ m_camera.getProjection() * m_camera.getView() };
-    for (const auto& [ entity, object ] : m_registry.view<const ::vksb::GameObject>().each()) {
-        m_renderSystem(commandBuffer, object, projectionView);
-    }
+
+    m_registry.view<::vksb::component::Transform3d>().each(
+        [&](auto& transform){
+            m_renderSystem(commandBuffer, transform, projectionView);
+        }
+    );
 }

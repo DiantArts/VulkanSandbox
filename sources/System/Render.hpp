@@ -2,8 +2,8 @@
 
 #include <Device.hpp>
 #include <Pipeline.hpp>
-#include <GameObject.hpp>
 #include <Camera.hpp>
+#include <Component/Transform3d.hpp>
 
 namespace vksb::system {
 
@@ -97,7 +97,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void operator()(
         ::VkCommandBuffer commandBuffer,
-        const ::vksb::GameObject& object,
+        ::vksb::component::Transform3d& transform,
         const ::glm::mat4& projectionView
     ) const;
 

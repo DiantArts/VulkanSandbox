@@ -95,14 +95,14 @@ void ::vksb::system::Render::createPipeline(
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::system::Render::operator()(
     ::VkCommandBuffer commandBuffer,
-    const ::vksb::GameObject& object,
+    ::vksb::component::Transform3d& transform,
     const ::glm::mat4& projectionView
 ) const
 {
     m_pPipeline->bind(commandBuffer);
     ::SimplePushConstantData push{};
-    push.color = object.color;
-    push.transform = projectionView * object.transform.getMatrix();
+    push.color = transform.color;
+    push.transform = projectionView * transform.getMatrix();
 
     ::vkCmdPushConstants(
         commandBuffer,
@@ -112,6 +112,6 @@ void ::vksb::system::Render::operator()(
         sizeof(::SimplePushConstantData),
         &push
     );
-    object.model->bind(commandBuffer);
-    object.model->draw(commandBuffer);
+    transform.model->bind(commandBuffer);
+    transform.model->draw(commandBuffer);
 }
