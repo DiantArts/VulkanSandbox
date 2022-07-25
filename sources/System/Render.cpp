@@ -94,7 +94,7 @@ void ::vksb::system::Render::createPipeline(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::system::Render::operator()(
-    ::vksb::SceneInfo& sceneInfo,
+    ::vksb::FrameInfo& sceneInfo,
     ::vksb::component::Transform3d& transform
 ) const
 {

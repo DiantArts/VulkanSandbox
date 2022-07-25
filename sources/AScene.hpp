@@ -4,7 +4,7 @@
 #include <Window.hpp>
 #include <Device.hpp>
 #include <Renderer.hpp>
-#include <SceneInfo.hpp>
+#include <FrameInfo.hpp>
 #include <System/Render.hpp>
 #include <Camera.hpp>
 #include <entt.hpp>
@@ -202,7 +202,7 @@ protected:
     ::entt::entity m_player;
 
     // Others
-    ::vksb::SceneInfo m_gameState;
+    ::vksb::FrameInfo m_gameState;
 
 };
 

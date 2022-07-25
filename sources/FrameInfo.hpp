@@ -10,12 +10,12 @@ namespace vksb {
 /// \brief No clue what it does xD
 /// \ingroup vulkan
 ///
-/// \include SceneInfo.hpp <SceneInfo.hpp>
+/// \include FrameInfo.hpp <FrameInfo.hpp>
 ///
 ///////////////////////////////////////////////////////////////////////////
-struct SceneInfo {
+struct FrameInfo {
 
-    explicit SceneInfo (
+    explicit FrameInfo (
         ::vksb::AScene& parentScene
     );
 
