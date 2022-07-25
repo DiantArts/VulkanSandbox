@@ -19,6 +19,32 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
+// Hash specialization
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace std {
+
+template <>
+struct hash<::vksb::Model::Vertex> {
+    auto operator()(
+        ::vksb::Model::Vertex const &vertex
+    ) const
+      -> ::std::size_t
+    {
+        auto seed{ 0uz };
+        ::vksb::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+        return seed;
+    }
+};
+
+}  // namespace std
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 // Static
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,6 +79,16 @@ auto ::vksb::Model::Vertex::getAttributeDescriptions()
 }
 
 ///////////////////////////////////////////////////////////////////////////
+auto ::vksb::Model::Vertex::operator==(
+    const Vertex &other
+) const
+    -> bool
+{
+  return this->position == other.position && this->color == other.color && this->normal == other.normal &&
+      uv == other.uv;
+}
+
+///////////////////////////////////////////////////////////////////////////
 void ::vksb::Model::Builder::loadFromFile(
     ::std::string_view filename
 )
@@ -78,6 +114,7 @@ void ::vksb::Model::Builder::loadFromFile(
     vertices.clear();
     indices.clear();
 
+    ::std::unordered_map<::vksb::Model::Vertex, ::std::size_t> uniqueVertices{};
     for (const auto& shape : shapes) {
         for (const auto& index : shape.mesh.indices) {
             ::vksb::Model::Vertex vertex{};
@@ -116,7 +153,11 @@ void ::vksb::Model::Builder::loadFromFile(
                 };
             }
 
-            vertices.push_back(::std::move(vertex));
+            if (!uniqueVertices.count(vertex)) {
+                uniqueVertices[vertex] = static_cast<::std::size_t>(vertices.size());
+                vertices.push_back(::std::move(vertex));
+            }
+            indices.push_back(uniqueVertices[vertex]);
         }
     }
 }

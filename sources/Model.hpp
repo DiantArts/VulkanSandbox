@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Device.hpp>
+#include <Hash.hpp>
 
 namespace vksb {
 
@@ -36,6 +37,11 @@ public:
 
         [[ nodiscard ]] static auto getAttributeDescriptions()
             -> ::std::vector<::VkVertexInputAttributeDescription>;
+
+        [[ nodiscard ]] auto operator==(
+            const Vertex &other
+        ) const
+            -> bool;
     };
 
     ///////////////////////////////////////////////////////////////////////////
