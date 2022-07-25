@@ -193,6 +193,7 @@ protected:
     ::vksb::Device m_device{ m_window };
     ::vksb::Renderer m_renderer{ m_window, m_device };
     ::vksb::system::Render m_renderSystem{ m_device, m_renderer.getSwapChainRenderPass() };
+    ::vksb::Buffer m_uboBuffer;
     ::vksb::Camera m_camera;
     ::std::uint16_t m_maxFrameRate{ 60 };
 

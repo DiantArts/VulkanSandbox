@@ -21,9 +21,18 @@
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::AScene::AScene()
-    : m_player{ m_registry.create() }
+    : m_uboBuffer{
+        m_device,
+        sizeof(AScene::Ubo),
+        ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT,
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+        m_device.properties.limits.minUniformBufferOffsetAlignment
+    }
+    , m_player{ m_registry.create() }
     , m_gameState{ *this }
 {
+    m_uboBuffer.map();
     m_camera.setViewDirection(::glm::vec3{ 0.0f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
 }
 
@@ -68,24 +77,9 @@
 void ::vksb::AScene::run()
 {
     ::xrn::Clock m_clock;
-    ::vksb::Buffer uboBuffer{
-        m_device,
-        sizeof(AScene::Ubo),
-        ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT,
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-        m_device.properties.limits.minUniformBufferOffsetAlignment
-    };
-    uboBuffer.map();
 
     while (!m_window.shouldClose()) {
-        m_gameState.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
         m_gameState.deltaTime = m_clock.restart();
-
-        AScene::Ubo ubo;
-        ubo.projectionView = m_camera.getProjection() * m_camera.getView();
-        uboBuffer.writeToIndex(&ubo, m_gameState.frameIndex);
-        uboBuffer.flushIndex(m_gameState.frameIndex);
 
         m_window.handleEvents(*this);
 
@@ -126,16 +120,17 @@ void ::vksb::AScene::draw()
     // );
 
     if ((m_gameState.commandBuffer = m_renderer.beginFrame())) {
-        m_renderer.beginSwapChainRenderPass(m_gameState.commandBuffer);
-
+        m_gameState.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
         m_gameState.projectionView = m_camera.getProjection() * m_camera.getView();
 
-        m_registry.view<::vksb::component::Transform3d>().each(
-            [this](auto& transform){
-                m_renderSystem(m_gameState, transform);
-            }
-        );
+        AScene::Ubo ubo{ .projectionView = m_camera.getProjection() * m_camera.getView() };
+        m_uboBuffer.writeToIndex(&ubo, m_gameState.frameIndex);
+        m_uboBuffer.flushIndex(m_gameState.frameIndex);
 
+        m_renderer.beginSwapChainRenderPass(m_gameState.commandBuffer);
+        m_registry.view<::vksb::component::Transform3d>().each([this](auto& transform){
+            m_renderSystem(m_gameState, transform);
+        });
         m_renderer.endSwapChainRenderPass(m_gameState.commandBuffer);
         m_renderer.endFrame();
     }
