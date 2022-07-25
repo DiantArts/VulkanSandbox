@@ -269,19 +269,19 @@ void ::vksb::Model::createVertexBuffers(
     ::vksb::Buffer stagingBuffer{
         m_device,
         vertexSize,
-        vertexCount,
+        m_vertexCount,
         ::VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | ::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-    }
+    };
     stagingBuffer.map();
-    stagingBuffer.writeToBuffer(static_cast<void*>(vertices.data()));
+    stagingBuffer.writeToBuffer(::std::bit_cast<void*>(vertices.data()));
 
-    m_vertexBuffer(
+    m_vertexBuffer = ::std::make_unique<::vksb::Buffer>(
         m_device,
         vertexSize,
-        vertexCount,
+        m_vertexCount,
         ::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
     );
     m_device.copyBuffer(stagingBuffer.getBuffer(), m_vertexBuffer->getBuffer(), bufferSize);
 }
@@ -295,25 +295,25 @@ void ::vksb::Model::createIndexBuffers(
     if (!(m_hasIndexBuffer = m_indexCount > 0)) {
         return;
     }
-    ::std::size_t indexSize{ sizeof(vertices[0]) };
+    ::std::size_t indexSize{ sizeof(indices[0]) };
     ::VkDeviceSize bufferSize{ indexSize * m_indexCount };
 
     ::vksb::Buffer stagingBuffer{
         m_device,
         indexSize,
-        indexCount,
+        m_indexCount,
         ::VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | ::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-    }
+        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | ::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    };
     stagingBuffer.map();
-    stagingBuffer.writeToBuffer(static_cast<void*>(vertices.data()));
+    stagingBuffer.writeToBuffer(::std::bit_cast<void*>(indices.data()));
 
-    m_indexBuffer(
+    m_indexBuffer = ::std::make_unique<::vksb::Buffer>(
         m_device,
         indexSize,
-        indexCount,
+        m_indexCount,
         ::VK_BUFFER_USAGE_INDEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
     );
     m_device.copyBuffer(stagingBuffer.getBuffer(), m_indexBuffer->getBuffer(), bufferSize);
 }

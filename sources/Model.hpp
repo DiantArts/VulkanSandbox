@@ -196,12 +196,12 @@ private:
     ::vksb::Device& m_device;
 
     // vertex
-    ::std::unique_ptr<::vksb::Buffer> m_vertexBuffer
+    ::std::unique_ptr<::vksb::Buffer> m_vertexBuffer;
     ::std::uint32_t m_vertexCount;
 
     // index
     bool m_hasIndexBuffer{ false };
-    ::std::unique_ptr<::vksb::Buffer> m_indexBuffer
+    ::std::unique_ptr<::vksb::Buffer> m_indexBuffer;
     ::std::uint32_t m_indexCount;
 
 };

@@ -7,7 +7,7 @@ namespace vksb {
 class Buffer {
  public:
   Buffer(
-      LveDevice& device,
+      ::vksb::Device& device,
       VkDeviceSize instanceSize,
       uint32_t instanceCount,
       VkBufferUsageFlags usageFlags,
@@ -33,27 +33,27 @@ class Buffer {
 
   VkBuffer getBuffer() const { return buffer; }
   void* getMappedMemory() const { return mapped; }
-  uint32_t getInstanceCount() const { return instanceCount; }
-  VkDeviceSize getInstanceSize() const { return instanceSize; }
-  VkDeviceSize getAlignmentSize() const { return instanceSize; }
-  VkBufferUsageFlags getUsageFlags() const { return usageFlags; }
-  VkMemoryPropertyFlags getMemoryPropertyFlags() const { return memoryPropertyFlags; }
-  VkDeviceSize getBufferSize() const { return bufferSize; }
+  uint32_t getInstanceCount() const { return m_instanceCount; }
+  VkDeviceSize getInstanceSize() const { return m_instanceSize; }
+  VkDeviceSize getAlignmentSize() const { return m_instanceSize; }
+  VkBufferUsageFlags getUsageFlags() const { return m_usageFlags; }
+  VkMemoryPropertyFlags getMemoryPropertyFlags() const { return m_memoryPropertyFlags; }
+  VkDeviceSize getBufferSize() const { return m_bufferSize; }
 
  private:
-  static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
+  static VkDeviceSize getAlignment(VkDeviceSize m_instanceSize, VkDeviceSize minOffsetAlignment);
 
-  LveDevice& lveDevice;
+  ::vksb::Device& device;
   void* mapped = nullptr;
   VkBuffer buffer = VK_NULL_HANDLE;
   VkDeviceMemory memory = VK_NULL_HANDLE;
 
-  VkDeviceSize bufferSize;
-  uint32_t instanceCount;
-  VkDeviceSize instanceSize;
-  VkDeviceSize alignmentSize;
-  VkBufferUsageFlags usageFlags;
-  VkMemoryPropertyFlags memoryPropertyFlags;
+  VkDeviceSize m_bufferSize;
+  uint32_t m_instanceCount;
+  VkDeviceSize m_instanceSize;
+  VkDeviceSize m_alignmentSize;
+  VkBufferUsageFlags m_usageFlags;
+  VkMemoryPropertyFlags m_memoryPropertyFlags;
 };
 
 }  // namespace vksb
