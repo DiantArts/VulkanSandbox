@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Device.hpp>
+#include <Buffer.hpp>
 #include <Hash.hpp>
 
 namespace vksb {
@@ -195,14 +196,12 @@ private:
     ::vksb::Device& m_device;
 
     // vertex
-    ::VkBuffer m_vertexBuffer;
-    ::VkDeviceMemory m_vertexBufferMemory;
+    ::std::unique_ptr<::vksb::Buffer> m_vertexBuffer
     ::std::uint32_t m_vertexCount;
 
     // index
     bool m_hasIndexBuffer{ false };
-    ::VkBuffer m_indexBuffer;
-    ::VkDeviceMemory m_indexBufferMemory;
+    ::std::unique_ptr<::vksb::Buffer> m_indexBuffer
     ::std::uint32_t m_indexCount;
 
 };

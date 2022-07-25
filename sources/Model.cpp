@@ -209,17 +209,7 @@ auto ::vksb::Model::createFromFile(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-::vksb::Model::~Model()
-{
-    ::vkDestroyBuffer(m_device.device(), m_vertexBuffer, nullptr);
-    ::vkFreeMemory(m_device.device(), m_vertexBufferMemory, nullptr);
-
-    if (m_hasIndexBuffer) {
-        ::vkDestroyBuffer(m_device.device(), m_indexBuffer, nullptr);
-        ::vkFreeMemory(m_device.device(), m_indexBufferMemory, nullptr);
-    }
-}
-
+::vksb::Model::~Model() = default;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,12 +224,12 @@ void ::vksb::Model::bind(
     ::VkCommandBuffer commandBuffer
 )
 {
-    ::VkBuffer buffers[] = { m_vertexBuffer };
+    ::VkBuffer buffers[] = { m_vertexBuffer->getBuffer() };
     ::VkDeviceSize offsets[] = { 0 };
     ::vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 
     if (m_hasIndexBuffer) {
-        ::vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+        ::vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
 }
 
@@ -273,34 +263,27 @@ void ::vksb::Model::createVertexBuffers(
     if (m_vertexCount < 3) {
         throw ::std::runtime_error{ "Vertex count must be at least 3" };
     }
-    auto bufferSize{ sizeof(vertices[0]) * m_vertexCount };
+    ::std::size_t vertexSize{ sizeof(vertices[0]) };
+    ::VkDeviceSize bufferSize{ vertexSize * m_vertexCount };
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    m_device.createBuffer(
-        bufferSize,
+    ::vksb::Buffer stagingBuffer{
+        m_device,
+        vertexSize,
+        vertexCount,
         ::VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        stagingBuffer,
-        stagingBufferMemory
-    );
-    void* pData;
-    ::vkMapMemory(m_device.device(), stagingBufferMemory, 0, bufferSize, 0, &pData);
-    ::memcpy(pData, vertices.data(), static_cast<::std::size_t>(bufferSize));
-    ::vkUnmapMemory(m_device.device(), stagingBufferMemory);
+        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | ::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    }
+    stagingBuffer.map();
+    stagingBuffer.writeToBuffer(static_cast<void*>(vertices.data()));
 
-    m_device.createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+    m_vertexBuffer(
+        m_device,
+        vertexSize,
+        vertexCount,
+        ::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        m_vertexBuffer,
-        m_vertexBufferMemory
     );
-
-    m_device.copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
-
-    ::vkDestroyBuffer(m_device.device(), stagingBuffer, nullptr);
-    ::vkFreeMemory(m_device.device(), stagingBufferMemory, nullptr);
+    m_device.copyBuffer(stagingBuffer.getBuffer(), m_vertexBuffer->getBuffer(), bufferSize);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -312,32 +295,25 @@ void ::vksb::Model::createIndexBuffers(
     if (!(m_hasIndexBuffer = m_indexCount > 0)) {
         return;
     }
-    auto bufferSize{ sizeof(indices[0]) * m_indexCount };
+    ::std::size_t indexSize{ sizeof(vertices[0]) };
+    ::VkDeviceSize bufferSize{ indexSize * m_indexCount };
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    m_device.createBuffer(
-        bufferSize,
+    ::vksb::Buffer stagingBuffer{
+        m_device,
+        indexSize,
+        indexCount,
         ::VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        stagingBuffer,
-        stagingBufferMemory
-    );
-    void* pData;
-    ::vkMapMemory(m_device.device(), stagingBufferMemory, 0, bufferSize, 0, &pData);
-    ::memcpy(pData, indices.data(), static_cast<::std::size_t>(bufferSize));
-    ::vkUnmapMemory(m_device.device(), stagingBufferMemory);
+        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | ::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+    }
+    stagingBuffer.map();
+    stagingBuffer.writeToBuffer(static_cast<void*>(vertices.data()));
 
-    m_device.createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+    m_indexBuffer(
+        m_device,
+        indexSize,
+        indexCount,
+        ::VK_BUFFER_USAGE_INDEX_BUFFER_BIT | ::VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         ::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        m_indexBuffer,
-        m_indexBufferMemory
     );
-
-    m_device.copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
-
-    ::vkDestroyBuffer(m_device.device(), stagingBuffer, nullptr);
-    ::vkFreeMemory(m_device.device(), stagingBufferMemory, nullptr);
+    m_device.copyBuffer(stagingBuffer.getBuffer(), m_indexBuffer->getBuffer(), bufferSize);
 }
