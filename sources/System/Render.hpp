@@ -4,6 +4,7 @@
 #include <Pipeline.hpp>
 #include <Camera.hpp>
 #include <Component/Transform3d.hpp>
+#include <SceneInfo.hpp>
 
 namespace vksb::system {
 
@@ -96,9 +97,8 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     void operator()(
-        ::VkCommandBuffer commandBuffer,
-        ::vksb::component::Transform3d& transform,
-        const ::glm::mat4& projectionView
+        ::vksb::SceneInfo& sceneInfo,
+        ::vksb::component::Transform3d& transform
     ) const;
 
 

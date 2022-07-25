@@ -51,6 +51,11 @@ template <
 ///////////////////////////////////////////////////////////////////////////
 template <
     typename T
+> constexpr ::xrn::util::BasicTime<T>::BasicTime() noexcept = default;
+
+///////////////////////////////////////////////////////////////////////////
+template <
+    typename T
 > constexpr ::xrn::util::BasicTime<T>::BasicTime(
     auto amount
 ) noexcept

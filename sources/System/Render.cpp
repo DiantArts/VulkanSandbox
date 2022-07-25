@@ -94,24 +94,23 @@ void ::vksb::system::Render::createPipeline(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::system::Render::operator()(
-    ::VkCommandBuffer commandBuffer,
-    ::vksb::component::Transform3d& transform,
-    const ::glm::mat4& projectionView
+    ::vksb::SceneInfo& sceneInfo,
+    ::vksb::component::Transform3d& transform
 ) const
 {
-    m_pPipeline->bind(commandBuffer);
+    m_pPipeline->bind(sceneInfo.commandBuffer);
     ::SimplePushConstantData push{};
-    push.transform = projectionView * transform.getMatrix();
+    push.transform = sceneInfo.projectionView * transform.getMatrix();
     push.normalMatrix = transform.getNormalMatrix();
 
     ::vkCmdPushConstants(
-        commandBuffer,
+        sceneInfo.commandBuffer,
         m_pipelineLayout,
         VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0,
         sizeof(::SimplePushConstantData),
         &push
     );
-    transform.model->bind(commandBuffer);
-    transform.model->draw(commandBuffer);
+    transform.model->bind(sceneInfo.commandBuffer);
+    transform.model->draw(sceneInfo.commandBuffer);
 }

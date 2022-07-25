@@ -136,6 +136,15 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Constructor
     ///
+    /// Constructs a ::xrn::util::BasicTime containing a point in time with no
+    /// value.
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    explicit constexpr BasicTime() noexcept;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Constructor
+    ///
     /// Constructs a ::xrn::util::BasicTime containing a point in time.
     ///
     /// \param amount Time in milliseconds

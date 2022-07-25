@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <AScene.hpp>
 #include <Component/Control.hpp>
+#include <Buffer.hpp>
 
 
 
@@ -21,6 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::AScene::AScene()
     : m_player{ m_registry.create() }
+    , m_gameState{ *this }
 {
     m_camera.setViewDirection(::glm::vec3{ 0.0f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
 }
@@ -66,31 +68,46 @@
 void ::vksb::AScene::run()
 {
     ::xrn::Clock m_clock;
+    ::vksb::Buffer uboBuffer{
+        m_device,
+        sizeof(AScene::Ubo),
+        ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT,
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+        m_device.properties.limits.minUniformBufferOffsetAlignment
+    };
+    uboBuffer.map();
 
     while (!m_window.shouldClose()) {
+        m_gameState.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
+        m_gameState.deltaTime = m_clock.restart();
+
+        AScene::Ubo ubo;
+        ubo.projectionView = m_camera.getProjection() * m_camera.getView();
+        uboBuffer.writeToIndex(&ubo, m_gameState.frameIndex);
+        uboBuffer.flushIndex(m_gameState.frameIndex);
+
         m_window.handleEvents(*this);
 
-        const auto dt{ m_clock.restart() };
-        if (!this->onUpdate(dt) || !this->update(dt) || !this->postUpdate(dt)) {
+        if (!this->onUpdate() || !this->update() || !this->postUpdate()) {
             m_window.close();
             break;
         }
 
         this->draw();
-        this->limitFrameRate(dt);
+        this->limitFrameRate();
     }
 
     ::vkDeviceWaitIdle(m_device.device());
 }
 
 ///////////////////////////////////////////////////////////////////////////
-auto ::vksb::AScene::update(
-    ::xrn::Time dt
-) -> bool
+auto ::vksb::AScene::update()
+    -> bool
 {
     m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
-        [dt](auto& transform, auto& control){
-            control.updatePosition(dt, transform);
+        [this](auto& transform, auto& control){
+            control.updatePosition(m_gameState.deltaTime, transform);
             control.updateRotation(transform);
         }
     );
@@ -108,28 +125,27 @@ void ::vksb::AScene::draw()
         // this->getPlayerComponent<::vksb::component::Transform3d>().getPosition()
     // );
 
-    if (auto commandBuffer{ m_renderer.beginFrame() }) {
-        m_renderer.beginSwapChainRenderPass(commandBuffer);
+    if ((m_gameState.commandBuffer = m_renderer.beginFrame())) {
+        m_renderer.beginSwapChainRenderPass(m_gameState.commandBuffer);
 
-        auto projectionView{ m_camera.getProjection() * m_camera.getView() };
+        m_gameState.projectionView = m_camera.getProjection() * m_camera.getView();
+
         m_registry.view<::vksb::component::Transform3d>().each(
-            [&](auto& transform){
-                m_renderSystem(commandBuffer, transform, projectionView);
+            [this](auto& transform){
+                m_renderSystem(m_gameState, transform);
             }
         );
 
-        m_renderer.endSwapChainRenderPass(commandBuffer);
+        m_renderer.endSwapChainRenderPass(m_gameState.commandBuffer);
         m_renderer.endFrame();
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::AScene::limitFrameRate(
-    ::xrn::Time dt
-)
+void ::vksb::AScene::limitFrameRate()
 {
     auto t{ ::xrn::Time::createAsSeconds(1) / m_maxFrameRate };
-    if (t > dt) {
-        ::std::this_thread::sleep_for(::std::chrono::milliseconds(t - dt));
+    if (t > m_gameState.deltaTime) {
+        ::std::this_thread::sleep_for(::std::chrono::milliseconds(t - m_gameState.deltaTime));
     }
 }
