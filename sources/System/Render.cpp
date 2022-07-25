@@ -12,7 +12,7 @@
 
 struct SimplePushConstantData {
     ::glm::mat4 transform{ 1.0f };
-    alignas(16) ::glm::vec3 color;
+    ::glm::mat4 normalMatrix{ 1.0f };
 };
 
 
@@ -101,8 +101,8 @@ void ::vksb::system::Render::operator()(
 {
     m_pPipeline->bind(commandBuffer);
     ::SimplePushConstantData push{};
-    push.color = transform.color;
     push.transform = projectionView * transform.getMatrix();
+    push.normalMatrix = transform.getNormalMatrix();
 
     ::vkCmdPushConstants(
         commandBuffer,

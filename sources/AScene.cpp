@@ -103,10 +103,10 @@ void ::vksb::AScene::draw()
     const float aspect{ m_renderer.getAspectRatio() };
     // m_camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
     m_camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 10.0f);
-    m_camera.setViewTarget(
-        { 0.0f, 0.0f, 0.0f },
-        this->getPlayerComponent<::vksb::component::Transform3d>().getPosition()
-    );
+    // m_camera.setViewTarget(
+        // { 0.0f, 0.0f, 0.0f },
+        // this->getPlayerComponent<::vksb::component::Transform3d>().getPosition()
+    // );
 
     if (auto commandBuffer{ m_renderer.beginFrame() }) {
         m_renderer.beginSwapChainRenderPass(commandBuffer);

@@ -69,12 +69,22 @@ auto ::vksb::Model::Vertex::getAttributeDescriptions()
         .location = 0,
         .binding = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
-        .offset = offsetof(::vksb::Model::Vertex, position)
+        .offset = offsetof(::vksb::Model::Vertex, Vertex::position)
     }, {
         .location = 1,
         .binding = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
-        .offset = offsetof(::vksb::Model::Vertex, color)
+        .offset = offsetof(::vksb::Model::Vertex, Vertex::color)
+    }, {
+        .location = 2,
+        .binding = 0,
+        .format = VK_FORMAT_R32G32B32_SFLOAT,
+        .offset = offsetof(::vksb::Model::Vertex, Vertex::normal)
+    }, {
+        .location = 3,
+        .binding = 0,
+        .format = VK_FORMAT_R32G32B32_SFLOAT,
+        .offset = offsetof(::vksb::Model::Vertex, Vertex::uv)
     } };
 }
 
@@ -127,16 +137,11 @@ void ::vksb::Model::Builder::loadFromFile(
                 };
             }
 
-            auto colorIndex{ 3 * index.vertex_index + 2 };
-            if (static_cast<::std::size_t>(colorIndex) < attrib.colors.size()) {
-                vertex.color = {
-                    attrib.colors[colorIndex - 2],
-                    attrib.colors[colorIndex - 1],
-                    attrib.colors[colorIndex - 0]
-                };
-            } else {
-                vertex.color = { 1.0f, 1.0f, 1.0f }; // default color
-            }
+            vertex.color = {
+                attrib.colors[3 * index.vertex_index + 0],
+                attrib.colors[3 * index.vertex_index + 1],
+                attrib.colors[3 * index.vertex_index + 2]
+            };
 
             if (index.normal_index >= 0) {
                 vertex.normal = {
@@ -170,7 +175,6 @@ auto ::vksb::Model::createFromFile(
 {
     Model::Builder modelBuilder;
     modelBuilder.loadFromFile(filename);
-    ::std::cout << "Vertex count: " << modelBuilder.vertices.size() << ::std::endl;
     return ::std::make_unique<::vksb::Model>(device, modelBuilder);
 }
 

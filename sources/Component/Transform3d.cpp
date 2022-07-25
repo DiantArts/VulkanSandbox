@@ -479,13 +479,14 @@ void ::vksb::component::Transform3d::setRotationZ(
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Transform3d::updateMatrix()
 {
-    const float c3{ glm::cos(m_rotation.z) };
-    const float s3{ glm::sin(m_rotation.z) };
-    const float c2{ glm::cos(m_rotation.x) };
-    const float s2{ glm::sin(m_rotation.x) };
-    const float c1{ glm::cos(m_rotation.y) };
-    const float s1{ glm::sin(m_rotation.y) };
-    m_matrix = glm::mat4{
+    const float c3{ ::glm::cos(m_rotation.z) };
+    const float s3{ ::glm::sin(m_rotation.z) };
+    const float c2{ ::glm::cos(m_rotation.x) };
+    const float s2{ ::glm::sin(m_rotation.x) };
+    const float c1{ ::glm::cos(m_rotation.y) };
+    const float s1{ ::glm::sin(m_rotation.y) };
+
+    m_matrix = ::glm::mat4{
         {
             m_scale.x * (c1 * c3 + s1 * s2 * s3),
             m_scale.x * (c2 * s3),
@@ -517,6 +518,37 @@ void ::vksb::component::Transform3d::updateMatrix()
         this->updateMatrix();
     }
     return m_matrix;
+}
+
+///////////////////////////////////////////////////////////////////////////
+[[ nodiscard ]] auto ::vksb::component::Transform3d::getNormalMatrix()
+    -> ::glm::mat3
+{
+    const float c3{ ::glm::cos(m_rotation.z) };
+    const float s3{ ::glm::sin(m_rotation.z) };
+    const float c2{ ::glm::cos(m_rotation.x) };
+    const float s2{ ::glm::sin(m_rotation.x) };
+    const float c1{ ::glm::cos(m_rotation.y) };
+    const float s1{ ::glm::sin(m_rotation.y) };
+    const ::glm::vec3 inversedScale{ 1.0f / m_scale };
+
+    return ::glm::mat3{
+        {
+            inversedScale.x * (c1 * c3 + s1 * s2 * s3),
+            inversedScale.x * (c2 * s3),
+            inversedScale.x * (c1 * s2 * s3 - c3 * s1),
+        },
+        {
+            inversedScale.y * (c3 * s1 * s2 - c1 * s3),
+            inversedScale.y * (c2 * c3),
+            inversedScale.y * (c1 * c3 * s2 + s1 * s3),
+        },
+        {
+            inversedScale.z * (c2 * s1),
+            inversedScale.z * (-s2),
+            inversedScale.z * (c1 * c2),
+        }
+    };
 }
 
 
