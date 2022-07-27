@@ -23,6 +23,7 @@ struct FrameInfo {
     ::xrn::Time deltaTime;
     ::VkCommandBuffer commandBuffer;
     ::glm::mat4 projectionView;
+    ::VkDescriptorSet descriptorSet;
     ::vksb::AScene& scene;
 };
 

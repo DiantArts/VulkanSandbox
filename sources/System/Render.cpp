@@ -11,7 +11,7 @@
 
 
 struct SimplePushConstantData {
-    ::glm::mat4 transform{ 1.0f };
+    ::glm::mat4 modelMatrix{ 1.0f };
     ::glm::mat4 normalMatrix{ 1.0f };
 };
 
@@ -27,11 +27,12 @@ struct SimplePushConstantData {
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::system::Render::Render(
     ::vksb::Device& device,
-    ::VkRenderPass renderPass
+    ::VkRenderPass renderPass,
+    ::VkDescriptorSetLayout descriptorSetLayout
 )
     : m_device{ device }
 {
-    this->createPipelineLayout();
+    this->createPipelineLayout(descriptorSetLayout);
     this->createPipeline(renderPass);
 }
 
@@ -60,21 +61,25 @@ struct SimplePushConstantData {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::Render::createPipelineLayout()
+void ::vksb::system::Render::createPipelineLayout(
+    ::VkDescriptorSetLayout descriptorSetLayout
+)
 {
     ::VkPushConstantRange pushConstantRange{};
-    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    pushConstantRange.stageFlags = ::VK_SHADER_STAGE_VERTEX_BIT | ::VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
     pushConstantRange.size = sizeof(::SimplePushConstantData);
 
+    ::std::vector<::VkDescriptorSetLayout> descriptorSetLayouts{ descriptorSetLayout };
+
     ::VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
-    pipelineLayoutInfo.pSetLayouts = nullptr;
+    pipelineLayoutInfo.sType = ::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = descriptorSetLayouts.size();
+    pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
-    if (::vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+    if (::vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != ::VK_SUCCESS) {
         throw ::std::runtime_error{ "Failed to create pipeline layout.\n" };
     }
 }
@@ -94,23 +99,40 @@ void ::vksb::system::Render::createPipeline(
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::system::Render::operator()(
-    ::vksb::FrameInfo& sceneInfo,
+    ::vksb::FrameInfo& frameInfo,
     ::vksb::component::Transform3d& transform
 ) const
 {
-    m_pPipeline->bind(sceneInfo.commandBuffer);
     ::SimplePushConstantData push{};
-    push.transform = sceneInfo.projectionView * transform.getMatrix();
+    push.modelMatrix = transform.getMatrix();
     push.normalMatrix = transform.getNormalMatrix();
 
     ::vkCmdPushConstants(
-        sceneInfo.commandBuffer,
+        frameInfo.commandBuffer,
         m_pipelineLayout,
-        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+        ::VK_SHADER_STAGE_VERTEX_BIT | ::VK_SHADER_STAGE_FRAGMENT_BIT,
         0,
         sizeof(::SimplePushConstantData),
         &push
     );
-    transform.model->bind(sceneInfo.commandBuffer);
-    transform.model->draw(sceneInfo.commandBuffer);
+    transform.model->bind(frameInfo.commandBuffer);
+    transform.model->draw(frameInfo.commandBuffer);
+}
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::system::Render::bind(
+    ::vksb::FrameInfo& frameInfo
+)
+{
+    m_pPipeline->bind(frameInfo.commandBuffer);
+    ::vkCmdBindDescriptorSets(
+        frameInfo.commandBuffer,
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_pipelineLayout,
+        0,
+        1,
+        &frameInfo.descriptorSet,
+        0,
+        nullptr
+    );
 }
