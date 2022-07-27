@@ -21,24 +21,15 @@
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::AScene::AScene()
-    : m_pDescriptorPool{ m_device }
-    , m_uboBuffer{
-        m_device,
-        sizeof(AScene::Ubo),
-        ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT,
-        ::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-        m_device.properties.limits.minUniformBufferOffsetAlignment
-    }
+    : m_uboBuffers{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT }
     , m_player{ m_registry.create() }
     , m_gameState{ *this }
 {
-    m_pDescriptorPool
+    m_pDescriptorPool = ::vksb::descriptor::Pool::Builder{ m_device }
         .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
     m_camera.setViewDirection(::glm::vec3{ 0.0f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
-    m_uboBuffer.map();
 }
 
 
@@ -81,17 +72,31 @@
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::AScene::run()
 {
-    ::xrn::Clock m_clock;
+    for (auto& pUbo : m_uboBuffers) {
+        pUbo = ::std::make_unique<::vksb::Buffer>(
+            m_device,
+            sizeof(AScene::Ubo),
+            1,
+            ::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+        );
+        pUbo->map();
+    }
+
+
     auto descriptorSetLayout{ ::vksb::descriptor::SetLayout::Builder{ m_device }
         .addBinding(0, ::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::VK_SHADER_STAGE_VERTEX_BIT)
         .build()
-    }
+    };
     ::std::vector<::VkDescriptorSet> pDescriptorSets{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT };
     for (auto i{ 0uz }; i < pDescriptorSets.size(); ++i) {
-        auto bufferInfo{ m_uboBuffer[i]->descriptorInfo() };
+        auto bufferInfo{ m_uboBuffers[i]->descriptorInfo() };
         ::vksb::descriptor::Writer{ *descriptorSetLayout, *m_pDescriptorPool }
             .writeBuffer(0, &bufferInfo)
             .build(pDescriptorSets[i]);
+    }
+
+    ::xrn::Clock m_clock;
 
     while (!m_window.shouldClose()) {
         m_gameState.deltaTime = m_clock.restart();
@@ -138,9 +143,9 @@ void ::vksb::AScene::draw()
         m_gameState.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
         m_gameState.projectionView = m_camera.getProjection() * m_camera.getView();
 
-        AScene::Ubo ubo{ .projectionView = m_camera.getProjection() * m_camera.getView() };
-        m_uboBuffer.writeToIndex(&ubo, m_gameState.frameIndex);
-        m_uboBuffer.flushIndex(m_gameState.frameIndex);
+        // AScene::Ubo ubo{ .projectionView = m_camera.getProjection() * m_camera.getView() };
+        // m_uboBuffers.writeToIndex(&ubo, m_gameState.frameIndex);
+        // m_uboBuffers.flushIndex(m_gameState.frameIndex);
 
         m_renderer.beginSwapChainRenderPass(m_gameState.commandBuffer);
         m_registry.view<::vksb::component::Transform3d>().each([this](auto& transform){
