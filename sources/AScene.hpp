@@ -195,7 +195,7 @@ protected:
 
     ::std::unique_ptr<::vksb::descriptor::SetLayout> m_pDescriptorSetLayout;
     ::std::unique_ptr<::vksb::descriptor::Pool> m_pDescriptorPool;
-    ::std::vector<::VkDescriptorSet> m_pDescriptorSets{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT };
+    ::std::vector<::VkDescriptorSet> m_descriptorSets{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT };
     ::std::vector<::std::unique_ptr<::vksb::Buffer>> m_uboBuffers;
 
     ::vksb::Renderer m_renderer{ m_window, m_device };

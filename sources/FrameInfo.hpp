@@ -16,6 +16,7 @@ namespace vksb {
 struct FrameInfo {
 
     explicit FrameInfo (
+        ::std::vector<::VkDescriptorSet>& parentDescriptorSets,
         ::vksb::AScene& parentScene
     );
 
@@ -23,7 +24,7 @@ struct FrameInfo {
     ::xrn::Time deltaTime;
     ::VkCommandBuffer commandBuffer;
     ::glm::mat4 projectionView;
-    ::VkDescriptorSet descriptorSet;
+    ::std::vector<::VkDescriptorSet>& descriptorSets;
     ::vksb::AScene& scene;
 };
 

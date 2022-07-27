@@ -20,7 +20,9 @@
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::FrameInfo::FrameInfo(
+    ::std::vector<::VkDescriptorSet>& parentDescriptorSets,
     ::vksb::AScene& parentScene
 )
-    : scene{ parentScene }
+    : descriptorSets{ parentDescriptorSets }
+    , scene{ parentScene }
 {}

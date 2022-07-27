@@ -32,14 +32,13 @@
         m_pDescriptorSetLayout->getDescriptorSetLayout()
     }
     , m_player{ m_registry.create() }
-    , m_frameInfo{ *this }
+    , m_frameInfo{ m_descriptorSets, *this }
 {
     m_pDescriptorPool = ::vksb::descriptor::Pool::Builder{ m_device }
         .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
     m_camera.setViewDirection(::glm::vec3{ 0.0f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
-
 
     for (auto& pUbo : m_uboBuffers) {
         pUbo = ::std::make_unique<::vksb::Buffer>(
@@ -51,11 +50,12 @@
         );
         pUbo->map();
     }
-    for (auto i{ 0uz }; i < m_pDescriptorSets.size(); ++i) {
+
+    for (auto i{ 0uz }; i < m_descriptorSets.size(); ++i) {
         auto bufferInfo{ m_uboBuffers[i]->descriptorInfo() };
         ::vksb::descriptor::Writer{ *m_pDescriptorSetLayout, *m_pDescriptorPool }
             .writeBuffer(0, &bufferInfo)
-            .build(m_pDescriptorSets[i]);
+            .build(m_descriptorSets[i]);
     }
 }
 
@@ -146,9 +146,9 @@ void ::vksb::AScene::draw()
         m_frameInfo.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
         m_frameInfo.projectionView = m_camera.getProjection() * m_camera.getView();
 
-        // AScene::Ubo ubo{ .projectionView = m_camera.getProjection() * m_camera.getView() };
-        // m_uboBuffers.writeToIndex(&ubo, m_frameInfo.frameIndex);
-        // m_uboBuffers.flushIndex(m_frameInfo.frameIndex);
+        AScene::Ubo ubo{ .projectionView = m_camera.getProjection() * m_camera.getView() };
+        m_uboBuffers[m_frameInfo.frameIndex]->writeToBuffer(&ubo);
+        m_uboBuffers[m_frameInfo.frameIndex]->flush();
 
         m_renderer.beginSwapChainRenderPass(m_frameInfo.commandBuffer);
         m_renderSystem.bind(m_frameInfo);

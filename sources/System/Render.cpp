@@ -131,7 +131,7 @@ void ::vksb::system::Render::bind(
         m_pipelineLayout,
         0,
         1,
-        &frameInfo.descriptorSet,
+        &frameInfo.descriptorSets[frameInfo.frameIndex],
         0,
         nullptr
     );
