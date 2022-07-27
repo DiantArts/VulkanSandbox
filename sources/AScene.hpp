@@ -8,6 +8,7 @@
 #include <System/Render.hpp>
 #include <Camera.hpp>
 #include <entt.hpp>
+#include <Descriptor.hpp>
 
 namespace vksb {
 
@@ -191,9 +192,13 @@ protected:
     // Vulkan
     ::vksb::Window m_window{ false };
     ::vksb::Device m_device{ m_window };
+
     ::vksb::Renderer m_renderer{ m_window, m_device };
     ::vksb::system::Render m_renderSystem{ m_device, m_renderer.getSwapChainRenderPass() };
+
+    ::std::unique_ptr<::vksb::descriptor::Pool> m_pDescriptorPool;
     ::vksb::Buffer m_uboBuffer;
+
     ::vksb::Camera m_camera;
     ::std::uint16_t m_maxFrameRate{ 60 };
 

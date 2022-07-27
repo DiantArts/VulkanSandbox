@@ -21,19 +21,24 @@
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::AScene::AScene()
-    : m_uboBuffer{
+    : m_pDescriptorPool{ m_device }
+    , m_uboBuffer{
         m_device,
         sizeof(AScene::Ubo),
         ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT,
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+        ::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
         m_device.properties.limits.minUniformBufferOffsetAlignment
     }
     , m_player{ m_registry.create() }
     , m_gameState{ *this }
 {
-    m_uboBuffer.map();
+    m_pDescriptorPool
+        .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .addPoolSize(::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .build();
     m_camera.setViewDirection(::glm::vec3{ 0.0f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
+    m_uboBuffer.map();
 }
 
 
@@ -77,6 +82,16 @@
 void ::vksb::AScene::run()
 {
     ::xrn::Clock m_clock;
+    auto descriptorSetLayout{ ::vksb::descriptor::SetLayout::Builder{ m_device }
+        .addBinding(0, ::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::VK_SHADER_STAGE_VERTEX_BIT)
+        .build()
+    }
+    ::std::vector<::VkDescriptorSet> pDescriptorSets{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT };
+    for (auto i{ 0uz }; i < pDescriptorSets.size(); ++i) {
+        auto bufferInfo{ m_uboBuffer[i]->descriptorInfo() };
+        ::vksb::descriptor::Writer{ *descriptorSetLayout, *m_pDescriptorPool }
+            .writeBuffer(0, &bufferInfo)
+            .build(pDescriptorSets[i]);
 
     while (!m_window.shouldClose()) {
         m_gameState.deltaTime = m_clock.restart();
