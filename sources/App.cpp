@@ -74,10 +74,9 @@ void ::vksb::App::loadObjects()
 {
     {
         ::vksb::component::Transform3d object;
-        object.model = ::vksb::Model::createFromFile(m_device, "FlatVase");
+        object.model = ::vksb::Model::createFromFile(m_device, "SmoothVase");
         object.setPosition(-0.5f, 0.5f, 2.5f);
         object.setScale(3.0f, 1.5f, 3.0f);
-        object.setRotationX(90.0f);
         m_registry.emplace<::vksb::component::Transform3d>(m_player, ::std::move(object));
         m_registry.emplace<::vksb::component::Control>(m_player);
     }

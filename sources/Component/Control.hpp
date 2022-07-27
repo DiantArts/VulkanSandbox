@@ -284,7 +284,7 @@ private:
     // Param
     ///////////////////////////////////////////////////////////////////////////
     float m_moveSpeed{ 100.0f };
-    ::glm::vec3 m_rotation{ -90.0f, 0.0f, 0.0f };
+    ::glm::vec3 m_rotation{ 0.0f };
 
 };
 
