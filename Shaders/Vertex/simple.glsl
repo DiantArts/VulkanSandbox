@@ -9,7 +9,7 @@ layout (location = 0) out vec3 fragColor;
 
 layout (set = 0, binding = 0) uniform Ubo {
     mat4 projectionView;
-    vec3 ambientLightColor; // w is intensity
+    vec4 ambientLightColor; // w is intensity
 
     // vec3 directionToLight;
     vec3 lightPosition;
@@ -28,7 +28,7 @@ void main()
 
     const vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
     const vec3 directionToLight = ubo.lightPosition - positionWorld.xyz;
-    const float attenuation = 1.0f / dot(directionToLight, directionToLight)
+    const float attenuation = 1.0f / dot(directionToLight, directionToLight);
 
     // intensity
     const vec3 lightColor = ubo.lightColor.xyz * ubo.lightColor.w * attenuation;

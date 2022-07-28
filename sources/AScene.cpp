@@ -38,7 +38,7 @@
         .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
-    m_camera.setViewDirection(::glm::vec3{ -2.5f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
+    m_camera.setViewDirection(::glm::vec3{ 0.0f, 0.0f, -2.5f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
 
     for (auto& pUbo : m_uboBuffers) {
         pUbo = ::std::make_unique<::vksb::Buffer>(
