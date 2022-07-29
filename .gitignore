@@ -3,7 +3,6 @@
 .dep*
 .vscode*
 *.pdf*
-*.txt*
 *.o
 *.d
 *.hpp.gch
