@@ -1,0 +1,394 @@
+#!/bin/bash
+
+# -------------------------------------------------------------------------------------------------
+
+runProgram() (
+    ./${binary} || exit $?
+)
+
+# -------------------------------------------------------------------------------------------------
+
+compiler=clang++
+buildDir=.build
+cxxVersion=23
+buildType=Debug
+binary=${buildDir}/sources/xrn
+parallel=$(nproc)
+
+# -------------------------------------------------------------------------------------------------
+
+declare -a listOfDisablable=("clear" "run" "cov" "coverage" "binary" "build" "color" "pch")
+getoptArgShort="hglstmdc"
+getoptArgLong="help,gcc,g\+\+,clang,clang\+\+,setup,test,tests,tests_run,debug,makefile,clean,debug-cmake,type:,version:,compiler:,cc-compiler:,cxx-compiler:,directory:,parallel:"
+
+
+
+# -------------------------------------------------------------------------------------------------
+
+usage() {
+    cat << EOF
+Usage: ./.toolchain/compile [Options] [Actions]
+Options (* only applies if cmake is setup):
+    -h, --help                    Display help
+    -s, --setup                   Setup CMake even if the build directory exists
+    -t, --tests --tests_run     * Run tests (automatically sets --no-binary)
+        --with-binary           * Force the creation of the main binary
+                                  (overrides --no-binary)
+    -m, --make --makefile       * Use Makefile instead of Ninja
+    -d, --debug                 * Use debug mode
+        --debug-cmake             Enable full outputs on cmake
+    -g, --g++                   * Use g++ instead of the default CXX env value
+        --gcc                   * Use gcc instead of the default CC env value
+    -l, --clang++               * Use clang++ instead of the default CXX env value
+        --clang                 * Use clang instead of the default CC env value
+        --cc-compiler=COMPILER  * Use the argument specified instead of CC env value
+        --cxx-compiler=COMPILER * Use the argument specified instead of CXX env value
+        --compiler=COMPILER     * Use the argument specified instead of CXX env value
+        --type=Type             * Use the build type specified in argument
+                                  ($buildType by default)
+        --version=VERSION       * Use the C++ version number specified in argument
+                                  ($cxxVersion by default)
+        --directory=DIRECTORY     Use the build directory specified in argument
+                                  ($buildDir by default)
+        --parallel=NUMBER         Specify the number of core to use
+                                  ($parallel by default)
+        --no-*                    Values:
+                                    clear: Do not clear the screen when running the script
+                                    build: Do not build the project
+                                    run: Do not run the project.
+                                    cov|coverage: Do not run the coverage report.
+                                    binary: Do not create the main binary
+                                    color: Does not color the output (no effect on CMake)
+                                *   pch: Do not use precompiled header
+                                  Notes: Those commands are combinable (--no-clear-run)
+Actions:
+    clean                         Clean the repository from every temporary files
+    remake rebuild re             Clean and build everything again
+    tests run_tests unit_tests  * Rebuild to generate and run tests informations
+    cov coverage                  Only run the coverage and nothing else
+EOF
+}
+
+setupCmake() {
+    clean
+    cmakeCommands=""
+    if [ ${testsNeeded} = true ]; then
+        cmakeCommands+="-DENABLE_COVERAGE=true -DENABLE_UNIT_TESTING=true -DRUN_UNIT_TESTS=false -DENABLE_TESTING=true "
+    else
+        cmakeCommands="-DENABLE_UNIT_TESTING=false -DRUN_UNIT_TESTS=false -DENABLE_TESTING=false "
+    fi
+    if [ ${makefileNeeded} = false ]; then
+        cmakeCommands+="-GNinja "
+    fi
+    if [ ${debugCmakeNeeded} = true ]; then
+        cmakeCommands+="-DENABLE_CMAKE_DEBUG=true "
+    fi
+    if [ ${pchNeeded} = false ]; then
+        cmakeCommands+="-DENABLE_PCH=false "
+    fi
+    if [ ${binaryNeeded} = true ]; then
+        cmakeCommands+="-DENABLE_BINARY=ON "
+    else
+        cmakeCommands+="-DENABLE_BINARY=OFF "
+    fi
+    cmake \
+        -S. \
+        -B${buildDir} \
+        -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+        -DXRN_CXX_VERSION=${cxxVersion} \
+        -DCMAKE_BUILD_TYPE=${buildType} \
+        ${cmakeCommands} || exit $?
+    ln ${buildDir}/compile_commands.json compile_commands.json
+}
+
+build() {
+    if [ ${clearNeeded} = true ]; then
+        clear
+    fi
+    cmake --build ${buildDir} --config ${buildType} --parallel ${parallel} || exit $?
+}
+
+run() {
+    if [ ! -f "./${binary}" ]; then
+        echo -e "${bold}${red}[ERROR]${normal}: the binary file './${binary}' does not exist. Try to:" 1>&2
+        echo -e "    - ${bold}${red}Resolve${normal} the invalid script arguments" 1>&2
+        echo -e "    - ${bold}${red}Fix${normal} compilation errors" 1>&2
+        echo -e "    - Run the script again with the '-s' argument" 1>&2
+    fi
+    runProgram
+}
+
+clean() {
+    rm -rf ${buildDir}
+    rm -f ./compile_commands.json
+    rm -rf ./.cache
+}
+
+runTests() {
+    ctest --test-dir ${buildDir} -C ${buildType}
+}
+
+runCoverage() {
+    gcovr -j ${parallel} --root ./ ./ -e ./.build/ -e ./tests/ --gcov-executable 'gcov'
+}
+
+abortError() {
+    echo "${errorColor}[ABORT]${normal}" &1>2
+    exit 1
+}
+
+
+# -------------------------------------------------------------------------------------------------
+
+usageNeeded=false
+clearNeeded=true
+setupNeeded=false
+buildNeeded=true
+runNeeded=true
+coverageNeeded=true
+binaryNeeded=true
+binaryNeededForced=false
+testsNeeded=false
+makefileNeeded=false
+colorNeeded=true
+cleanNeeded=false
+stopAfterCleanNeeded=false
+debugCmakeNeeded=false
+pchNeeded=true
+
+compilerModified=false
+typeModified=false
+
+error=false
+compilerSpecifiedMultipleTime=false
+typeSpecifiedMultipleTime=false
+
+for i in ${listOfDisablable[@]}; do
+    getoptArgLong+=",no-$i"
+done
+for i in ${listOfDisablable[@]}; do
+    for j in ${listOfDisablable[@]}; do
+        if [ ! $i = $j ]; then
+            getoptArgLong+=",no-$i-$j"
+        fi
+    done
+done
+for i in ${listOfDisablable[@]}; do
+    for j in ${listOfDisablable[@]}; do
+        for k in ${listOfDisablable[@]}; do
+            if [ ! $i = $j ] && [ ! $i = $k ] && [ ! $j = $k ]; then
+                getoptArgLong+=",no-$i-$j-$k"
+            fi
+        done
+    done
+done
+
+if ! options=$(getopt -o ${getoptArgShort} -l ${getoptArgLong}, --name "$0" -- "$@"); then
+    exit 1
+fi
+set -- ${options}
+while [ $# -gt 0 ]; do
+    case "$1" in
+    -h|--help) usageNeeded=true ;;
+    -s|--setup) setupNeeded=true ;;
+    -t|--test|--tests|--tests_run)
+        testsNeeded=true
+        if [ $binaryNeededForced = false ]; then
+            binaryNeeded=false;
+        fi
+        ;;
+    --with-binary) binaryNeededForced=true; binaryNeeded=true ;;
+    -m|--make|--makefile) makefileNeeded=true ;;
+    -d|--debug)
+        if [ $typeModified = true ]; then
+            typeSpecifiedMultipleTime=true; error=true
+        else
+            typeModified=true
+        fi
+        buildType=Debug ;;
+    -r|--release)
+        if [ $typeModified = true ]; then
+            typeSpecifiedMultipleTime=true; error=true
+        else
+            typeModified=true
+        fi
+        buildType=Release ;;
+    -c|--clean) cleanNeeded=true ;;
+    -g|--g++)
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CXX=g++ ;;
+    -l|--clang++)
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CXX=clang++ ;;
+    --gcc)
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CC=gcc ;;
+    --clang)
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CC=clang ;;
+    --compiler) shift;
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CXX=$1  ;;
+    --cc-compiler) shift;
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CC=$1  ;;
+    --cxx-compiler) shift;
+        if [ $compilerModified = true ]; then
+            compilerSpecifiedMultipleTime=true; error=true
+        else
+            compilerModified=true
+        fi
+        export CXX=$1  ;;
+    --debug-cmake) debugCmake=true ;;
+    --type) shift;
+        if [ $typeModified = true ]; then
+            typeSpecifiedMultipleTime=true; error=true
+        else
+            typeModified=true
+        fi
+        buildType=$1 ;;
+    --version) shift; cxxVersion=$1  ;;
+    --directory) shift; buildDir=$1  ;;
+    --parallel) shift; parallel=$1  ;;
+    --no-*)
+        if [[ $1 == *"-clear-"* ]] || [[ $1 == *"-clear" ]]; then
+            clearNeeded=false;
+        fi
+        if [[ $1 == *"-run-"* ]] || [[ $1 == *"-run" ]]; then
+            runNeeded=false;
+        fi
+        if [[ $1 == *"-cov-"* ]] || [[ $1 == *"-cov" ]] || [[ $1 == *"-coverage" ]] || [[ $1 == *"-coverage" ]]; then
+            coverageNeeded=false;
+        fi
+        if [[ $1 == *"-binary-"* ]] || [[ $1 == *"-binary" ]]; then
+            if [ $binaryNeededForced = false ]; then
+                binaryNeeded=false;
+            fi
+        fi
+        if [[ $1 == *"-build-"* ]] || [[ $1 == *"-build" ]]; then
+            buildNeeded=false;
+        fi
+        if [[ $1 == *"-color-"* ]] || [[ $1 == *"-color" ]]; then
+            colorNeeded=false;
+        fi
+        if [[ $1 == *"-pch-"* ]] || [[ $1 == *"-pch" ]]; then
+            pchNeeded=false;
+        fi
+        ;;
+    "'clean'") cleanNeeded=true; stopAfterCleanNeeded=true ;;
+    "'re'"|"'remake'"|"'rebuild'") cleanNeeded=true; setupNeeded=true ;;
+    "'test'"|"'tests'"|"'run_tests'"|"'unit_test'"|"'unit_tests'") testsNeeded=true ;;
+    "'cov'"|"'coverage'") runCoverage; exit 0 ;;
+    esac
+    shift
+done
+
+
+# -------------------------------------------------------------------------------------------------
+
+if [ ${colorNeeded} = true ]; then
+    if test -t 1; then
+        # see if it supports colors...
+        ncolors=$(tput colors)
+        if test -n "$ncolors" && test $ncolors -ge 8; then
+            bold="$(tput bold)"
+            underline="$(tput smul)"
+            standout="$(tput smso)"
+            normal="$(tput sgr0)"
+            black="$(tput setaf 0)"
+            red="$(tput setaf 1)"
+            green="$(tput setaf 2)"
+            yellow="$(tput setaf 3)"
+            blue="$(tput setaf 4)"
+            magenta="$(tput setaf 5)"
+            cyan="$(tput setaf 6)"
+            white="$(tput setaf 7)"
+            errorColor=${red}
+        fi
+    fi
+fi
+
+
+
+# -------------------------------------------------------------------------------------------------
+
+if [ ${clearNeeded} = true ]; then
+    clear
+fi
+
+
+
+# -------------------------------------------------------------------------------------------------
+
+if [ $compilerSpecifiedMultipleTime = true ]; then
+    echo "${errorColor}[ERROR]${normal} Compiler is specified multiple times." &1>2
+fi
+
+if [ $typeSpecifiedMultipleTime = true ]; then
+    echo "${errorColor}[ERROR]${normal} Built type is specified multiple times." &1>2
+fi
+
+if [ $error = true ]; then
+    abortError
+fi
+
+
+
+# -------------------------------------------------------------------------------------------------
+
+if [ ${cleanNeeded} = true ]; then
+    clean
+    if [ ${stopAfterCleanNeeded} = true ]; then
+        exit 0
+    fi
+fi
+
+if [ ${usageNeeded} = true ]; then
+    usage
+    exit 0
+fi
+
+if [ ! -d ${buildDir} ] || [ ${setupNeeded} = true ]; then
+    setupCmake
+fi
+
+if [ ${buildNeeded} = true ]; then
+    build
+fi
+
+if [ ${runNeeded} = true ] && [ ${binaryNeeded} = true ]; then
+    run
+fi
+
+if [ ${testsNeeded} = true ]; then
+    runTests
+fi
+
+if [ ${testsNeeded} = true ] && [ ${coverageNeeded} = true ]; then
+    runCoverage
+fi
