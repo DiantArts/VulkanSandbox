@@ -25,8 +25,7 @@ void main()
 {
     const vec4 positionWorld = push.modelMatrix * vec4(position, 1.0f);
     gl_Position = ubo.projectionView * positionWorld;
-
     fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
-    fragPosWorld = positionWorld.xyz
-    outColor = vec4((diffuseLight + ambientLight) * fragColor, 1.0f);
+    fragPosWorld = positionWorld.xyz;
+    fragColor = color;
 }

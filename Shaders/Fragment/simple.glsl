@@ -28,5 +28,5 @@ void main()
     const vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w * attenuation;
     const vec3 diffuseLight = lightColor * max(dot(normalize(fragNormalWorld), normalize(directionToLight)), 0);
 
-    outColor = vec4(fragColor, 1.0f);
+    outColor = vec4((diffuseLight + ambientLight) * fragColor, 1.0);
 }
