@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::AScene::AScene()
     : m_pDescriptorSetLayout{ ::vksb::descriptor::SetLayout::Builder{ m_device }
-        .addBinding(0, ::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::VK_SHADER_STAGE_VERTEX_BIT)
+        .addBinding(0, ::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::VK_SHADER_STAGE_ALL_GRAPHICS)
         .build()
     }
     , m_uboBuffers{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT }
@@ -138,7 +138,7 @@ void ::vksb::AScene::draw()
 {
     const float aspect{ m_renderer.getAspectRatio() };
     // m_camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
-    m_camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 10.0f);
+    m_camera.setPerspectiveProjection(::glm::radians(50.0f), aspect, 0.1f, 1000.0f);
     // m_camera.setViewTarget(
         // { 0.0f, 0.0f, 0.0f },
         // this->getPlayerComponent<::vksb::component::Transform3d>().getPosition()
