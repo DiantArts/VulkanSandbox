@@ -98,10 +98,10 @@ VkResult SwapChain::submitCommandBuffers(
   submitInfo.pSignalSemaphores = signalSemaphores;
 
   vkResetFences(device.device(), 1, &inFlightFences[currentFrame]);
-  if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
-      VK_SUCCESS) {
-    throw std::runtime_error("Failed to submit draw command buffer.");
-  }
+  XRN_SASSERT(vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) ==
+      VK_SUCCESS,
+    "Failed to submit draw command buffer."
+  );
 
   VkPresentInfoKHR presentInfo = {};
   presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -167,9 +167,7 @@ void SwapChain::createSwapChain() {
 
   createInfo.oldSwapchain = !oldSwapchain ? VK_NULL_HANDLE : oldSwapchain->swapChain;
 
-  if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
-    throw std::runtime_error("Failed to create swap chain.");
-  }
+  XRN_SASSERT(vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) == VK_SUCCESS, "Failed to create swap chain.");
 
   // we only specified a minimum number of images in the swap chain, so the implementation is
   // allowed to create a swap chain with more. That's why we'll first query the final number of
@@ -197,10 +195,7 @@ void SwapChain::createImageViews() {
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    if (vkCreateImageView(device.device(), &viewInfo, nullptr, &swapChainImageViews[i]) !=
-        VK_SUCCESS) {
-      throw std::runtime_error("Failed to create texture image view.");
-    }
+    XRN_SASSERT(vkCreateImageView(device.device(), &viewInfo, nullptr, &swapChainImageViews[i]) == VK_SUCCESS, "Failed to create texture image view.");
   }
 }
 
@@ -260,9 +255,7 @@ void SwapChain::createRenderPass() {
   renderPassInfo.dependencyCount = 1;
   renderPassInfo.pDependencies = &dependency;
 
-  if (vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
-    throw std::runtime_error("Failed to create render pass.");
-  }
+  XRN_SASSERT(vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) == VK_SUCCESS, "Failed to create render pass.");
 }
 
 void SwapChain::createFramebuffers() {
@@ -280,13 +273,12 @@ void SwapChain::createFramebuffers() {
     framebufferInfo.height = swapChainExtent.height;
     framebufferInfo.layers = 1;
 
-    if (vkCreateFramebuffer(
+    XRN_SASSERT(vkCreateFramebuffer(
             device.device(),
             &framebufferInfo,
             nullptr,
-            &swapChainFramebuffers[i]) != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create framebuffer.");
-    }
+            &swapChainFramebuffers[i]) == VK_SUCCESS,
+      "Failed to create framebuffer.");
   }
 }
 
@@ -333,9 +325,7 @@ void SwapChain::createDepthResources() {
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    if (vkCreateImageView(device.device(), &viewInfo, nullptr, &depthImageViews[i]) != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create texture image view.");
-    }
+    XRN_SASSERT(vkCreateImageView(device.device(), &viewInfo, nullptr, &depthImageViews[i]) == VK_SUCCESS, "Failed to create texture image view.");
   }
 }
 
@@ -353,13 +343,12 @@ void SwapChain::createSyncObjects() {
   fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
   for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-    if (vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) !=
+    XRN_SASSERT(!(vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) !=
             VK_SUCCESS ||
         vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) !=
             VK_SUCCESS ||
-        vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create synchronization objects for a frame.");
-    }
+        vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS),
+      "Failed to create synchronization objects for a frame.");
   }
 }
 

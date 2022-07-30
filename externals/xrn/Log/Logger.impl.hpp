@@ -56,20 +56,15 @@ template <
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// Test
+// Assert
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-/// \brief Same as assert from <cassert>
-///
-/// Prints successful tests if PRINT_DEBUG is defined
-///
-///////////////////////////////////////////////////////////////////////////
 template <
     typename... Args
-> void ::xrn::Logger::testImpl(
+> void ::xrn::Logger::assertImpl(
     bool condition,
     const ::std::string_view filepath,
     const ::std::string_view functionName,
@@ -78,7 +73,7 @@ template <
     Args&&... args
 )
 {
-    Logger::outputTest(
+    Logger::outputAssert(
         condition,
         filepath,
         functionName,
@@ -90,11 +85,9 @@ template <
 }
 
 ///////////////////////////////////////////////////////////////////////////
-///
-///////////////////////////////////////////////////////////////////////////
 template <
     typename... Args
-> void ::xrn::Logger::testImpl(
+> void ::xrn::Logger::assertImpl(
     bool condition,
     const ::std::string_view filepath,
     const ::std::string_view functionName,
@@ -104,7 +97,63 @@ template <
     Args&&... args
 )
 {
-    Logger::outputTest(
+    Logger::outputAssert(
+        condition,
+        filepath,
+        functionName,
+        lineNumber,
+        level,
+        subformat,
+        ::std::forward<decltype(args)>(args)...
+    );
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Silent Assert
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+template <
+    typename... Args
+> void ::xrn::Logger::silentAssertImpl(
+    bool condition,
+    const ::std::string_view filepath,
+    const ::std::string_view functionName,
+    const ::std::size_t lineNumber,
+    const ::fmt::format_string<Args...> subformat,
+    Args&&... args
+)
+{
+    Logger::outputSilentAssert(
+        condition,
+        filepath,
+        functionName,
+        lineNumber,
+        Logger::Level::fatalError,
+        subformat,
+        ::std::forward<decltype(args)>(args)...
+    );
+}
+
+///////////////////////////////////////////////////////////////////////////
+template <
+    typename... Args
+> void ::xrn::Logger::silentAssertImpl(
+    bool condition,
+    const ::std::string_view filepath,
+    const ::std::string_view functionName,
+    const ::std::size_t lineNumber,
+    const Logger::Level level,
+    const ::fmt::format_string<Args...> subformat,
+    Args&&... args
+)
+{
+    Logger::outputSilentAssert(
         condition,
         filepath,
         functionName,
@@ -200,7 +249,7 @@ template <
     case Logger::Level::error: // error that cannot be recovered but does not throw
         logSpecifier = ::fmt::format(
             ::fmt::emphasis::bold | ::fmt::bg(fmt::color::red) | ::fmt::fg(fmt::color::black),
-            "ERROR"
+            "FAILURE"
         );
         break;
     case Logger::Level::none: // no extra output. Should be avoided
@@ -210,7 +259,7 @@ template <
     case Logger::Level::fatalError: // same as fatal
         logSpecifier = ::fmt::format(
             ::fmt::emphasis::bold | ::fmt::bg(fmt::color::red) | ::fmt::fg(fmt::color::black),
-            "ERROR"
+            "FAILURE"
         );
         throw ::std::runtime_error{
             ::fmt::format("[{}] {} [{}] {}", Logger::getDate(), callPosition, logSpecifier, userMessage)
@@ -237,7 +286,7 @@ template <
 ///////////////////////////////////////////////////////////////////////////
 template <
     typename... Args
-> void ::xrn::Logger::outputTest(
+> void ::xrn::Logger::outputAssert(
     const bool condition,
     const ::std::string_view filepath,
     const ::std::string_view functionName,
@@ -264,6 +313,37 @@ template <
         return;
     }
 #endif
+
+    Logger::outputLog(
+        filepath,
+        functionName,
+        lineNumber,
+        level,
+        subformat,
+        ::std::forward<decltype(args)>(args)...
+    );
+}
+
+///////////////////////////////////////////////////////////////////////////
+template <
+    typename... Args
+> void ::xrn::Logger::outputSilentAssert(
+    const bool condition,
+    const ::std::string_view filepath,
+    const ::std::string_view functionName,
+    const ::std::size_t lineNumber,
+    Logger::Level level,
+    const ::fmt::format_string<Args...> subformat,
+    Args&&... args
+)
+{
+#if defined(NDEBUG)
+    return;
+#endif
+
+    if (condition) {
+        return;
+    }
 
     Logger::outputLog(
         filepath,

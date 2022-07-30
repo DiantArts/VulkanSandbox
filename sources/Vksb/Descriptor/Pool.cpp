@@ -38,10 +38,10 @@ auto ::vksb::descriptor::Pool::Builder::build() const -> std::unique_ptr<::vksb:
   descriptorPoolInfo.maxSets = maxSets;
   descriptorPoolInfo.flags = poolFlags;
 
-  if (vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
-      VK_SUCCESS) {
-      throw ::std::runtime_error("failed to create descriptor pool!");
-  }
+    XRN_ASSERT(
+        vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool) == VK_SUCCESS,
+        "Create descriptor pool"
+    );
 }
 
 ::vksb::descriptor::Pool::~Pool() {

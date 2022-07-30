@@ -8,7 +8,7 @@
     ::VkDescriptorType descriptorType,
     ::VkShaderStageFlags stageFlags,
     ::std::uint32_t count) {
-  assert(bindings.count(binding) == 0 && "Binding already in use");
+  XRN_SASSERT(bindings.count(binding) == 0, "Binding already in use");
   ::VkDescriptorSetLayoutBinding layoutBinding{};
   layoutBinding.binding = binding;
   layoutBinding.descriptorType = descriptorType;
@@ -37,13 +37,14 @@ auto ::vksb::descriptor::SetLayout::Builder::build() const -> ::std::unique_ptr<
   descriptorSetLayoutInfo.bindingCount = static_cast<::std::uint32_t>(setLayoutBindings.size());
   descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
-  if (vkCreateDescriptorSetLayout(
+  XRN_ASSERT(
+    vkCreateDescriptorSetLayout(
           device.device(),
           &descriptorSetLayoutInfo,
           nullptr,
-          &descriptorSetLayout) != VK_SUCCESS) {
-      throw ::std::runtime_error("failed to create descriptor set layout!");
-  }
+          &descriptorSetLayout) == VK_SUCCESS,
+      "Create descriptor set layout"
+  );
 }
 
 ::vksb::descriptor::SetLayout::~SetLayout() {

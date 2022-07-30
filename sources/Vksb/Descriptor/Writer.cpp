@@ -10,12 +10,12 @@
 
 ::vksb::descriptor::Writer &::vksb::descriptor::Writer::writeBuffer(
     ::std::uint32_t binding, ::VkDescriptorBufferInfo *bufferInfo) {
-  assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
+  XRN_SASSERT(setLayout.bindings.count(binding) == 1, "Layout does not contain specified binding");
 
   auto &bindingDescription = setLayout.bindings[binding];
 
-  assert(
-      bindingDescription.descriptorCount == 1 &&
+  XRN_SASSERT(
+      bindingDescription.descriptorCount == 1,
       "Binding single descriptor info, but binding expects multiple");
 
   ::VkWriteDescriptorSet write{};
@@ -31,12 +31,12 @@
 
 ::vksb::descriptor::Writer &::vksb::descriptor::Writer::writeImage(
     ::std::uint32_t binding, ::VkDescriptorImageInfo *imageInfo) {
-  assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
+  XRN_SASSERT(setLayout.bindings.count(binding) == 1, "Layout does not contain specified binding");
 
   auto &bindingDescription = setLayout.bindings[binding];
 
-  assert(
-      bindingDescription.descriptorCount == 1 &&
+  XRN_SASSERT(
+      bindingDescription.descriptorCount == 1,
       "Binding single descriptor info, but binding expects multiple");
 
   ::VkWriteDescriptorSet write{};

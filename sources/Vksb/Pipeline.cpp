@@ -112,12 +112,12 @@
 )
     : m_device{ device }
 {
-    assert(
-        configuration.pipelineLayout != VK_NULL_HANDLE &&
+    XRN_SASSERT(
+        configuration.pipelineLayout != VK_NULL_HANDLE,
         "Cannot create graphics pipeline: no pipelineLayout provided in the configuration"
     );
-    assert(
-        configuration.renderPass != VK_NULL_HANDLE &&
+    XRN_SASSERT(
+        configuration.renderPass != VK_NULL_HANDLE,
         "Cannot create graphics pipeline: no renderPass provided in the configuration");
 
 

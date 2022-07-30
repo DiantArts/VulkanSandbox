@@ -79,9 +79,12 @@ void ::vksb::system::Render::createPipelineLayout(
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
-    if (::vkCreatePipelineLayout(m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != ::VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to create pipeline layout.\n" };
-    }
+    XRN_ASSERT(
+        ::vkCreatePipelineLayout(
+            m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout
+        ) == ::VK_SUCCESS,
+        "Create pipeline layout"
+    );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -89,7 +92,7 @@ void ::vksb::system::Render::createPipeline(
     ::VkRenderPass renderPass
 )
 {
-    assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+    XRN_SASSERT(m_pipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
 
     ::vksb::Pipeline::Configuration pipelineConfig{};
     pipelineConfig.renderPass = renderPass;

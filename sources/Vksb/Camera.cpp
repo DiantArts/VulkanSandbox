@@ -79,7 +79,7 @@ void ::vksb::Camera::setPerspectiveProjection(
     const float far
 )
 {
-    assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
+    XRN_SASSERT(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "invalid camera aspect value");
     const float tanHalfFovy = tan(fovY / 2.f);
     m_projectionMatrix = glm::mat4{0.0f};
     m_projectionMatrix[0][0] = 1.f / (aspect * tanHalfFovy);
@@ -130,7 +130,7 @@ void ::vksb::Camera::setViewTarget(
 )
 {
     const auto direction{ target - position };
-    assert((direction.x || direction.y || direction.z) && "direction provided is 0");
+    XRN_SASSERT((direction.x || direction.y || direction.z), "direction provided is 0");
     setViewDirection(position, direction, up);
 }
 

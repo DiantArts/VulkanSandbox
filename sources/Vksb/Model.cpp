@@ -117,9 +117,7 @@ void ::vksb::Model::Builder::loadFromFile(
     filepath += filename;
     filepath += ::vksb::configuration.filepath.modelExtension;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, filepath.c_str())) {
-        throw ::std::runtime_error(warning + error);
-    }
+    XRN_SASSERT(tinyobj::LoadObj(&attrib, &shapes, &materials, &warning, &error, filepath.c_str()), "{} {}", warning, error);
 
     vertices.clear();
     indices.clear();
@@ -260,9 +258,7 @@ void ::vksb::Model::createVertexBuffers(
 )
 {
     m_vertexCount = static_cast<::std::uint32_t>(vertices.size());
-    if (m_vertexCount < 3) {
-        throw ::std::runtime_error{ "Vertex count must be at least 3" };
-    }
+    XRN_SASSERT(m_vertexCount >= 3, "Vertex count must be at least 3");
     ::std::size_t vertexSize{ sizeof(vertices[0]) };
     ::VkDeviceSize bufferSize{ vertexSize * m_vertexCount };
 

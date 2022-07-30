@@ -1,7 +1,8 @@
-.build*
-.obj*
-.dep*
-.vscode*
+.build/
+.cache/
+.obj*/
+.dep*/
+.vscode/
 *.pdf*
 *.o
 *.d
@@ -10,8 +11,9 @@
 *.spv
 #*#
 *~
-binaries*
+binaries/
 .doxygenOutput
 _*
 cccontrolReminder
 TODO
+compile_commands.json

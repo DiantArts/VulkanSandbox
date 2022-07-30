@@ -59,7 +59,7 @@ Buffer::~Buffer() {
  * @return VkResult of the buffer mapping call
  */
 VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
-  assert(buffer && memory && "Called map on buffer before create");
+  XRN_SASSERT(buffer && memory, "Called map on buffer before create");
   return vkMapMemory(device.device(), memory, offset, size, 0, &mapped);
 }
 
@@ -85,7 +85,7 @@ void Buffer::unmap() {
  *
  */
 void Buffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) {
-  assert(mapped && "Cannot copy to unmapped buffer");
+  XRN_SASSERT(mapped, "Cannot copy to unmapped buffer");
 
   if (size == VK_WHOLE_SIZE) {
     memcpy(mapped, data, m_bufferSize);

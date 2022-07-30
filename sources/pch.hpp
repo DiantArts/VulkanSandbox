@@ -7,40 +7,105 @@
 #ifndef ___INCLUDE_GUARD_INCLUDES_PCH_HPP___
 #define ___INCLUDE_GUARD_INCLUDES_PCH_HPP___
 
-
-
-#include <stack>
-#include <vector>
-#include <list>
-#include <deque>
-#include <array>
-#include <set>
-#include <map>
-#include <queue>
-#include <unordered_set>
-#include <unordered_map>
-
-#include <algorithm>
+#include <concepts>
+// #include <coroutine> // requires -fcoroutines
+#include <any>
+#include <bitset>
 #include <chrono>
-#include <fstream>
+#include <compare>
+#include <csetjmp>
+#include <csignal>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdlib>
+#include <ctime>
 #include <functional>
-#include <iostream>
+#include <initializer_list>
+#include <optional>
+#include <source_location>
+#include <tuple>
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
+#include <utility>
+#include <variant>
+#include <version>
 #include <memory>
-#include <mutex>
-#include <ranges>
-#include <span>
-#include <sstream>
+#include <memory_resource>
+#include <new>
+#include <scoped_allocator>
+#include <cfloat>
+#include <cinttypes>
+#include <climits>
+#include <cstdint>
+#include <limits>
+#include <cassert>
+#include <cerrno>
+#include <exception>
 #include <stdexcept>
+#include <system_error>
+// #include <stacktrace> // c++23
+#include <cctype>
+#include <charconv>
+#include <cstring>
+#include <cuchar>
+#include <cwchar>
+#include <cwctype>
+// #include <format> // c++23
 #include <string>
 #include <string_view>
-#include <variant>
+#include <array>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <span>
+#include <stack>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <iterator>
+#include <ranges>
+#include <algorithm>
+// #include <execution> // linkage errors
+#include <bit>
+#include <cfenv>
+#include <cmath>
+#include <complex>
+#include <numbers>
+#include <numeric>
+#include <random>
+#include <ratio>
+#include <valarray>
+#include <clocale>
+#include <codecvt>
+#include <locale>
+#include <cstdio>
+#include <fstream>
+#include <iomanip>
+#include <ios>
+#include <iosfwd>
+#include <iostream>
+#include <istream>
+#include <ostream>
+// #include <spanstream> // c++23
+#include <sstream>
+#include <streambuf>
+#include <syncstream>
+#include <filesystem>
+#include <regex>
+#include <atomic>
+#include <barrier>
+#include <condition_variable>
+#include <future>
+#include <latch>
+#include <mutex>
+#include <semaphore>
+#include <shared_mutex>
+#include <stop_token>
 #include <thread>
-#include <utility>
-#include <concepts>
-#include <bitset>
-#include <initializer_list>
-#include <compare>
-#include <cstring>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -62,8 +127,8 @@ using ::std::string_literals::operator""s;
 using ::std::literals::string_view_literals::operator""sv;
 using ::std::chrono_literals::operator""ms;
 
-// #define PRINT_DEBUG
-// #include <Logger.hpp>
+#define PRINT_DEBUG
+#include <xrn/Log/Logger.hpp>
 
 
 inline auto operator<<(

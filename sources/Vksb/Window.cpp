@@ -45,26 +45,23 @@ auto ::vksb::Window::Size::isValid()
     const ::std::string& windowName /* = Window::defaultName */
 )
     : m_size{ Window::defaultSize }
-    , m_pWindow{ glfwCreateWindow(
+    , m_pWindow{ ::glfwCreateWindow(
         m_size.width,
         m_size.height,
         windowName.c_str(),
-        isFullscreen ? glfwGetPrimaryMonitor() : nullptr,
+        isFullscreen ? ::glfwGetPrimaryMonitor() : nullptr,
         nullptr
     ) }
 {
-    if (!m_pWindow) {
-        glfwTerminate();
-        throw::std::runtime_error("Window creation Failed");
-    }
+    XRN_ASSERT(!!m_pWindow, "Create glfw window");
 
-    glfwSetWindowUserPointer(m_pWindow.get(), &m_events);
+    ::glfwSetWindowUserPointer(m_pWindow.get(), &m_events);
 
     // setup callbacks
-    glfwSetFramebufferSizeCallback(m_pWindow.get(), Window::framebufferResizeCallback);
-    glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
-    // glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
-    // glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
+    ::glfwSetFramebufferSizeCallback(m_pWindow.get(), Window::framebufferResizeCallback);
+    ::glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
+    // ::glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
+    // ::glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
 }
 
 
@@ -160,7 +157,6 @@ void ::vksb::Window::resize(
     m_size.width = size.width;
     m_size.height = size.height;
     this->setResizedFlag();
-    ::std::cout << "Window resized." << ::std::endl;
 }
 
 
@@ -192,9 +188,10 @@ void ::vksb::Window::createWindowSurface(
     ::VkSurfaceKHR* surface
 )
 {
-    if (::glfwCreateWindowSurface(instance, m_pWindow.get(), nullptr, surface) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to create window surface" };
-    }
+    XRN_ASSERT(
+        ::glfwCreateWindowSurface(instance, m_pWindow.get(), nullptr, surface) == VK_SUCCESS,
+        "Create glfw window surface"
+    );
 }
 
 
@@ -212,7 +209,7 @@ void ::vksb::Window::framebufferResizeCallback(
     const int width,
     const int height
 ) {
-    auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
+    auto& events{ *reinterpret_cast<::vksb::event::Container*>(::glfwGetWindowUserPointer(pWindow)) };
     events.emplace<::vksb::event::WindowResize>(Window::Size{
         .width = static_cast<::std::size_t>(width),
         .height = static_cast<::std::size_t>(height)
@@ -228,7 +225,7 @@ void ::vksb::Window::keyCallback(
     const int mods
 )
 {
-    auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
+    auto& events{ *reinterpret_cast<::vksb::event::Container*>(::glfwGetWindowUserPointer(pWindow)) };
     if (action == GLFW_PRESS) {
         events.emplace<::vksb::event::KeyPressed>(keyCode);
     } else if (action == GLFW_RELEASE) {
@@ -243,7 +240,7 @@ void ::vksb::Window::mouseMovedCallback(
     const double yPos
 )
 {
-    // auto& events{ *reinterpret_cast<::vksb::event::Container*>(glfwGetWindowUserPointer(pWindow)) };
+    // auto& events{ *reinterpret_cast<::vksb::event::Container*>(::glfwGetWindowUserPointer(pWindow)) };
     // events.emplace<::vksb::event::MouseMoved>(xPos, yPos);
 }
 
@@ -277,17 +274,15 @@ void ::vksb::Window::Deleter::operator()(
 class GlfwMemoryManager {
     GlfwMemoryManager()
     {
-        if (!glfwInit()) {
-            throw::std::runtime_error("glwfInit Failed");
-        }
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        XRN_ASSERT(::glfwInit(), "Init glfw");
+        ::glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        ::glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         // stbi_set_flip_vertically_on_load(true);
     }
 
     ~GlfwMemoryManager()
     {
-        glfwTerminate();
+        ::glfwTerminate();
     }
 
     static const GlfwMemoryManager _;

@@ -86,7 +86,7 @@ auto ::vksb::Renderer::isFrameInProgress() const
 auto ::vksb::Renderer::getCurrentCommandBuffer() const
     -> ::VkCommandBuffer
 {
-    assert(this->isFrameInProgress() && "Cannot get command buffer when frame is not in progress");
+    XRN_SASSERT(this->isFrameInProgress(), "Cannot get command buffer when frame is not in progress");
     return m_commandBuffers[m_currentFrameIndex];
 }
 
@@ -94,7 +94,7 @@ auto ::vksb::Renderer::getCurrentCommandBuffer() const
 [[ nodiscard ]] auto ::vksb::Renderer::getFrameIndex() const
     -> int
 {
-    assert(this->isFrameInProgress() && "Cannot get frame index when frame is not in progress");
+    XRN_SASSERT(this->isFrameInProgress(), "Cannot get frame index when frame is not in progress");
     return m_currentFrameIndex;
 }
 
@@ -111,13 +111,13 @@ auto ::vksb::Renderer::getCurrentCommandBuffer() const
 [[ nodiscard ]] auto ::vksb::Renderer::beginFrame()
     -> ::VkCommandBuffer
 {
-    assert(!this->isFrameInProgress() && "Cannot call beginFrame() while frame already in progress");
+    XRN_SASSERT(!this->isFrameInProgress(), "Cannot call beginFrame() while frame already in progress");
     switch (m_pSwapChain->acquireNextImage(&m_currentImageIndex)) {
     case VK_SUCCESS:
     case VK_SUBOPTIMAL_KHR:
         break;
     case VK_ERROR_OUT_OF_DATE_KHR:
-        ::std::cout << "New swapchain needs to be created." << ::std::endl;
+        XRN_LOG(::xrn::Logger::Level::note, "New swapchain needs to be created.");
         m_window.setResizedFlag();
         this->recreateSwapChain();
         return nullptr;
@@ -131,28 +131,24 @@ auto ::vksb::Renderer::getCurrentCommandBuffer() const
     ::VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if (::vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to begin recording command buffer!\n" };
-    }
+    XRN_SASSERT(::vkBeginCommandBuffer(commandBuffer, &beginInfo) == VK_SUCCESS, "Failed to begin recording command buffer!");
     return commandBuffer;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::Renderer::endFrame()
 {
-    assert(this->isFrameInProgress() && "Cannot call endFrame() if frame is not in progress");
+    XRN_SASSERT(this->isFrameInProgress(), "Cannot call endFrame() if frame is not in progress");
     auto commandBuffer{ this->getCurrentCommandBuffer() };
-    if (::vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to record command buffer.\n" };
-    }
+    XRN_SASSERT(::vkEndCommandBuffer(commandBuffer) == VK_SUCCESS, "Failed to record command buffer.\n");
     if (
         auto result{ m_pSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex) };
         result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.wasResized()
     ) {
         m_window.resetResizedFlag();
         recreateSwapChain();
-    } else if (result != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to present swapChain image.\n" };
+    } else {
+        XRN_SASSERT(result == VK_SUCCESS, "Failed to present swapChain image.");
     }
 
     m_isFrameStarted = false;
@@ -164,8 +160,8 @@ void ::vksb::Renderer::beginSwapChainRenderPass(
     ::VkCommandBuffer commandBuffer
 )
 {
-    assert(this->isFrameInProgress() && "Cannot call beginSwapChainRenderPass() if frame is not in progress");
-    assert(commandBuffer == getCurrentCommandBuffer() && "Cannot begin render pass on command buffer from a different frame");
+    XRN_SASSERT(this->isFrameInProgress(), "Cannot call beginSwapChainRenderPass() if frame is not in progress");
+    XRN_SASSERT(commandBuffer == getCurrentCommandBuffer(), "Cannot begin render pass on command buffer from a different frame");
 
     ::VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -200,8 +196,8 @@ void ::vksb::Renderer::endSwapChainRenderPass(
     ::VkCommandBuffer commandBuffer
 )
 {
-    assert(this->isFrameInProgress() && "Cannot call endSwapChainRenderPass() if frame is not in progress");
-    assert(commandBuffer == getCurrentCommandBuffer() && "Cannot end render pass on command buffer from a different frame");
+    XRN_SASSERT(this->isFrameInProgress(), "Cannot call endSwapChainRenderPass() if frame is not in progress");
+    XRN_SASSERT(commandBuffer == getCurrentCommandBuffer(), "Cannot end render pass on command buffer from a different frame");
     ::vkCmdEndRenderPass(commandBuffer);
 }
 
@@ -225,9 +221,7 @@ void ::vksb::Renderer::createCommandBuffers()
     allocInfo.commandPool = m_device.getCommandPool();
     allocInfo.commandBufferCount = static_cast<uint32_t>(m_commandBuffers.size());
 
-    if (vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) != VK_SUCCESS) {
-        throw ::std::runtime_error{ "Failed to allocate command buffers!\n" };
-    }
+    XRN_SASSERT(vkAllocateCommandBuffers(m_device.device(), &allocInfo, m_commandBuffers.data()) == VK_SUCCESS, "Failed to allocate command buffers!");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -257,8 +251,6 @@ void ::vksb::Renderer::recreateSwapChain()
     } else {
         ::std::shared_ptr<::vksb::SwapChain> oldSwapchain{ ::std::move(m_pSwapChain) };
         m_pSwapChain = ::std::make_unique<::vksb::SwapChain>(m_device, windowSize, oldSwapchain);
-        if (!oldSwapchain->compareSwapFormats(*m_pSwapChain.get())) {
-            throw ::std::runtime_error{ "Swap chain image or depth format has changed" };
-        }
+        XRN_SASSERT(oldSwapchain->compareSwapFormats(*m_pSwapChain.get()), "Swap chain image or depth format has changed");
     }
 }

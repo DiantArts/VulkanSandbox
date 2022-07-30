@@ -1,5 +1,8 @@
 #pragma once
 
+#include <fmt/format.h>
+#include <fmt/color.h>
+
 namespace xrn {
 
 ///////////////////////////////////////////////////////////////////////////
@@ -7,21 +10,21 @@ namespace xrn {
 ///
 /// \include Logger.hpp <Logger.hpp>
 ///
-/// Output varies if NDEBUG (no debug) that disable tests and PRINT_DEBUG
-/// that prints "success" if the test succeeded.
+/// Output varies if NDEBUG (no debug) that disable asserts and PRINT_DEBUG
+/// that prints "success" if the assert succeeded.
 /// The logger level is optional;
 /// The print format is the same as fmt (::std::format) library
 ///
 /// \code cpp
-/// ::xrn::test(true, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::none, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::success, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::note, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::info, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::trace, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::debug, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::warning, "Message");
-/// ::xrn::test(true, ::xrn::Logger::Level::error, "Message");
+/// XRN_ASSERT(true, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::none, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::success, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::note, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::info, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::trace, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::debug, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::warning, "Message");
+/// XRN_ASSERT(true, ::xrn::Logger::Level::error, "Message");
 /// \endcode
 ///
 ///////////////////////////////////////////////////////////////////////////
@@ -123,7 +126,7 @@ public:
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Test
+    // Assert
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,12 +134,12 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Same as assert from <cassert>
     ///
-    /// Prints successful tests if PRINT_DEBUG is defined
+    /// Prints successful asserts if PRINT_DEBUG is defined
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename... Args
-    > static void testImpl(
+    > static void assertImpl(
         bool condition,
         ::std::string_view filepath,
         ::std::string_view functionName,
@@ -150,7 +153,46 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename... Args
-    > static void testImpl(
+    > static void assertImpl(
+        bool condition,
+        ::std::string_view filepath,
+        ::std::string_view functionName,
+        ::std::size_t lineNumber,
+        Logger::Level level,
+        ::fmt::format_string<Args...> subformat,
+        Args&&... args
+    );
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Silent Assert
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Same as assert from <cassert>
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename... Args
+    > static void silentAssertImpl(
+        bool condition,
+        ::std::string_view filepath,
+        ::std::string_view functionName,
+        ::std::size_t lineNumber,
+        ::fmt::format_string<Args...> subformat,
+        Args&&... args
+    );
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename... Args
+    > static void silentAssertImpl(
         bool condition,
         ::std::string_view filepath,
         ::std::string_view functionName,
@@ -186,11 +228,26 @@ private:
     );
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Test and outputs the message with the right format if needed
+    /// \brief Assert and outputs the message with the right format if needed
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename... Args
-    > static void outputTest(
+    > static void outputAssert(
+        bool condition,
+        ::std::string_view filepath,
+        ::std::string_view functionName,
+        ::std::size_t lineNumber,
+        Logger::Level level,
+        ::fmt::format_string<Args...> subformat,
+        Args&&... args
+    );
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Assert and outputs the message with the right format if needed
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename... Args
+    > static void outputSilentAssert(
         bool condition,
         ::std::string_view filepath,
         ::std::string_view functionName,
@@ -203,7 +260,7 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Format date
     ///////////////////////////////////////////////////////////////////////////
-    [[ nodiscard ]] static auto getDate()
+    [[ nodiscard ]] static inline auto getDate()
         -> ::std::string;
 };
 
@@ -221,12 +278,17 @@ private:
 ///////////////////////////////////////////////////////////////////////////
 ///
 ///////////////////////////////////////////////////////////////////////////
-#define log(...) Logger::logImpl(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define XRN_LOG(...) ::xrn::Logger::logImpl(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 ///////////////////////////////////////////////////////////////////////////
 /// \brief Same as assert from <cassert>
 ///////////////////////////////////////////////////////////////////////////
-#define test(condition, ...) Logger::testImpl(((condition)), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define XRN_ASSERT(condition, ...) ::xrn::Logger::assertImpl((condition), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+
+///////////////////////////////////////////////////////////////////////////
+/// \brief Same as assert from <cassert>
+///////////////////////////////////////////////////////////////////////////
+#define XRN_SASSERT(condition, ...) ::xrn::Logger::silentAssertImpl((condition), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 
 
@@ -236,4 +298,4 @@ private:
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-#include <Log/Logger.impl.hpp>
+#include "./Logger.impl.hpp"
