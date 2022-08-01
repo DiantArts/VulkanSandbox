@@ -31,6 +31,11 @@
         m_renderer.getSwapChainRenderPass(),
         m_pDescriptorSetLayout->getDescriptorSetLayout()
     }
+    , m_pointLightSystem{
+        m_device,
+        m_renderer.getSwapChainRenderPass(),
+        m_pDescriptorSetLayout->getDescriptorSetLayout()
+    }
     , m_player{ m_registry.create() }
     , m_frameInfo{ m_descriptorSets, *this }
 {
@@ -160,6 +165,8 @@ void ::vksb::AScene::draw()
         m_registry.view<::vksb::component::Transform3d>().each([this](auto& transform){
             m_renderSystem(m_frameInfo, transform);
         });
+        m_pointLightSystem.bind(m_frameInfo);
+        m_pointLightSystem(m_frameInfo);
         m_renderer.endSwapChainRenderPass(m_frameInfo.commandBuffer);
         m_renderer.endFrame();
     }

@@ -129,22 +129,18 @@ file(
     GLOB_RECURSE
     XRN_FRAGMENTS
     ${XRN_FRAGMENTS_DIR}/*.glsl
-    ${XRN_FRAGMENTS_DIR}/*.vert
-    ${XRN_FRAGMENTS_DIR}/*.vertex
-    ${XRN_FRAGMENTS_DIR}/*.frag
-    ${XRN_FRAGMENTS_DIR}/*.fragment
     ${XRN_FRAGMENTS_DIR}/*.shader
+    ${XRN_SHADERS_DIR}/*.vert
+    ${XRN_SHADERS_DIR}/*.vertex
     PARENT_SCOPE
 )
 file(
     GLOB_RECURSE
     XRN_VERTEXES
     ${XRN_VERTEXES_DIR}/*.glsl
-    ${XRN_VERTEXES_DIR}/*.vert
-    ${XRN_VERTEXES_DIR}/*.vertex
-    ${XRN_VERTEXES_DIR}/*.frag
-    ${XRN_VERTEXES_DIR}/*.fragment
     ${XRN_VERTEXES_DIR}/*.shader
+    ${XRN_SHADERS_DIR}/*.vert
+    ${XRN_SHADERS_DIR}/*.vertex
     PARENT_SCOPE
 )
 
