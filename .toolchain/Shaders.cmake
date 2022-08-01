@@ -7,7 +7,7 @@ macro(compile_shaders interface)
             set(SPIRV "${XRN_FRAGMENTS_DIR}/${FILE_NAME}.spv")
             add_custom_command(
                 OUTPUT ${SPIRV}
-                COMMAND glslc -fshader-stage="vertex" ${SHADER} -o ${SPIRV}
+                COMMAND glslc -fshader-stage="fragment" ${SHADER} -o ${SPIRV}
                 DEPENDS ${SHADER}
                 COMMENT "Compiling ${SHADER}"
             )
