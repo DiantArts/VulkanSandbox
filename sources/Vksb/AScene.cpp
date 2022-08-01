@@ -12,6 +12,7 @@
 #include <Vksb/Component/Rotation.hpp>
 #include <Vksb/Component/Scale.hpp>
 #include <Vksb/Buffer.hpp>
+#include <Vksb/Configuration.hpp>
 
 
 
@@ -28,6 +29,7 @@
         .addBinding(0, ::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::VK_SHADER_STAGE_ALL_GRAPHICS)
         .build()
     }
+    , m_frameInfo{ m_descriptorSets, *this }
     , m_uboBuffers{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT }
     , m_renderSystem{
         m_device,
@@ -40,13 +42,12 @@
         m_pDescriptorSetLayout->getDescriptorSetLayout()
     }
     , m_player{ m_registry.create() }
-    , m_frameInfo{ m_descriptorSets, *this }
+    , m_camera{ m_player }
 {
     m_pDescriptorPool = ::vksb::descriptor::Pool::Builder{ m_device }
         .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
-    m_camera.setViewDirection(::glm::vec3{ 0.0f, 0.0f, -2.5f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
 
     for (auto& pUbo : m_uboBuffers) {
         pUbo = ::std::make_unique<::vksb::Buffer>(
@@ -140,39 +141,44 @@ auto ::vksb::AScene::update()
         // direction
         if (pRotation) {
             if (pRotation->isChanged()) {
-                transform.updateDirection(*pRotation);
-                pRotation->resetChangedFlag();
             }
         }
 
         // matrix and normalMatrix
         if (pPosition) {
             if (pRotation) {
+                transform.updateDirection(*pRotation);
+                pRotation->resetChangedFlag();
                 if (pScale) {
                     if (pPosition->isChanged() || pRotation->isChanged() || pScale->isChanged()) {
                         transform.updateMatrix(*pPosition, *pRotation, *pScale);
                         transform.updateNormalMatrix(*pRotation, *pScale);
                     }
-                } else {
-                    if (pPosition->isChanged() || pRotation->isChanged()) {
-                        transform.updateMatrix(*pPosition, *pRotation);
-                        transform.updateNormalMatrix(*pRotation);
-                    }
+                    pScale->resetChangedFlag();
+                } else if (pPosition->isChanged() || pRotation->isChanged()) {
+                    transform.updateMatrix(*pPosition, *pRotation);
+                    transform.updateNormalMatrix(*pRotation);
                 }
-            } else {
-                if (pPosition->isChanged()) {
-                    transform.updateMatrix(*pPosition);
-                }
+                pRotation->resetChangedFlag();
+            } else if (pPosition->isChanged()) {
+                transform.updateMatrix(*pPosition);
             }
+            pPosition->resetChangedFlag();
         }
     }
 
-    m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
-        [this](auto& transform, auto& control){
-            control.updatePosition(m_frameInfo.deltaTime, transform);
-            control.updateRotation(transform);
-        }
-    );
+    {
+        auto& position{ m_registry.get<::vksb::component::Position>(m_camera.getId()) };
+        auto& transform{ m_registry.get<::vksb::component::Transform3d>(m_camera.getId()) };
+        m_camera.setViewDirection(position, transform.getDirection());
+    }
+
+    // m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
+        // [this](auto& transform, auto& control){
+            // control.updatePosition(m_frameInfo.deltaTime, transform);
+            // control.updateRotation(transform);
+        // }
+    // );
     return true;
 }
 
@@ -213,7 +219,7 @@ void ::vksb::AScene::draw()
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::AScene::limitFrameRate()
 {
-    auto t{ ::xrn::Time::createAsSeconds(1) / m_maxFrameRate };
+    auto t{ ::xrn::Time::createAsSeconds(1) / ::vksb::configuration.maxFrameRate };
     if (t > m_frameInfo.deltaTime) {
         ::std::this_thread::sleep_for(::std::chrono::milliseconds(t - m_frameInfo.deltaTime));
     }

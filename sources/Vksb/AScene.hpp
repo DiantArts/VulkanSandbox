@@ -196,26 +196,25 @@ protected:
 
     // Vulkan
     ::vksb::Window m_window{ false };
-   ::vksb::Device m_device{ m_window };
+    ::vksb::Device m_device{ m_window };
 
     ::std::unique_ptr<::vksb::descriptor::SetLayout> m_pDescriptorSetLayout;
     ::std::unique_ptr<::vksb::descriptor::Pool> m_pDescriptorPool;
     ::std::vector<::VkDescriptorSet> m_descriptorSets{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT };
-    ::std::vector<::std::unique_ptr<::vksb::Buffer>> m_uboBuffers;
+    ::vksb::FrameInfo m_frameInfo;
 
+    ::std::vector<::std::unique_ptr<::vksb::Buffer>> m_uboBuffers;
     ::vksb::Renderer m_renderer{ m_window, m_device };
+
     ::vksb::system::Render m_renderSystem;
     ::vksb::system::PointLight m_pointLightSystem;
 
-    ::vksb::Camera m_camera;
-    ::std::uint16_t m_maxFrameRate{ 60 };
-
     // ECS
     ::entt::registry m_registry;
-    ::entt::entity m_player;
 
-    // Others
-    ::vksb::FrameInfo m_frameInfo;
+    // Special entities
+    ::entt::entity m_player;
+    ::vksb::Camera m_camera;
 
 };
 

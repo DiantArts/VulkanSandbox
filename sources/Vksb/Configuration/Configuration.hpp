@@ -25,6 +25,9 @@ struct Configuration
     ::glm::vec3 rotateSpeed{ 1.5f }; // when rotating with keys
     static inline constexpr float minPitch{ -89.999f };
     static inline constexpr float maxPitch{ 89.999f };
+
+    // others
+    ::std::uint16_t maxFrameRate{ 60 };
 };
 
 } // namespace vksb::detail::configuration

@@ -18,7 +18,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-::vksb::Camera::Camera() = default;
+::vksb::Camera::Camera(
+    ::entt::entity id
+)
+    : m_id{ id }
+{}
 
 
 
@@ -169,4 +173,11 @@ auto ::vksb::Camera::getView() const
     -> const ::glm::mat4&
 {
     return m_viewMatrix;
+}
+
+///////////////////////////////////////////////////////////////////////////
+[[ nodiscard ]] auto ::vksb::Camera::getId() const
+    -> ::entt::entity
+{
+    return m_id;
 }
