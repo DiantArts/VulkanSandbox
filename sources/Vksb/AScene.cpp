@@ -129,6 +129,18 @@ void ::vksb::AScene::run()
 auto ::vksb::AScene::update()
     -> bool
 {
+    // for(auto& [entity, transform]: m_registry.view<::vksb::component::Transform3d>().each()) {
+        // auto* pScale{ m_registry.get_if<::vksb::component::Scale>(entity) };
+        // auto* pRotation{ m_registry.get_if<::vksb::component::Rotation>(entity) };
+        // auto* pPosition{ m_registry.get_if<::vksb::component::Position>(entity) };
+        // if (pRotation) {
+            // if (pRotation->isChanged()) {
+                // transform.updateDirection(*pRotation);
+                // pRotation->resetChangedFlag();
+            // }
+        // }
+    // }
+
     m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
         [this](auto& transform, auto& control){
             control.updatePosition(m_frameInfo.deltaTime, transform);

@@ -72,25 +72,24 @@ auto ::vksb::App::postUpdate()
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::loadObjects()
 {
-    {
-        ::vksb::component::Transform3d object;
-        object.model = ::vksb::Model::createFromFile(m_device, "SmoothVase");
-        object.setPosition(-0.5f, 0.5f, 0.0f);
-        object.setScale(3.0f, 1.5f, 3.0f);
-        m_registry.emplace<::vksb::component::Transform3d>(m_player, ::std::move(object));
-    }
-    {
-        ::vksb::component::Transform3d object;
-        object.model = ::vksb::Model::createFromFile(m_device, "SmoothVase");
-        object.setPosition(0.5f, 0.5f, 0.0f);
-        object.setScale(3.0f, 1.5f, 3.0f);
-        m_registry.emplace<::vksb::component::Transform3d>(m_registry.create(), ::std::move(object));
-    }
-    {
-        ::vksb::component::Transform3d object;
-        object.model = ::vksb::Model::createFromFile(m_device, "Floor");
-        object.setPosition(0.0f, 0.5f, 0.0f);
-        object.setScale(3.0f, 1.0f, 3.0f);
-        m_registry.emplace<::vksb::component::Transform3d>(m_registry.create(), ::std::move(object));
-    }
+    // object.setPosition(-0.5f, 0.5f, 0.0f);
+    // object.setScale(3.0f, 1.5f, 3.0f);
+    // m_registry.emplace<::vksb::component::Transform3d>(
+        // m_player,
+        // ::vksb::Model::createFromFile(m_device, "SmoothVase")
+    // );
+
+    // object.setPosition(0.5f, 0.5f, 0.0f);
+    // object.setScale(3.0f, 1.5f, 3.0f);
+    // m_registry.emplace<::vksb::component::Transform3d>(
+        // m_registry.create(),
+        // ::vksb::Model::createFromFile(m_device, "SmoothVase")
+    // );
+
+    // object.setPosition(0.5f, 0.5f, 0.0f);
+    // object.setScale(3.0f, 1.5f, 3.0f);
+    // m_registry.emplace<::vksb::component::Transform3d>(
+        // m_registry.create(),
+        // ::vksb::Model::createFromFile(m_device, "Floor")
+    // );
 }

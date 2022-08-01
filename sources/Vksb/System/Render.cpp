@@ -106,9 +106,10 @@ void ::vksb::system::Render::operator()(
     ::vksb::component::Transform3d& transform
 ) const
 {
-    ::SimplePushConstantData push{};
-    push.modelMatrix = transform.getMatrix();
-    push.normalMatrix = transform.getNormalMatrix();
+    ::SimplePushConstantData push{
+        .modelMatrix = transform.getMatrix(),
+        .normalMatrix = transform.getNormalMatrix()
+    };
 
     ::vkCmdPushConstants(
         frameInfo.commandBuffer,
@@ -118,8 +119,8 @@ void ::vksb::system::Render::operator()(
         sizeof(::SimplePushConstantData),
         &push
     );
-    transform.model->bind(frameInfo.commandBuffer);
-    transform.model->draw(frameInfo.commandBuffer);
+    transform.getModel().bind(frameInfo.commandBuffer);
+    transform.getModel().draw(frameInfo.commandBuffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////

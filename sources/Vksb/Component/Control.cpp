@@ -96,30 +96,30 @@ void ::vksb::component::Control::updatePosition(
     if (m_ableToFly) {
         if (this->isMovingUp()) {
             if (!this->isMovingDown()) {
-                transform.moveUp(velocity);
+                // transform.moveUp(velocity);
             }
             speedDirectionDivider /= 2;
         } else if (this->isMovingDown()) {
-            transform.moveDown(velocity);
+            // transform.moveDown(velocity);
         }
     }
 
     // left right
     if (this->isMovingLeft()) {
         if (!this->isMovingRight()) {
-            transform.moveLeft(velocity);
+            // transform.moveLeft(velocity);
         }
     } else if (this->isMovingRight()) {
-        transform.moveRight(velocity);
+        // transform.moveRight(velocity);
     }
 
     // forward backward
     if (this->isMovingForward()) {
         if (!this->isMovingBackward()) {
-            transform.moveForward(velocity);
+            // transform.moveForward(velocity);
         }
     } else if (this->isMovingBackward()) {
-        transform.moveBackward(velocity);
+        // transform.moveBackward(velocity);
     }
 }
 
@@ -128,7 +128,7 @@ void ::vksb::component::Control::updateRotation(
     ::vksb::component::Transform3d& transform
 )
 {
-    transform.rotate(::std::move(m_rotation));
+    // transform.rotate(::std::move(m_rotation));
     m_rotation = ::glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
 
