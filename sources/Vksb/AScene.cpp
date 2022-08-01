@@ -145,16 +145,18 @@ auto ::vksb::AScene::update()
             }
         }
 
-        // matrix
+        // matrix and normalMatrix
         if (pPosition) {
             if (pRotation) {
                 if (pScale) {
                     if (pPosition->isChanged() || pRotation->isChanged() || pScale->isChanged()) {
                         transform.updateMatrix(*pPosition, *pRotation, *pScale);
+                        transform.updateNormalMatrix(*pRotation, *pScale);
                     }
                 } else {
                     if (pPosition->isChanged() || pRotation->isChanged()) {
                         transform.updateMatrix(*pPosition, *pRotation);
+                        transform.updateNormalMatrix(*pRotation);
                     }
                 }
             } else {
