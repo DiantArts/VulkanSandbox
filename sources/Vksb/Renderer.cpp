@@ -122,7 +122,7 @@ auto ::vksb::Renderer::getCurrentCommandBuffer() const
         this->recreateSwapChain();
         return nullptr;
     default:
-        throw ::std::runtime_error{ "Failed to aquire swapChain image.\n" };
+        XRN_LOG(::xrn::Logger::fatalError, "Failed to aquire swapChain image");
     }
 
     m_isFrameStarted = true;

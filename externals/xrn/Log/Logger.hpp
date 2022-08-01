@@ -276,19 +276,29 @@ private:
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-///
+/// \brief Output logs
 ///////////////////////////////////////////////////////////////////////////
-#define XRN_LOG(...) ::xrn::Logger::logImpl(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define XRN_LOG(...) \
+    ::xrn::Logger::logImpl(__FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+
+///////////////////////////////////////////////////////////////////////////
+/// \brief Throws a runtime_error with the right output
+///////////////////////////////////////////////////////////////////////////
+#define XRN_THROW(...) \
+    ::xrn::Logger::logImpl(__FILE__, __FUNCTION__, __LINE__, ::xrn::Logger::Level::fatalError, __VA_ARGS__); \
+    throw ::std::logic_error{ "exception shoulh have been already thrown" }
 
 ///////////////////////////////////////////////////////////////////////////
 /// \brief Same as assert from <cassert>
 ///////////////////////////////////////////////////////////////////////////
-#define XRN_ASSERT(condition, ...) ::xrn::Logger::assertImpl((condition), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define XRN_ASSERT(condition, ...) \
+    ::xrn::Logger::assertImpl((condition), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 ///////////////////////////////////////////////////////////////////////////
-/// \brief Same as assert from <cassert>
+/// \brief Same as assert from XRN_ASSERT but does not print success
 ///////////////////////////////////////////////////////////////////////////
-#define XRN_SASSERT(condition, ...) ::xrn::Logger::silentAssertImpl((condition), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define XRN_SASSERT(condition, ...) \
+    ::xrn::Logger::silentAssertImpl((condition), __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 
 

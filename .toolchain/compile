@@ -121,6 +121,7 @@ run() {
 
 clean() {
     rm -rf ${buildDir}
+    find -type f -name \*.spv -delete
     rm -f ./compile_commands.json
     rm -rf ./.cache
 }

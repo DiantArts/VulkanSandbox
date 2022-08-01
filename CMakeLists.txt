@@ -28,6 +28,10 @@ set(XRN_TESTS_DIR "tests")
 set(XRN_EXTERNAL_DIR "externals")
 set(XRN_OUTPUT_DIR "binaries")
 
+set(XRN_SHADERS_DIR "shaders")
+set(XRN_FRAGMENTS_DIR "Fragment")
+set(XRN_VERTEXES_DIR "Vertex")
+
 # testing
 option(ENABLE_TESTING "Enable testing" OFF)
 option(ENABLE_UNIT_TESTING "Build unit tests" OFF)
@@ -55,11 +59,12 @@ option(ENABLE_SANITIZER_MEMORY "Enable memory sanitizer" OFF)
 # compilations
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 option(ENABLE_C++20_COROUTINES "Enable coroutines supports" OFF)
+option(ENABLE_SHADERS "Compiles GLSL shaders to SPV" ON)
 
 # optimization
 option(ENABLE_IPO "Enable IterpPocedural Optimization (Link Time Optimization)" ON)
 option(ENABLE_CACHE "Enable cache if available" ON)
-option(ENABLE_STD_PCH "Enable Precompiled Headers of the STD library" OFF)
+option(ENABLE_STD_PCH "Enable Precompiled Headers of the STD library" ON)
 option(ENABLE_PCH "Enable personal Precompiled Headers (<pch.hpp>)" ON)
 
 # others
@@ -87,6 +92,10 @@ set(XRN_SOURCES_DIR_RELATIVE ${XRN_SOURCES_DIR})
 set(XRN_TESTS_DIR_RELATIVE ${XRN_TESTS_DIR})
 set(XRN_INCLUDE_DIRS_RELATIVE ${XRN_EXTERNAL_DIR})
 
+set(XRN_SHADERS_DIR_RELATIVE ${XRN_SHADERS_DIR})
+set(XRN_FRAGMENTS_DIR_RELATIVE ${XRN_SHADERS_DIR}/${XRN_FRAGMENTS_DIR})
+set(XRN_VERTEXES_DIR_RELATIVE ${XRN_SHADERS_DIR}/${XRN_VERTEXES_DIR})
+
 get_filename_component(XRN_ROOT_DIR ${CMAKE_SOURCE_DIR} REALPATH)
 get_filename_component(XRN_BUILD_DIR ${CMAKE_BINARY_DIR} REALPATH)
 get_filename_component(XRN_TOOLCHAIN_DIR ${XRN_TOOLCHAIN_DIR} REALPATH)
@@ -95,6 +104,10 @@ get_filename_component(XRN_SOURCES_DIR ${XRN_SOURCES_DIR} REALPATH)
 get_filename_component(XRN_TESTS_DIR ${XRN_TESTS_DIR} REALPATH)
 get_filename_component(XRN_EXTERNAL_DIR ${XRN_EXTERNAL_DIR} REALPATH)
 get_filename_component(XRN_OUTPUT_DIR ${XRN_BUILD_DIR}/${XRN_OUTPUT_DIR} REALPATH)
+
+get_filename_component(XRN_SHADERS_DIR ${XRN_SHADERS_DIR} REALPATH)
+get_filename_component(XRN_VERTEXES_DIR ${XRN_VERTEXES_DIR_RELATIVE} REALPATH)
+get_filename_component(XRN_FRAGMENTS_DIR ${XRN_FRAGMENTS_DIR_RELATIVE} REALPATH)
 
 
 
@@ -110,6 +123,28 @@ file(
     ${XRN_SOURCES_DIR}/*.cxx
     ${XRN_SOURCES_DIR}/*.c
     ${XRN_SOURCES_DIR}/*.CC
+    PARENT_SCOPE
+)
+file(
+    GLOB_RECURSE
+    XRN_FRAGMENTS
+    ${XRN_FRAGMENTS_DIR}/*.glsl
+    ${XRN_FRAGMENTS_DIR}/*.vert
+    ${XRN_FRAGMENTS_DIR}/*.vertex
+    ${XRN_FRAGMENTS_DIR}/*.frag
+    ${XRN_FRAGMENTS_DIR}/*.fragment
+    ${XRN_FRAGMENTS_DIR}/*.shader
+    PARENT_SCOPE
+)
+file(
+    GLOB_RECURSE
+    XRN_VERTEXES
+    ${XRN_VERTEXES_DIR}/*.glsl
+    ${XRN_VERTEXES_DIR}/*.vert
+    ${XRN_VERTEXES_DIR}/*.vertex
+    ${XRN_VERTEXES_DIR}/*.frag
+    ${XRN_VERTEXES_DIR}/*.fragment
+    ${XRN_VERTEXES_DIR}/*.shader
     PARENT_SCOPE
 )
 
@@ -181,6 +216,10 @@ add_precompiled_headers(project_options)
 # download dependencies
 include(${XRN_TOOLCHAIN_DIR}/Dependencies.cmake)
 download_dependencies("${XRN_LIBS_REQUIRED}") # isn't check whether the dowloaded failed or not
+
+# compile shaders
+include(${XRN_TOOLCHAIN_DIR}/Shaders.cmake)
+compile_shaders(project_dependencies)
 
 # sub projects
 add_subdirectory(${XRN_SOURCES_DIR})

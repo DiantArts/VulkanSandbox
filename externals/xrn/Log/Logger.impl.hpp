@@ -210,6 +210,9 @@ template <
     // log level
     ::std::string logSpecifier;
     switch (level) {
+    case Logger::Level::none: // no extra output. Should be avoided
+        ::fmt::print("{}\n", userMessage);
+        return;
     case Logger::Level::success: // is successful
         logSpecifier = ::fmt::format(
             ::fmt::emphasis::bold | ::fmt::bg(fmt::color::chartreuse) | ::fmt::fg(fmt::color::black),
@@ -252,9 +255,6 @@ template <
             "FAILURE"
         );
         break;
-    case Logger::Level::none: // no extra output. Should be avoided
-        ::fmt::print("[{}] {} {}\n", Logger::getDate(), callPosition, userMessage);
-        return;
     case Logger::Level::fatal: // error that cannot be recovered, throws an exception
     case Logger::Level::fatalError: // same as fatal
         logSpecifier = ::fmt::format(
@@ -262,7 +262,7 @@ template <
             "FAILURE"
         );
         throw ::std::runtime_error{
-            ::fmt::format("[{}] {} [{}] {}", Logger::getDate(), callPosition, logSpecifier, userMessage)
+            ::fmt::format("\n[{}] [{}] [{}] {}", Logger::getDate(), logSpecifier, callPosition, userMessage)
         };
     };
 
@@ -277,8 +277,7 @@ template <
     case Logger::Level::debug: // (disabled with NDEBUG)
     case Logger::Level::warning: // can potential become an error
     case Logger::Level::error: // error that cannot be recovered but does not throw
-    case Logger::Level::fatal: // error that cannot be recovered, throws an exception
-        ::fmt::print("[{}] {} [{}] {}\n", Logger::getDate(), callPosition, logSpecifier, userMessage);
+        ::fmt::print("[{}] [{}] [{}] {}\n", Logger::getDate(), logSpecifier, callPosition, userMessage);
         break;
     };
 }

@@ -148,7 +148,10 @@ void ::vksb::AScene::draw()
         m_frameInfo.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
         m_frameInfo.projectionView = m_camera.getProjection() * m_camera.getView();
 
-        AScene::Ubo ubo{ .projectionView = m_camera.getProjection() * m_camera.getView() };
+        AScene::Ubo ubo{
+            .projection = m_camera.getProjection(),
+            .view = m_camera.getView()
+        };
         m_uboBuffers[m_frameInfo.frameIndex]->writeToBuffer(&ubo);
         m_uboBuffers[m_frameInfo.frameIndex]->flush();
 

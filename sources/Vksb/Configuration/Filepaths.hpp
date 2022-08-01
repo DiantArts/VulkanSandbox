@@ -12,11 +12,11 @@ namespace vksb::detail::configuration {
 struct Filepaths
 {
     // shaders
-    ::std::string_view shadersDirectory{ "./Shaders/" };
+    ::std::string_view shadersDirectory{ "./shaders/" };
     ::std::string_view fragmentDirectory{ "Fragment/" };
-    ::std::string_view fragmentExtension{ ".spv" };
+    ::std::string_view fragmentExtension{ ".glsl.spv" };
     ::std::string_view vertexDirectory{ "Vertex/" };
-    ::std::string_view vertexExtension{ ".spv" };
+    ::std::string_view vertexExtension{ ".glsl.spv" };
 
     // models
     ::std::string_view modelDirectory{ "./data/Visual/Model/" };

@@ -2,7 +2,7 @@ foreach(library IN LISTS XRN_LIBRARIES_REQUIREMENTS)
     find_package(${library} REQUIRED)
 endforeach()
 
-add_library(XRN_BIN_OBJECTS OBJECT ${XRN_MAIN} ${XRN_SOURCES})
+add_library(XRN_BIN_OBJECTS OBJECT ${XRN_MAIN} ${XRN_SOURCES} ${XRN_FRAGMENT} ${XRN_VERTEX})
 target_link_libraries(
     project_dependencies
     INTERFACE
