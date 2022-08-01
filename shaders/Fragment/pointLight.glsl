@@ -14,5 +14,9 @@ layout (set = 0, binding = 0) uniform Ubo {
 
 void main()
 {
+    const float dist = sqrt(dot(fragOffset, fragOffset));
+    if (dist >= 0.0f) {
+        discard;
+    }
     outColor = vec4(ubo.lightColor.xyz, 1.0f);
 }

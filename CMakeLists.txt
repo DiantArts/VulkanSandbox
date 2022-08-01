@@ -132,6 +132,7 @@ file(
     ${XRN_FRAGMENTS_DIR}/*.shader
     ${XRN_SHADERS_DIR}/*.vert
     ${XRN_SHADERS_DIR}/*.vertex
+    ${XRN_SHADERS_DIR}/*.vs
     PARENT_SCOPE
 )
 file(
@@ -141,6 +142,7 @@ file(
     ${XRN_VERTEXES_DIR}/*.shader
     ${XRN_SHADERS_DIR}/*.vert
     ${XRN_SHADERS_DIR}/*.vertex
+    ${XRN_SHADERS_DIR}/*.fs
     PARENT_SCOPE
 )
 
