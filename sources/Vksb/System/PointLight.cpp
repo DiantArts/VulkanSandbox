@@ -88,6 +88,8 @@ void ::vksb::system::PointLight::createPipeline(
     XRN_SASSERT(m_pipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
 
     ::vksb::Pipeline::Configuration pipelineConfig{};
+    pipelineConfig.attributeDescriptions.clear();
+    pipelineConfig.bindingDescriptions.clear();
     pipelineConfig.renderPass = renderPass;
     pipelineConfig.pipelineLayout = m_pipelineLayout;
     m_pPipeline = ::std::make_unique<::vksb::Pipeline>(m_device, pipelineConfig, "pointLight");

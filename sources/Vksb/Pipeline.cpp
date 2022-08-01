@@ -93,6 +93,9 @@
     this->dynamicStateInfo.pDynamicStates = this->dynamicStateEnables.data();
     this->dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(this->dynamicStateEnables.size());
     this->dynamicStateInfo.flags = 0;
+
+    this->bindingDescriptions = ::vksb::Model::Vertex::getBindingDescriptions();
+    this->attributeDescriptions = ::vksb::Model::Vertex::getAttributeDescriptions();
 }
 
 
@@ -163,8 +166,8 @@
     shaderStages[1].pNext = nullptr;
     shaderStages[1].pSpecializationInfo = nullptr;
 
-    auto bindingDescriptions{ ::vksb::Model::Vertex::getBindingDescriptions() };
-    auto attributeDescriptions{ ::vksb::Model::Vertex::getAttributeDescriptions() };
+    auto& bindingDescriptions{ configuration.bindingDescriptions };
+    auto& attributeDescriptions{ configuration.attributeDescriptions };
     ::VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexAttributeDescriptionCount = static_cast<::std::uint32_t>(attributeDescriptions.size());

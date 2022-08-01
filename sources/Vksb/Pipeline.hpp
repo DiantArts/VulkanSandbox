@@ -36,6 +36,8 @@ public:
             const ::vksb::Pipeline::Configuration&
         ) = delete;
 
+        ::std::vector<::VkVertexInputBindingDescription> bindingDescriptions{};
+        ::std::vector<::VkVertexInputAttributeDescription> attributeDescriptions{};
         ::VkPipelineViewportStateCreateInfo viewportInfo{};
         ::VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
         ::VkPipelineRasterizationStateCreateInfo rasterizationInfo{};
