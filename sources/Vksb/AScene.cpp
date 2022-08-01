@@ -8,6 +8,9 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <Vksb/AScene.hpp>
 #include <Vksb/Component/Control.hpp>
+#include <Vksb/Component/Position.hpp>
+#include <Vksb/Component/Rotation.hpp>
+#include <Vksb/Component/Scale.hpp>
 #include <Vksb/Buffer.hpp>
 
 
@@ -129,17 +132,38 @@ void ::vksb::AScene::run()
 auto ::vksb::AScene::update()
     -> bool
 {
-    // for(auto& [entity, transform]: m_registry.view<::vksb::component::Transform3d>().each()) {
-        // auto* pScale{ m_registry.get_if<::vksb::component::Scale>(entity) };
-        // auto* pRotation{ m_registry.get_if<::vksb::component::Rotation>(entity) };
-        // auto* pPosition{ m_registry.get_if<::vksb::component::Position>(entity) };
-        // if (pRotation) {
-            // if (pRotation->isChanged()) {
-                // transform.updateDirection(*pRotation);
-                // pRotation->resetChangedFlag();
-            // }
-        // }
-    // }
+    for(auto [entity, transform]: m_registry.view<::vksb::component::Transform3d>().each()) {
+        auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
+        auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
+        auto* pScale{ m_registry.try_get<::vksb::component::Scale>(entity) };
+
+        // direction
+        if (pRotation) {
+            if (pRotation->isChanged()) {
+                transform.updateDirection(*pRotation);
+                pRotation->resetChangedFlag();
+            }
+        }
+
+        // matrix
+        if (pPosition) {
+            if (pRotation) {
+                if (pScale) {
+                    if (pPosition->isChanged() || pRotation->isChanged() || pScale->isChanged()) {
+                        transform.updateMatrix(*pPosition, *pRotation, *pScale);
+                    }
+                } else {
+                    if (pPosition->isChanged() || pRotation->isChanged()) {
+                        transform.updateMatrix(*pPosition, *pRotation);
+                    }
+                }
+            } else {
+                if (pPosition->isChanged()) {
+                    transform.updateMatrix(*pPosition);
+                }
+            }
+        }
+    }
 
     m_registry.view<::vksb::component::Transform3d, ::vksb::component::Control>().each(
         [this](auto& transform, auto& control){
