@@ -36,6 +36,95 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
+// Update
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+///
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::component::Position::update(
+    float deltaTime,
+    ::vksb::component::Control& control
+    const ::glm::vec3& direction
+)
+{
+    // search the number of directions moving in and removing speed when multiple direction at once
+    auto speedDirectionDivider{ 1.0f };
+
+    // bot top
+    if (m_ableToFly) {
+        if (control.isMovingUp()) {
+            if (!control.isMovingDown()) {
+                speedDirectionDivider /= 2;
+            }
+            speedDirectionDivider /= 2;
+        } else if (control.isMovingDown()) {
+            speedDirectionDivider /= 2;
+        }
+    }
+
+    // left right
+    if (control.isMovingLeft()) {
+        if (!control.isMovingRight()) {
+            speedDirectionDivider /= 2;
+        }
+    } else if (control.isMovingRight()) {
+        speedDirectionDivider /= 2;
+    }
+
+    // forward backward
+    if (control.isMovingForward()) {
+        if (!control.isMovingBackward()) {
+            speedDirectionDivider /= 2;
+        }
+    } else if (control.isMovingBackward()) {
+        speedDirectionDivider /= 2;
+    } else if (speedDirectionDivider == 2) {
+        return; // not any direction
+    }
+
+
+
+    // apply movement
+    auto velocity{ control.getSpeed() * deltaTime * speedDirectionDivider / 10000 };
+
+    // bot top
+    if (m_ableToFly) {
+        if (control.isMovingUp()) {
+            if (!control.isMovingDown()) {
+                this->moveUp(velocity, direction);
+            }
+            speedDirectionDivider /= 2;
+        } else if (control.isMovingDown()) {
+            this->moveDown(velocity, direction);
+        }
+    }
+
+    // left right
+    if (control.isMovingLeft()) {
+        if (!control.isMovingRight()) {
+            this->moveLeft(velocity, direction);
+        }
+    } else if (control.isMovingRight()) {
+        this->moveRight(velocity, direction);
+    }
+
+    // forward backward
+    if (control.isMovingForward()) {
+        if (!control.isMovingBackward()) {
+            this->moveForward(velocity, direction);
+        }
+    } else if (control.isMovingBackward()) {
+        this->moveBackward(velocity, direction);
+    }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 // Position
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
