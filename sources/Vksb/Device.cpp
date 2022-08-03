@@ -1,5 +1,6 @@
 #include <pch.hpp>
 #include <Vksb/Device.hpp>
+#include <Vksb/errorToString.hpp>
 
 namespace vksb {
 
@@ -96,8 +97,8 @@ void Device::createInstance() {
     createInfo.pNext = nullptr;
   }
 
-  if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
-    XRN_THROW("Failed to create instance");
+  if (auto result{ vkCreateInstance(&createInfo, nullptr, &instance)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to create instance (err: {})", ::vksb::errorToString(result));
   }
 
   hasGflwRequiredInstanceExtensions();
@@ -164,8 +165,8 @@ void Device::createLogicalDevice() {
     createInfo.enabledLayerCount = 0;
   }
 
-  if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS) {
-    XRN_THROW("Failed to create logical device");
+  if (auto result{ vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to create logical device (err: {})", ::vksb::errorToString(result));
   }
 
   vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
@@ -181,8 +182,8 @@ void Device::createCommandPool() {
   poolInfo.flags =
       VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-  if (vkCreateCommandPool(device_, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-    XRN_THROW("Failed to create command pool");
+  if (auto result{ vkCreateCommandPool(device_, &poolInfo, nullptr, &commandPool)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to create command pool (err: {})", ::vksb::errorToString(result));
   }
 }
 
@@ -225,8 +226,8 @@ void Device::setupDebugMessenger() {
   if (!enableValidationLayers) return;
   VkDebugUtilsMessengerCreateInfoEXT createInfo;
   populateDebugMessengerCreateInfo(createInfo);
-  if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
-    XRN_THROW("Failed to set up debug messenger");
+  if (auto result{ CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to set up debug messenger (err: {})", ::vksb::errorToString(result));
   }
 }
 
@@ -406,8 +407,8 @@ void Device::createBuffer(
   bufferInfo.usage = usage;
   bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-  if (vkCreateBuffer(device_, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-    XRN_THROW("Failed to create vertex buffer");
+  if (auto result{ vkCreateBuffer(device_, &bufferInfo, nullptr, &buffer)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to create vertex buffer (err: {})", ::vksb::errorToString(result));
   }
 
   VkMemoryRequirements memRequirements;
@@ -418,8 +419,8 @@ void Device::createBuffer(
   allocInfo.allocationSize = memRequirements.size;
   allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-  if (vkAllocateMemory(device_, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-    XRN_THROW("Failed to allocate vertex buffer memory");
+  if (auto result{ vkAllocateMemory(device_, &allocInfo, nullptr, &bufferMemory) }; result != VK_SUCCESS) {
+    XRN_THROW("Failed to allocate vertex buffer memory (err: {})", ::vksb::errorToString(result));
   }
 
   vkBindBufferMemory(device_, buffer, bufferMemory, 0);
@@ -501,8 +502,8 @@ void Device::createImageWithInfo(
     VkMemoryPropertyFlags properties,
     VkImage &image,
     VkDeviceMemory &imageMemory) {
-  if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-    XRN_THROW("Failed to create image");
+  if (auto result{ vkCreateImage(device_, &imageInfo, nullptr, &image)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to create image (err: {})", ::vksb::errorToString(result));
   }
 
   VkMemoryRequirements memRequirements;
@@ -513,12 +514,12 @@ void Device::createImageWithInfo(
   allocInfo.allocationSize = memRequirements.size;
   allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-  if (vkAllocateMemory(device_, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-    XRN_THROW("Failed to allocate image memory");
+  if (auto result{ vkAllocateMemory(device_, &allocInfo, nullptr, &imageMemory)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to allocate image memory (err: {})", ::vksb::errorToString(result));
   }
 
-  if (vkBindImageMemory(device_, image, imageMemory, 0) != VK_SUCCESS) {
-    XRN_THROW("Failed to bind image memory");
+  if (auto result{ vkBindImageMemory(device_, image, imageMemory, 0)}; result != VK_SUCCESS) {
+    XRN_THROW("Failed to bind image memory (err: {})", ::vksb::errorToString(result));
   }
 }
 

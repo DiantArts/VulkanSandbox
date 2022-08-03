@@ -11,6 +11,7 @@
 #include <Vksb/Device.hpp>
 #include <Vksb/Model.hpp>
 #include <Vksb/Configuration.hpp>
+#include <Vksb/errorToString.hpp>
 
 
 
@@ -196,16 +197,17 @@
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
     if (
-        ::vkCreateGraphicsPipelines(
+        auto result{ ::vkCreateGraphicsPipelines(
             m_device.device(),
             VK_NULL_HANDLE,
             1,
             &pipelineInfo,
             nullptr,
             &m_graphicsPipeline
-        ) != VK_SUCCESS
+        ) };
+        result != VK_SUCCESS
     ) {
-        XRN_THROW("Failed to create pipeline.");
+        XRN_THROW("Failed to create pipeline (err: {})", ::vksb::errorToString(result));
     }
 }
 
@@ -299,7 +301,7 @@ void ::vksb::Pipeline::createShaderModule(
     createInfo.pCode = ::std::bit_cast<const ::std::uint32_t*>(code.data());
 
     // create the shader module
-    if (::vkCreateShaderModule(m_device.device(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-        XRN_THROW("Failed to create Vulkan shader module.");
+    if (auto result{ ::vkCreateShaderModule(m_device.device(), &createInfo, nullptr, &shaderModule)}; result != VK_SUCCESS) {
+        XRN_THROW("Failed to create Vulkan shader module (err: {})", ::vksb::errorToString(result));
     }
 }

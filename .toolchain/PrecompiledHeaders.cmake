@@ -1,4 +1,4 @@
-function(add_precompiled_headers interface)
+macro(add_precompiled_headers interface)
 
     # =========================================================================
     # STL
@@ -125,4 +125,4 @@ function(add_precompiled_headers interface)
         )
     endif ()
 
-endfunction()
+endmacro()

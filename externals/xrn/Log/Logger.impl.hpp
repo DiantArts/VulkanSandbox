@@ -129,6 +129,17 @@ template <
     Args&&... args
 )
 {
+#if defined(FORCE_PRINT)
+    Logger::outputAssert(
+        condition,
+        filepath,
+        functionName,
+        lineNumber,
+        Logger::Level::fatalError,
+        subformat,
+        ::std::forward<decltype(args)>(args)...
+    );
+#else
     Logger::outputSilentAssert(
         condition,
         filepath,
@@ -138,6 +149,7 @@ template <
         subformat,
         ::std::forward<decltype(args)>(args)...
     );
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -153,6 +165,17 @@ template <
     Args&&... args
 )
 {
+#if defined(FORCE_PRINT)
+    Logger::outputAssert(
+        condition,
+        filepath,
+        functionName,
+        lineNumber,
+        level,
+        subformat,
+        ::std::forward<decltype(args)>(args)...
+    );
+#else
     Logger::outputSilentAssert(
         condition,
         filepath,
@@ -162,6 +185,7 @@ template <
         subformat,
         ::std::forward<decltype(args)>(args)...
     );
+#endif
 }
 
 

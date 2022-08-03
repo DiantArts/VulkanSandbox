@@ -9,6 +9,8 @@
 #include <xrn/Util.hpp>
 #include <Vksb/App.hpp>
 #include <Vksb/Component/Control.hpp>
+#include <Vksb/Component/Position.hpp>
+#include <Vksb/Component/Scale.hpp>
 
 
 
@@ -72,24 +74,24 @@ auto ::vksb::App::postUpdate()
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::loadObjects()
 {
-    // object.setPosition(-0.5f, 0.5f, 0.0f);
-    // object.setScale(3.0f, 1.5f, 3.0f);
-    m_registry.emplace<::vksb::component::Transform3d>(
-        m_registry.create(),
-        ::vksb::Model::createFromFile(m_device, "SmoothVase")
-    );
+    {
+        auto entity{ m_registry.create() };
+        m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "SmoothVase"));
+        m_registry.emplace<::vksb::component::Position>(entity, -0.5f, 0.5f, 0.0f);
+        m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
+    }
 
-    // object.setPosition(0.5f, 0.5f, 0.0f);
-    // object.setScale(3.0f, 1.5f, 3.0f);
-    m_registry.emplace<::vksb::component::Transform3d>(
-        m_registry.create(),
-        ::vksb::Model::createFromFile(m_device, "SmoothVase")
-    );
+    {
+        auto entity{ m_registry.create() };
+        m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "SmoothVase"));
+        m_registry.emplace<::vksb::component::Position>(entity, 0.5f, 0.5f, 0.0f);
+        m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
+    }
 
-    // object.setPosition(0.5f, 0.5f, 0.0f);
-    // object.setScale(3.0f, 1.5f, 3.0f);
-    m_registry.emplace<::vksb::component::Transform3d>(
-        m_registry.create(),
-        ::vksb::Model::createFromFile(m_device, "Floor")
-    );
+    {
+        auto entity{ m_registry.create() };
+        m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "floor"));
+        // m_registry.emplace<::vksb::component::Position>(entity, 0.5f, 0.5f, 0.0f);
+        // m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
+    }
 }

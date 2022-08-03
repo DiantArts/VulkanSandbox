@@ -271,6 +271,7 @@ void ::vksb::Model::createVertexBuffers(
     };
     stagingBuffer.map();
     stagingBuffer.writeToBuffer(::std::bit_cast<void*>(vertices.data()));
+    return;
 
     m_vertexBuffer = ::std::make_unique<::vksb::Buffer>(
         m_device,

@@ -12,6 +12,8 @@ namespace xrn {
 ///
 /// Output varies if NDEBUG (no debug) that disable asserts and PRINT_DEBUG
 /// that prints "success" if the assert succeeded.
+/// If FORCE_PRINT overrides silent actions (like SASSERT) and print on
+/// success.
 /// The logger level is optional;
 /// The print format is the same as fmt (::std::format) library
 ///

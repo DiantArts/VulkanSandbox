@@ -2,7 +2,7 @@ foreach(library IN LISTS XRN_LIBRARIES_REQUIREMENTS)
     find_package(${library} REQUIRED)
 endforeach()
 
-add_library(XRN_BIN_OBJECTS OBJECT ${XRN_MAIN} ${XRN_SOURCES} ${XRN_FRAGMENT} ${XRN_VERTEX})
+add_library(XRN_BIN_OBJECTS OBJECT ${XRN_MAIN} ${XRN_SOURCES} ${XRN_FRAGMENT} ${XRN_VERTEX} ${XRN_HEADERS})
 target_link_libraries(
     project_dependencies
     INTERFACE
@@ -19,6 +19,12 @@ if (ENABLE_BINARY)
             project_dependencies
     )
 endif ()
+
+target_precompile_headers(
+    ${XRN_BIN_NAME}
+    PRIVATE
+    <pch.hpp>
+)
 
 set_property(TARGET XRN_BIN_OBJECTS PROPERTY POSITION_INDEPENDENT_CODE 1)
 if (ENABLE_STATIC_LIBRARY)

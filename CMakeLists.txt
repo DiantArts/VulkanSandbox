@@ -70,7 +70,7 @@ option(ENABLE_PCH "Enable personal Precompiled Headers (<pch.hpp>)" ON)
 # others
 option(ENABLE_UPDATE_CONAN "Enable updates of the <conan.cmake> file each run" OFF)
 option(ENABLE_DOCUMENTATION "Enable doxygen doc builds of source" OFF)
-option(ENABLE_CMAKE_DEBUG "Enable debug outputs of cmake's makefiles" OFF)
+option(ENABLE_CMAKE_DEBUG "Enable debug outputs of cmake's makefiles" ON)
 
 # Binary form
 option(ENABLE_OUTPUT_DIR "Puts every ouput binaries in the '${XRN_OUTPUT_DIR}' directory" OFF)
@@ -123,6 +123,14 @@ file(
     ${XRN_SOURCES_DIR}/*.cxx
     ${XRN_SOURCES_DIR}/*.c
     ${XRN_SOURCES_DIR}/*.CC
+    PARENT_SCOPE
+)
+file(
+    GLOB_RECURSE
+    XRN_HEADERS
+    ${XRN_SOURCES_DIR}/*.hpp
+    ${XRN_SOURCES_DIR}/*.hxx
+    ${XRN_SOURCES_DIR}/*.h
     PARENT_SCOPE
 )
 file(
@@ -208,8 +216,8 @@ include(${XRN_TOOLCHAIN_DIR}/StaticAnalyzers.cmake) # possible to add more stati
 run_static_analysis()
 
 # add precompile headers
-include(${XRN_TOOLCHAIN_DIR}/PrecompiledHeaders.cmake)
-add_precompiled_headers(project_options)
+# include(${XRN_TOOLCHAIN_DIR}/PrecompiledHeaders.cmake)
+# add_precompiled_headers(project_options)
 
 # download dependencies
 include(${XRN_TOOLCHAIN_DIR}/Dependencies.cmake)

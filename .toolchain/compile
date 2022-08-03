@@ -89,6 +89,8 @@ setupCmake() {
     fi
     if [ ${pchNeeded} = false ]; then
         cmakeCommands+="-DENABLE_PCH=false "
+    else
+        cmakeCommands+="-DENABLE_PCH=true "
     fi
     if [ ${binaryNeeded} = true ]; then
         cmakeCommands+="-DENABLE_BINARY=ON "
