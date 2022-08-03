@@ -1,5 +1,6 @@
 #include <pch.hpp>
 #include <Vksb/Component/Position.hpp>
+#include <Vksb/Component/Control.hpp>
 
 
 
@@ -46,7 +47,7 @@
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Position::update(
     float deltaTime,
-    ::vksb::component::Control& control
+    ::vksb::component::Control& control,
     const ::glm::vec3& direction
 )
 {
@@ -54,7 +55,7 @@ void ::vksb::component::Position::update(
     auto speedDirectionDivider{ 1.0f };
 
     // bot top
-    if (m_ableToFly) {
+    if (control.isAbleToFly()) {
         if (control.isMovingUp()) {
             if (!control.isMovingDown()) {
                 speedDirectionDivider /= 2;
@@ -91,7 +92,7 @@ void ::vksb::component::Position::update(
     auto velocity{ control.getSpeed() * deltaTime * speedDirectionDivider / 10000 };
 
     // bot top
-    if (m_ableToFly) {
+    if (control.isAbleToFly()) {
         if (control.isMovingUp()) {
             if (!control.isMovingDown()) {
                 this->moveUp(velocity, direction);

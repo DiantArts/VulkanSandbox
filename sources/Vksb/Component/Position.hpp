@@ -1,5 +1,7 @@
 #pragma once
 
+namespace vksb::component { class Control; }
+
 namespace vksb::component {
 
 class Position {
@@ -43,7 +45,8 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void update(
         float deltaTime,
-        ::vksb::component::Control& control
+        ::vksb::component::Control& control,
+        const ::glm::vec3& direction
     );
 
 

@@ -68,6 +68,10 @@
     }
 
     m_registry.emplace<::vksb::component::Control>(m_player); // player always is controllable
+
+    m_registry.emplace<::vksb::component::Control>(m_camera.getId());
+    m_registry.emplace<::vksb::component::Position>(m_camera.getId(), ::glm::vec3{ -2.5f });
+    m_registry.emplace<::vksb::component::Rotation>(m_camera.getId());
 }
 
 
@@ -133,36 +137,35 @@ void ::vksb::AScene::run()
 auto ::vksb::AScene::update()
     -> bool
 {
-    for(auto& [entity, control]: m_registry.view<::vksb::component::Control>().each()) {
+    m_registry.view<::vksb::component::Rotation>().each([this](auto& rotation){
+        if (rotation.isChanged()) {
+            rotation.updateDirection();
+            rotation.resetChangedFlag();
+        }
+    });
+
+
+    for (auto [entity, control]: m_registry.view<::vksb::component::Control>().each()) {
         auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
         auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
 
         if (pPosition) {
-            pPosition->update(m_frameInfo.deltaTime, control);
+            if (pRotation) {
+                pPosition->update(m_frameInfo.deltaTime, control, pRotation->getDirection());
+            } else {
+                pPosition->update(m_frameInfo.deltaTime, control, ::glm::vec3{ 0.0f });
+            }
         }
+    }
 
-        if (pRotation) {
-            pRotation.update(control);
-        }
-    );
-
-    for(auto& [entity, transform]: m_registry.view<::vksb::component::Transform3d>().each()) {
+    for (auto [entity, transform]: m_registry.view<::vksb::component::Transform3d>().each()) {
         auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
         auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
         auto* pScale{ m_registry.try_get<::vksb::component::Scale>(entity) };
 
-        // direction
-        if (pRotation) {
-            if (pRotation->isChanged()) {
-            }
-        }
-
         // matrix and normalMatrix
         if (pPosition) {
             if (pRotation) {
-                if (pRotation->isChanged()) {
-                    transform.updateDirection(*pRotation);
-                }
                 if (pScale) {
                     if (pPosition->isChanged() || pRotation->isChanged() || pScale->isChanged()) {
                         transform.updateMatrix(*pPosition, *pRotation, *pScale);
@@ -173,7 +176,6 @@ auto ::vksb::AScene::update()
                     transform.updateMatrix(*pPosition, *pRotation);
                     transform.updateNormalMatrix(*pRotation);
                 }
-                pRotation->resetChangedFlag();
             } else if (pPosition->isChanged()) {
                 transform.updateMatrix(*pPosition);
             }
@@ -183,8 +185,8 @@ auto ::vksb::AScene::update()
 
     {
         auto& position{ m_registry.get<::vksb::component::Position>(m_camera.getId()) };
-        auto& transform{ m_registry.get<::vksb::component::Transform3d>(m_camera.getId()) };
-        m_camera.setViewDirection(position, transform.getDirection());
+        auto& rotation{ m_registry.get<::vksb::component::Rotation>(m_camera.getId()) };
+        m_camera.setViewDirection(position, rotation.getDirection());
     }
     return true;
 }
