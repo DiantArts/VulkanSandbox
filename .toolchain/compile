@@ -3,7 +3,11 @@
 # -------------------------------------------------------------------------------------------------
 
 runProgram() (
-    ./${binary} || exit $?
+    if [ ${buildType} = Debug ]; then
+        valgrind ./${binary} || exit $?
+    else
+        ./${binary} || exit $?
+    fi
 )
 
 # -------------------------------------------------------------------------------------------------
@@ -11,7 +15,7 @@ runProgram() (
 compiler=clang++
 buildDir=.build
 cxxVersion=23
-buildType=Debug
+buildType=Release
 binary=${buildDir}/sources/xrn
 parallel=$(nproc)
 
@@ -121,9 +125,10 @@ run() {
 
 clean() {
     rm -rf ${buildDir}
-    find -type f -name \*.spv -delete
     rm -f ./compile_commands.json
     rm -rf ./.cache
+    find -type f -name \*.spv -delete
+    find -type f -name vgcore.\* -delete
 }
 
 runTests() {

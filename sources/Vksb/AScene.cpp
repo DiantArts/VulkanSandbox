@@ -70,7 +70,7 @@
     m_registry.emplace<::vksb::component::Control>(m_player); // player always is controllable
 
     m_registry.emplace<::vksb::component::Control>(m_camera.getId());
-    m_registry.emplace<::vksb::component::Position>(m_camera.getId(), ::glm::vec3{ -2.5f });
+    m_registry.emplace<::vksb::component::Position>(m_camera.getId(), ::glm::vec3{ 0.0f, 0.0f, -2.5f });
     m_registry.emplace<::vksb::component::Rotation>(m_camera.getId());
 }
 
@@ -187,6 +187,7 @@ auto ::vksb::AScene::update()
         auto& position{ m_registry.get<::vksb::component::Position>(m_camera.getId()) };
         auto& rotation{ m_registry.get<::vksb::component::Rotation>(m_camera.getId()) };
         m_camera.setViewDirection(position, rotation.getDirection());
+        ::std::cout << position << ::std::endl;
     }
     return true;
 }
