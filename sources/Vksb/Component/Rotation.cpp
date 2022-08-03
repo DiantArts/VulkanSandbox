@@ -1,5 +1,6 @@
 #include <pch.hpp>
 #include <Vksb/Component/Rotation.hpp>
+#include <Vksb/Component/Control.hpp>
 
 
 
@@ -45,6 +46,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
+
 
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::component::Rotation::rotate(
@@ -214,12 +216,14 @@ void ::vksb::component::Rotation::setRotationZ(
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::component::Rotation::updateDirection()
+void ::vksb::component::Rotation::updateDirection(
+    const ::glm::vec3& offset
+)
 {
     m_direction = ::glm::normalize(::glm::vec3(
-        cos(::glm::radians(m_rotation.x)) * cos(::glm::radians(m_rotation.y)),
-        sin(::glm::radians(m_rotation.y)),
-        sin(::glm::radians(m_rotation.x)) * cos(::glm::radians(m_rotation.y))
+        cos(::glm::radians(m_rotation.x + offset.x)) * cos(::glm::radians(m_rotation.y + offset.y)),
+        sin(::glm::radians(m_rotation.y + offset.y)),
+        sin(::glm::radians(m_rotation.x + offset.x)) * cos(::glm::radians(m_rotation.y + offset.y))
     ));
 }
 

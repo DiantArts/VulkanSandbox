@@ -195,7 +195,7 @@ protected:
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     // Vulkan
-    ::vksb::Window m_window{ false };
+    ::vksb::Window m_window{ true };
     ::vksb::Device m_device{ m_window };
 
     ::std::unique_ptr<::vksb::descriptor::SetLayout> m_pDescriptorSetLayout;

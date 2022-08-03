@@ -19,7 +19,7 @@ struct Configuration
     // Keys
     ::vksb::detail::configuration::KeyBindings keyBinding{};
     float moveSpeed{ 3.0f };
-    ::glm::vec3 sensitivity{ 0.1f, 0.1f, 1.0f }; // used for mouse especially
+    ::glm::vec3 sensitivity{ 0.05f }; // used for mouse especially
 
     // Rotation
     ::glm::vec3 rotateSpeed{ 1.5f }; // when rotating with keys

@@ -89,7 +89,7 @@ void ::vksb::component::Position::update(
 
 
     // apply movement
-    auto velocity{ control.getSpeed() * deltaTime * speedDirectionDivider / 10000 };
+    auto velocity{ control.getSpeed() * deltaTime * speedDirectionDivider / 50000 };
 
     // bot top
     if (control.isAbleToFly()) {
@@ -157,7 +157,7 @@ void ::vksb::component::Position::moveRight(
     const ::glm::vec3& direction
 )
 {
-    m_position += ::glm::normalize(::glm::cross(direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
+    m_position -= ::glm::normalize(::glm::cross(direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
     m_isChanged = true;
 }
 
@@ -167,7 +167,7 @@ void ::vksb::component::Position::moveLeft(
     const ::glm::vec3& direction
 )
 {
-    m_position -= ::glm::normalize(::glm::cross(direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
+    m_position += ::glm::normalize(::glm::cross(direction, ::glm::vec3{ 0.0f, 1.0f, 0.0f })) * velocity;
     m_isChanged = true;
 }
 

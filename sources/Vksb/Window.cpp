@@ -7,9 +7,10 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <Vksb/Window.hpp>
+#include <Vksb/Event/WindowResize.hpp>
 #include <Vksb/Event/KeyPressed.hpp>
 #include <Vksb/Event/KeyReleased.hpp>
-#include <Vksb/Event/WindowResize.hpp>
+#include <Vksb/Event/MouseMoved.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +61,9 @@ auto ::vksb::Window::Size::isValid()
     // setup callbacks
     ::glfwSetFramebufferSizeCallback(m_pWindow.get(), Window::framebufferResizeCallback);
     ::glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
-    // ::glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
+    glfwSetCursorPos(m_pWindow.get(), m_size.x, m_size.y);
+    ::glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
+
     // ::glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
 }
 
@@ -240,8 +243,12 @@ void ::vksb::Window::mouseMovedCallback(
     const double yPos
 )
 {
-    // auto& events{ *reinterpret_cast<::vksb::event::Container*>(::glfwGetWindowUserPointer(pWindow)) };
-    // events.emplace<::vksb::event::MouseMoved>(xPos, yPos);
+    auto& events{ *reinterpret_cast<::vksb::event::Container*>(::glfwGetWindowUserPointer(pWindow)) };
+    ::std::size_t width, height;
+    glfwGetWindowSize(&width, &height);
+    events.emplace<::vksb::event::MouseMoved>(xPos - width / 2, yPos - height / 2);
+    glfwSetCursorPos(pWindow, width / 2, height / 2);
+
 }
 
 void ::vksb::Window::mouseScrollcallback(

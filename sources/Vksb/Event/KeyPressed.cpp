@@ -72,9 +72,13 @@ void ::vksb::event::KeyPressed::resolve(
 
     // look
     } else if (m_keyCode == ::vksb::configuration.keyBinding.lookUp) {
+        playerController.rotateZ(-45 / 2);
     } else if (m_keyCode == ::vksb::configuration.keyBinding.lookDown) {
+        playerController.rotateZ(45 / 2);
     } else if (m_keyCode == ::vksb::configuration.keyBinding.lookLeft) {
+        playerController.rotateX(45 / 2);
     } else if (m_keyCode == ::vksb::configuration.keyBinding.lookRight) {
+        playerController.rotateX(-45 / 2);
     } else {
         ::std::cout << "this key is not bound" << ::std::endl;
     }

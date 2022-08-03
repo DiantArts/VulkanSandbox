@@ -69,9 +69,9 @@
 
     m_registry.emplace<::vksb::component::Control>(m_player); // player always is controllable
 
-    m_registry.emplace<::vksb::component::Control>(m_camera.getId());
+    // m_registry.emplace<::vksb::component::Control>(m_camera.getId());
     m_registry.emplace<::vksb::component::Position>(m_camera.getId(), ::glm::vec3{ 0.0f, 0.0f, -2.5f });
-    m_registry.emplace<::vksb::component::Rotation>(m_camera.getId());
+    m_registry.emplace<::vksb::component::Rotation>(m_camera.getId(), ::glm::vec3{ 90.0f, 0.0f, 0.0f });
 }
 
 
@@ -137,18 +137,15 @@ void ::vksb::AScene::run()
 auto ::vksb::AScene::update()
     -> bool
 {
-    m_registry.view<::vksb::component::Rotation>().each([this](auto& rotation){
-        if (rotation.isChanged()) {
-            rotation.updateDirection();
-            rotation.resetChangedFlag();
-        }
-    });
-
-
     for (auto [entity, control]: m_registry.view<::vksb::component::Control>().each()) {
         auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
         auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
 
+        if (pRotation->isChanged() || control.isRotated()) {
+            pRotation->updateDirection(control.getRotation());
+            pRotation->resetChangedFlag();
+            control.resetRotatedFlag();
+        }
         if (pPosition) {
             if (pRotation) {
                 pPosition->update(m_frameInfo.deltaTime, control, pRotation->getDirection());
@@ -187,7 +184,7 @@ auto ::vksb::AScene::update()
         auto& position{ m_registry.get<::vksb::component::Position>(m_camera.getId()) };
         auto& rotation{ m_registry.get<::vksb::component::Rotation>(m_camera.getId()) };
         m_camera.setViewDirection(position, rotation.getDirection());
-        ::std::cout << position << ::std::endl;
+        // m_camera.setViewDirection(::glm::vec3{ 0.0f, 0.0f, -2.5f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
     }
     return true;
 }
