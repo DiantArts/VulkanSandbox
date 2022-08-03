@@ -23,9 +23,8 @@
 ::vksb::event::MouseMoved::MouseMoved(
     ::glm::vec2 position
 )
-    : m_offset{ position.x - m_oldMousePosition.x, position.y - m_oldMousePosition.y }
+    : m_offset{ position.x, position.y }
 {
-    m_oldMousePosition = ::glm::vec2{ position.x, position.y };
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -33,9 +32,8 @@
     float positionX,
     float positionY
 )
-    : m_offset{ positionX - m_oldMousePosition.x, positionY - m_oldMousePosition.y }
+    : m_offset{ positionX, positionY }
 {
-    m_oldMousePosition = ::glm::vec2{ positionX, positionY };
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -44,11 +42,10 @@
     double positionY
 )
     : m_offset{
-        static_cast<float>(positionX) - m_oldMousePosition.x,
-        static_cast<float>(positionY) - m_oldMousePosition.y
+        static_cast<float>(positionX),
+        static_cast<float>(positionY)
     }
 {
-    m_oldMousePosition = ::glm::vec2{ static_cast<float>(positionX), static_cast<float>(positionY) };
 }
 
 

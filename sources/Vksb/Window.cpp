@@ -57,11 +57,12 @@ auto ::vksb::Window::Size::isValid()
     XRN_ASSERT(!!m_pWindow, "Create glfw window");
 
     ::glfwSetWindowUserPointer(m_pWindow.get(), &m_events);
+    ::glfwSetCursorPos(m_pWindow.get(), m_size.width / 2, m_size.height / 2);
+    ::glfwSetInputMode(m_pWindow.get(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     // setup callbacks
     ::glfwSetFramebufferSizeCallback(m_pWindow.get(), Window::framebufferResizeCallback);
     ::glfwSetKeyCallback(m_pWindow.get(), Window::keyCallback);
-    glfwSetCursorPos(m_pWindow.get(), m_size.x, m_size.y);
     ::glfwSetCursorPosCallback(m_pWindow.get(), Window::mouseMovedCallback);
 
     // ::glfwSetScrollCallback(m_pWindow.get(), Window::mouseScrollcallback);
@@ -244,10 +245,10 @@ void ::vksb::Window::mouseMovedCallback(
 )
 {
     auto& events{ *reinterpret_cast<::vksb::event::Container*>(::glfwGetWindowUserPointer(pWindow)) };
-    ::std::size_t width, height;
-    glfwGetWindowSize(&width, &height);
+    int width, height;
+    ::glfwGetWindowSize(pWindow, &width, &height);
     events.emplace<::vksb::event::MouseMoved>(xPos - width / 2, yPos - height / 2);
-    glfwSetCursorPos(pWindow, width / 2, height / 2);
+    ::glfwSetCursorPos(pWindow, width / 2, height / 2);
 
 }
 

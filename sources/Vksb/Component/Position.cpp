@@ -52,44 +52,41 @@ void ::vksb::component::Position::update(
 )
 {
     // search the number of directions moving in and removing speed when multiple direction at once
-    auto speedDirectionDivider{ 1.0f };
+    auto speedDirectionDivider{ 2.0f };
 
     // bot top
     if (control.isAbleToFly()) {
         if (control.isMovingUp()) {
             if (!control.isMovingDown()) {
-                speedDirectionDivider /= 2;
+                speedDirectionDivider /= 1.5f;
             }
-            speedDirectionDivider /= 2;
         } else if (control.isMovingDown()) {
-            speedDirectionDivider /= 2;
+            speedDirectionDivider /= 1.5f;
         }
     }
 
     // left right
     if (control.isMovingLeft()) {
         if (!control.isMovingRight()) {
-            speedDirectionDivider /= 2;
+            speedDirectionDivider /= 1.5f;
         }
     } else if (control.isMovingRight()) {
-        speedDirectionDivider /= 2;
+        speedDirectionDivider /= 1.5f;
     }
 
     // forward backward
     if (control.isMovingForward()) {
         if (!control.isMovingBackward()) {
-            speedDirectionDivider /= 2;
+            speedDirectionDivider /= 1.5f;
         }
     } else if (control.isMovingBackward()) {
-        speedDirectionDivider /= 2;
-    } else if (speedDirectionDivider == 2) {
+        speedDirectionDivider /= 1.5f;
+    } else if (speedDirectionDivider == 2.0f) {
         return; // not any direction
     }
 
-
-
     // apply movement
-    auto velocity{ control.getSpeed() * deltaTime * speedDirectionDivider / 50000 };
+    auto velocity{ control.getSpeed() * deltaTime * speedDirectionDivider / 100000 };
 
     // bot top
     if (control.isAbleToFly()) {
