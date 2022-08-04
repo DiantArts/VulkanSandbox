@@ -7,12 +7,9 @@
 // Headers
 ///////////////////////////////////////////////////////////////////////////
 #include <Vksb/AScene.hpp>
-#include <Vksb/Component/Control.hpp>
-#include <Vksb/Component/Position.hpp>
-#include <Vksb/Component/Rotation.hpp>
-#include <Vksb/Component/Scale.hpp>
 #include <Vksb/Buffer.hpp>
 #include <Vksb/Configuration.hpp>
+#include <Vksb/Components.hpp>
 
 
 
@@ -52,7 +49,7 @@
     for (auto& pUbo : m_uboBuffers) {
         pUbo = ::std::make_unique<::vksb::Buffer>(
             m_device,
-            sizeof(AScene::Ubo),
+            sizeof(::vksb::Ubo),
             1,
             ::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             ::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
@@ -137,6 +134,8 @@ void ::vksb::AScene::run()
 auto ::vksb::AScene::update()
     -> bool
 {
+    this->updateCamera();
+
     for (auto [entity, control]: m_registry.view<::vksb::component::Control>().each()) {
         auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
         auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
@@ -186,11 +185,18 @@ auto ::vksb::AScene::update()
         m_camera.setViewDirection(position, rotation.getDirection());
         // m_camera.setViewDirection(::glm::vec3{ 0.0f, 0.0f, -2.5f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
     }
+
+    auto lightIndex{ 0uz };
+    m_registry.view<::vksb::component::PointLight>().each([this, &lightIndex](auto& pointLight) {
+        m_pointLightSystem.update(m_frameInfo, pointLight, lightIndex);
+        ++lightIndex;
+    });
+    m_frameInfo.ubo.numOfLights = lightIndex;
     return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void ::vksb::AScene::draw()
+void ::vksb::AScene::updateCamera()
 {
     const float aspect{ m_renderer.getAspectRatio() };
     // m_camera.setOrthographicProjection(-aspect, aspect, -1.0, 1.0, -1.0, 1.0);
@@ -200,18 +206,22 @@ void ::vksb::AScene::draw()
         // this->getPlayerComponent<::vksb::component::Transform3d>().getPosition()
     // );
 
+    m_frameInfo.projectionView = m_camera.getProjection() * m_camera.getView();
+    m_frameInfo.ubo.projection = m_camera.getProjection();
+    m_frameInfo.ubo.view= m_camera.getView();
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+void ::vksb::AScene::draw()
+{
+
     if (!(m_frameInfo.commandBuffer = m_renderer.beginFrame())) {
         return;
     }
-
     m_frameInfo.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
-    m_frameInfo.projectionView = m_camera.getProjection() * m_camera.getView();
 
-    AScene::Ubo ubo{
-        .projection = m_camera.getProjection(),
-        .view = m_camera.getView()
-    };
-    m_uboBuffers[m_frameInfo.frameIndex]->writeToBuffer(&ubo);
+    m_uboBuffers[m_frameInfo.frameIndex]->writeToBuffer(&m_frameInfo.ubo);
     m_uboBuffers[m_frameInfo.frameIndex]->flush();
 
     m_renderer.beginSwapChainRenderPass(m_frameInfo.commandBuffer);
@@ -222,7 +232,9 @@ void ::vksb::AScene::draw()
     });
 
     m_pointLightSystem.bind(m_frameInfo);
-    m_pointLightSystem(m_frameInfo);
+    m_registry.view<::vksb::component::PointLight>().each([this](auto& pointLight) {
+        m_pointLightSystem(m_frameInfo, pointLight);
+    });
 
     m_renderer.endSwapChainRenderPass(m_frameInfo.commandBuffer);
     m_renderer.endFrame();

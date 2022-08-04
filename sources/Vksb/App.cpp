@@ -8,9 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////
 #include <xrn/Util.hpp>
 #include <Vksb/App.hpp>
-#include <Vksb/Component/Control.hpp>
-#include <Vksb/Component/Position.hpp>
-#include <Vksb/Component/Scale.hpp>
+#include <Vksb/Components.hpp>
 
 
 
@@ -93,5 +91,11 @@ void ::vksb::App::loadObjects()
         m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "Floor"));
         m_registry.emplace<::vksb::component::Position>(entity, 0.0f, 0.5f, 0.0f);
         m_registry.emplace<::vksb::component::Scale>(entity, 0.1f);
+    }
+
+    {
+        auto entity{ m_registry.create() };
+        m_registry.emplace<::vksb::component::Position>(entity, 0.0f, 0.5f, 0.0f);
+        m_registry.emplace<::vksb::component::PointLight>(entity);
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <xrn/Util.hpp>
+#include <Vksb/Ubo.hpp>
 
 namespace vksb { class AScene; }
 
@@ -22,9 +23,13 @@ struct FrameInfo {
 
     ::std::size_t frameIndex;
     ::xrn::Time deltaTime;
+
     ::VkCommandBuffer commandBuffer;
+    ::vksb::Ubo ubo;
     ::glm::mat4 projectionView;
+
     ::std::vector<::VkDescriptorSet>& descriptorSets;
+
     ::vksb::AScene& scene;
 };
 
