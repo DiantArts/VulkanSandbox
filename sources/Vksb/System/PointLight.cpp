@@ -1,122 +1,69 @@
-///////////////////////////////////////////////////////////////////////////
-// Precompilled headers
-///////////////////////////////////////////////////////////////////////////
 #include <pch.hpp>
+#include "PointLight.hpp"
 
-///////////////////////////////////////////////////////////////////////////
-// Headers
-///////////////////////////////////////////////////////////////////////////
-#include <Vksb/System/PointLight.hpp>
+namespace vksb::system {
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Constructors
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////
-::vksb::system::PointLight::PointLight(
-    ::vksb::Device& device,
-    ::VkRenderPass renderPass,
-    ::VkDescriptorSetLayout descriptorSetLayout
-)
-    : m_device{ device }
-{
-    this->createPipelineLayout(descriptorSetLayout);
-    this->createPipeline(renderPass);
+PointLight::PointLight(
+    ::vksb::Device& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+    : lveDevice{device} {
+  createPipelineLayout(globalSetLayout);
+  createPipeline(renderPass);
 }
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Rule of 5
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////
-::vksb::system::PointLight::~PointLight()
-{
-    ::vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
+PointLight::~PointLight() {
+  vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr);
 }
 
+void PointLight::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+  // VkPushConstantRange pushConstantRange{};
+  // pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+  // pushConstantRange.offset = 0;
+  // pushConstantRange.size = sizeof(SimplePushConstantData);
 
+  std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Basic
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::PointLight::createPipelineLayout(
-    ::VkDescriptorSetLayout descriptorSetLayout
-)
-{
-    // ::VkPushConstantRange pushConstantRange{};
-    // pushConstantRange.stageFlags = ::VK_SHADER_STAGE_VERTEX_BIT | ::VK_SHADER_STAGE_FRAGMENT_BIT;
-    // pushConstantRange.offset = 0;
-    // pushConstantRange.size = sizeof(::SimplePushConstantData);
-
-    ::std::vector<::VkDescriptorSetLayout> descriptorSetLayouts{ descriptorSetLayout };
-
-    ::VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = ::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = descriptorSetLayouts.size();
-    pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-    pipelineLayoutInfo.pPushConstantRanges = nullptr;
-
-    XRN_ASSERT(
-        ::vkCreatePipelineLayout(
-            m_device.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout
-        ) == ::VK_SUCCESS,
-        "Create pipeline layout"
-    );
+  VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+  pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+  pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+  pipelineLayoutInfo.pushConstantRangeCount = 0;
+  pipelineLayoutInfo.pPushConstantRanges = nullptr;
+  if (vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
+      VK_SUCCESS) {
+    throw std::runtime_error("failed to create pipeline layout!");
+  }
 }
 
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::PointLight::createPipeline(
-    ::VkRenderPass renderPass
-)
-{
-    XRN_SASSERT(m_pipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
+void PointLight::createPipeline(VkRenderPass renderPass) {
+  assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-    ::vksb::Pipeline::Configuration pipelineConfig{};
-    pipelineConfig.attributeDescriptions.clear();
-    pipelineConfig.bindingDescriptions.clear();
-    pipelineConfig.renderPass = renderPass;
-    pipelineConfig.pipelineLayout = m_pipelineLayout;
-    m_pPipeline = ::std::make_unique<::vksb::Pipeline>(m_device, pipelineConfig, "pointLight");
+  ::vksb::Pipeline::Configuration pipelineConfig{};
+  pipelineConfig.attributeDescriptions.clear();
+  pipelineConfig.bindingDescriptions.clear();
+  pipelineConfig.renderPass = renderPass;
+  pipelineConfig.pipelineLayout = pipelineLayout;
+  lvePipeline = std::make_unique<::vksb::Pipeline>(
+      lveDevice,
+      pipelineConfig,
+      "pointLight");
 }
 
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::PointLight::operator()(
-    ::vksb::FrameInfo& frameInfo
-) const
-{
-    ::vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
+void PointLight::bind(vksb::FrameInfo& frameInfo) {
+  lvePipeline->bind(frameInfo.commandBuffer);
 }
 
-///////////////////////////////////////////////////////////////////////////
-void ::vksb::system::PointLight::bind(
-    ::vksb::FrameInfo& frameInfo
-)
-{
-    m_pPipeline->bind(frameInfo.commandBuffer);
-    ::vkCmdBindDescriptorSets(
-        frameInfo.commandBuffer,
-        VK_PIPELINE_BIND_POINT_GRAPHICS,
-        m_pipelineLayout,
-        0,
-        1,
-        &frameInfo.descriptorSets[frameInfo.frameIndex],
-        0,
-        nullptr
-    );
+void PointLight::operator()(vksb::FrameInfo& frameInfo) {
+  vkCmdBindDescriptorSets(
+      frameInfo.commandBuffer,
+      VK_PIPELINE_BIND_POINT_GRAPHICS,
+      pipelineLayout,
+      0,
+      1,
+      &frameInfo.descriptorSets[frameInfo.frameIndex],
+      0,
+      nullptr);
+
+  vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
 }
+
+}  // namespace vksb::system

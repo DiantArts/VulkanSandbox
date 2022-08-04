@@ -1,6 +1,6 @@
 #version 460 core
 
-layout (location = 0) in vec3 fragOffset;
+layout (location = 0) in vec2 fragOffset;
 
 layout (location = 0) out vec4 outColor;
 
@@ -15,7 +15,7 @@ layout (set = 0, binding = 0) uniform Ubo {
 void main()
 {
     const float dist = sqrt(dot(fragOffset, fragOffset));
-    if (dist >= 0.0f) {
+    if (dist >= 1.0f) {
         discard;
     }
     outColor = vec4(ubo.lightColor.xyz, 1.0f);

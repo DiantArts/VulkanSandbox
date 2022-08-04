@@ -39,7 +39,7 @@ public:
         ::glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f }; // w is intensity
 
         // ::glm::vec3 lightDirection{ ::glm::normalize(::glm::vec3{ 1.0f, -3.0f, -1.0f }) };
-        ::glm::vec3 lightPosition{ -1.0f };
+        ::glm::vec3 lightPosition{ -0.5f };
         alignas(16) ::glm::vec4 lightColor{ 1.0f }; // w is intensity
     };
 
