@@ -140,7 +140,7 @@ void ::vksb::Renderer::endFrame()
 {
     XRN_SASSERT(this->isFrameInProgress(), "Cannot call endFrame() if frame is not in progress");
     auto commandBuffer{ this->getCurrentCommandBuffer() };
-    XRN_SASSERT(::vkEndCommandBuffer(commandBuffer) == VK_SUCCESS, "Failed to record command buffer.\n");
+    XRN_SASSERT(::vkEndCommandBuffer(commandBuffer) == VK_SUCCESS, "Failed to record command buffer.");
     if (
         auto result{ m_pSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex) };
         result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.wasResized()

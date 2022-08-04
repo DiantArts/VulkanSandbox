@@ -54,6 +54,8 @@ void ::vksb::component::Position::update(
     // search the number of directions moving in and removing speed when multiple direction at once
     auto speedDirectionDivider{ 2.0f };
 
+    // TODO: error left/right - backward - down
+
     // bot top
     if (control.isAbleToFly()) {
         if (control.isMovingUp()) {
@@ -75,14 +77,16 @@ void ::vksb::component::Position::update(
     }
 
     // forward backward
-    if (control.isMovingForward()) {
-        if (!control.isMovingBackward()) {
+    if (speedDirectionDivider > 1.0f) {
+        if (control.isMovingForward()) {
+            if (!control.isMovingBackward()) {
+                speedDirectionDivider /= 1.5f;
+            }
+        } else if (control.isMovingBackward()) {
             speedDirectionDivider /= 1.5f;
+        } else if (speedDirectionDivider == 2.0f) {
+            return; // not any direction
         }
-    } else if (control.isMovingBackward()) {
-        speedDirectionDivider /= 1.5f;
-    } else if (speedDirectionDivider == 2.0f) {
-        return; // not any direction
     }
 
     // apply movement

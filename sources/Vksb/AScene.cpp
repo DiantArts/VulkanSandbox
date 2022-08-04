@@ -200,27 +200,32 @@ void ::vksb::AScene::draw()
         // this->getPlayerComponent<::vksb::component::Transform3d>().getPosition()
     // );
 
-    if ((m_frameInfo.commandBuffer = m_renderer.beginFrame())) {
-        m_frameInfo.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
-        m_frameInfo.projectionView = m_camera.getProjection() * m_camera.getView();
-
-        AScene::Ubo ubo{
-            .projection = m_camera.getProjection(),
-            .view = m_camera.getView()
-        };
-        m_uboBuffers[m_frameInfo.frameIndex]->writeToBuffer(&ubo);
-        m_uboBuffers[m_frameInfo.frameIndex]->flush();
-
-        m_renderer.beginSwapChainRenderPass(m_frameInfo.commandBuffer);
-        m_renderSystem.bind(m_frameInfo);
-        m_registry.view<::vksb::component::Transform3d>().each([this](auto& transform){
-            m_renderSystem(m_frameInfo, transform);
-        });
-        m_pointLightSystem.bind(m_frameInfo);
-        m_pointLightSystem(m_frameInfo);
-        m_renderer.endSwapChainRenderPass(m_frameInfo.commandBuffer);
-        m_renderer.endFrame();
+    if (!(m_frameInfo.commandBuffer = m_renderer.beginFrame())) {
+        return;
     }
+
+    m_frameInfo.frameIndex = static_cast<::std::size_t>(m_renderer.getFrameIndex());
+    m_frameInfo.projectionView = m_camera.getProjection() * m_camera.getView();
+
+    AScene::Ubo ubo{
+        .projection = m_camera.getProjection(),
+        .view = m_camera.getView()
+    };
+    m_uboBuffers[m_frameInfo.frameIndex]->writeToBuffer(&ubo);
+    m_uboBuffers[m_frameInfo.frameIndex]->flush();
+
+    m_renderer.beginSwapChainRenderPass(m_frameInfo.commandBuffer);
+
+    m_renderSystem.bind(m_frameInfo);
+    m_registry.view<::vksb::component::Transform3d>().each([this](auto& transform){
+        m_renderSystem(m_frameInfo, transform);
+    });
+
+    m_pointLightSystem.bind(m_frameInfo);
+    m_pointLightSystem(m_frameInfo);
+
+    m_renderer.endSwapChainRenderPass(m_frameInfo.commandBuffer);
+    m_renderer.endFrame();
 }
 
 ///////////////////////////////////////////////////////////////////////////

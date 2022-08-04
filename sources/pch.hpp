@@ -128,6 +128,7 @@ using ::std::literals::string_view_literals::operator""sv;
 using ::std::chrono_literals::operator""ms;
 
 #define PRINT_DEBUG
+// #define FORCE_PRINT // print even silent asserts
 #include <xrn/Log/Logger.hpp>
 
 
