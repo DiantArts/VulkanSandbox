@@ -94,8 +94,8 @@ auto ::vksb::Model::Vertex::operator==(
 ) const
     -> bool
 {
-  return this->position == other.position && this->color == other.color && this->normal == other.normal &&
-      uv == other.uv;
+    return this->position == other.position && this->color == other.color && this->normal == other.normal &&
+        uv == other.uv;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -271,7 +271,6 @@ void ::vksb::Model::createVertexBuffers(
     };
     stagingBuffer.map();
     stagingBuffer.writeToBuffer(::std::bit_cast<void*>(vertices.data()));
-    return;
 
     m_vertexBuffer = ::std::make_unique<::vksb::Buffer>(
         m_device,
