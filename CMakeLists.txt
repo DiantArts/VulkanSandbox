@@ -64,8 +64,7 @@ option(ENABLE_SHADERS "Compiles GLSL shaders to SPV" ON)
 # optimization
 option(ENABLE_IPO "Enable IterpPocedural Optimization (Link Time Optimization)" ON)
 option(ENABLE_CACHE "Enable cache if available" ON)
-option(ENABLE_STD_PCH "Enable Precompiled Headers of the STD library" ON)
-option(ENABLE_PCH "Enable personal Precompiled Headers (<pch.hpp>)" ON)
+option(ENABLE_PCH "Enable personal Precompiled Headers (<pch.hpp>)" OFF)
 
 # others
 option(ENABLE_UPDATE_CONAN "Enable updates of the <conan.cmake> file each run" OFF)
@@ -172,28 +171,29 @@ list(REMOVE_ITEM XRN_SOURCES "${XRN_MAIN}")
 include_directories(${XRN_SOURCES_DIR})
 include_directories(${XRN_EXTERNAL_DIR})
 
-# interfaces
+
+
+# =========================================================================
+# Options
+# =========================================================================
+
 add_library(project_options INTERFACE)
-add_library(project_warnings INTERFACE)
-add_library(project_dependencies INTERFACE)
-
-
-
-# =========================================================================
-# Implementation
-# =========================================================================
-
-# checks the build directory if it points to the sources, aborts if it does
-include(${XRN_TOOLCHAIN_DIR}/PreventInSourceBuilds.cmake)
-prevent_in_source_builds()
 
 # basic useful actions controlled by the options/
 include(${XRN_TOOLCHAIN_DIR}/StandardProjectSettings.cmake)
 set_standard_project_settings(project_options ${XRN_CXX_VERSION})
 
-# cache if supported by compiler
-include(${XRN_TOOLCHAIN_DIR}/Cache.cmake)
-enable_cache()
+# sanitizer options if supported by compiler
+include(${XRN_TOOLCHAIN_DIR}/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
+
+
+# =========================================================================
+# Warnings and flags
+# =========================================================================
+
+add_library(project_warnings INTERFACE)
 
 # compiler warnings
 include(${XRN_TOOLCHAIN_DIR}/CompilerWarnings.cmake)
@@ -203,9 +203,31 @@ set_compiler_warnings(project_warnings)
 include(${XRN_TOOLCHAIN_DIR}/CompilerFlags.cmake)
 set_compiler_flags(project_warnings)
 
-# sanitizer options if supported by compiler
-include(${XRN_TOOLCHAIN_DIR}/Sanitizers.cmake)
-enable_sanitizers(project_options)
+
+
+# =========================================================================
+# Dependencies
+# =========================================================================
+
+add_library(project_dependencies INTERFACE)
+
+# compile shaders
+include(${XRN_TOOLCHAIN_DIR}/Shaders.cmake)
+compile_shaders(project_dependencies)
+
+
+
+# =========================================================================
+# Others
+# =========================================================================
+
+# checks the build directory if it points to the sources, aborts if it does
+include(${XRN_TOOLCHAIN_DIR}/PreventInSourceBuilds.cmake)
+prevent_in_source_builds()
+
+# cache if supported by compiler
+include(${XRN_TOOLCHAIN_DIR}/Cache.cmake)
+enable_cache()
 
 # enable documentation
 include(${XRN_TOOLCHAIN_DIR}/Documentation.cmake) # documentation configuration in the file
@@ -215,20 +237,24 @@ extract_documentation()
 include(${XRN_TOOLCHAIN_DIR}/StaticAnalyzers.cmake) # possible to add more static analyzers in the file
 run_static_analysis()
 
-# add precompile headers
-# include(${XRN_TOOLCHAIN_DIR}/PrecompiledHeaders.cmake)
-# add_precompiled_headers(project_options)
-
 # download dependencies
 include(${XRN_TOOLCHAIN_DIR}/Dependencies.cmake)
 download_dependencies("${XRN_LIBS_REQUIRED}") # isn't check whether the dowloaded failed or not
 
-# compile shaders
-include(${XRN_TOOLCHAIN_DIR}/Shaders.cmake)
-compile_shaders(project_dependencies)
+
+
+# =========================================================================
+# Sub directories
+# =========================================================================
 
 # sub projects
 add_subdirectory(${XRN_SOURCES_DIR})
+
+
+
+# =========================================================================
+# Tests
+# =========================================================================
 
 # tests
 include(${XRN_TOOLCHAIN_DIR}/Tests.cmake)

@@ -91,7 +91,7 @@ void ::vksb::App::loadObjects()
     {
         auto entity{ m_registry.create() };
         m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "floor"));
-        // m_registry.emplace<::vksb::component::Position>(entity, 0.5f, 0.5f, 0.0f);
-        // m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
+        m_registry.emplace<::vksb::component::Position>(entity, 0.5f, 0.5f, 0.0f);
+        m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
     }
 }

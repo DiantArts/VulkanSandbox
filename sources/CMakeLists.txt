@@ -9,6 +9,14 @@ target_link_libraries(
         ${XRN_LIBRARIES_DEPENDENCY}
 )
 
+if (ENABLE_PCH)
+    target_precompile_headers(
+        XRN_BIN_OBJECTS
+        PRIVATE
+            <pch.hpp>
+    )
+endif ()
+
 if (ENABLE_BINARY)
     add_executable(${XRN_BIN_NAME} $<TARGET_OBJECTS:XRN_BIN_OBJECTS>)
     target_link_libraries(
@@ -19,12 +27,6 @@ if (ENABLE_BINARY)
             project_dependencies
     )
 endif ()
-
-target_precompile_headers(
-    ${XRN_BIN_NAME}
-    PRIVATE
-    <pch.hpp>
-)
 
 set_property(TARGET XRN_BIN_OBJECTS PROPERTY POSITION_INDEPENDENT_CODE 1)
 if (ENABLE_STATIC_LIBRARY)
