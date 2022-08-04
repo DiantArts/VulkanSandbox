@@ -22,10 +22,16 @@ macro(set_standard_project_settings interface language_version)
 
     # Enable IterpPocedural Optimization (LTO: Link Time Optimization) if needed
     if (ENABLE_IPO)
+        include(ProcessorCount)
+        ProcessorCount(XRN_NPROC)
+        if (NOT XRN_NPROC EQUAL 0)
+            set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_JOBS ${XRN_NPROC})
+        endif ()
+
         include(CheckIPOSupported)
         check_ipo_supported(RESULT isIpoSupported OUTPUT output)
         if (isIpoSupported)
-            message(STATUS "IPO enabled")
+            message(STATUS "IPO enabled (${XRN_NPROC} procs)")
             set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
         else ()
             message(WARNING "IPO is not supported: ${output}")
