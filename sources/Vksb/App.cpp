@@ -94,8 +94,26 @@ void ::vksb::App::loadObjects()
     }
 
     {
-        auto entity{ m_registry.create() };
-        m_registry.emplace<::vksb::component::Position>(entity, 0.0f, 0.5f, 0.0f);
-        m_registry.emplace<::vksb::component::PointLight>(entity);
+        std::vector<glm::vec3> lightColors{
+            { 1.f, .1f, .1f },
+            { .1f, .1f, 1.f },
+            { .1f, 1.f, .1f },
+            { 1.f, 1.f, .1f },
+            { .1f, 1.f, 1.f },
+            { 1.f, 1.f, 1.f }
+        };
+        for (auto i{ 0uz }; const auto& color : lightColors) {
+            auto rotation{ ::glm::rotate(
+                ::glm::mat4(1.0f),
+                i * ::glm::two_pi<float>() / lightColors.size(),
+                { 0.0f, -1.0f, 0.0f }
+            ) };
+            auto entity{ m_registry.create() };
+            m_registry.emplace<::vksb::component::Position>(
+                entity, ::glm::vec3{ rotation * ::glm::vec4{ -0.0f, -0.0f, -0.5f, 1.0f } }
+            );
+            m_registry.emplace<::vksb::component::PointLight>(entity, color);
+            ++i;
+        }
     }
 }

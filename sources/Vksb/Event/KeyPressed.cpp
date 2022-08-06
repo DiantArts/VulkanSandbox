@@ -58,7 +58,6 @@ void ::vksb::event::KeyPressed::resolve(
     } else if (m_keyCode == ::vksb::configuration.keyBinding.moveUp) {
         playerController.startMovingUp();
     } else if (m_keyCode == ::vksb::configuration.keyBinding.moveDown) {
-        ::fmt::print("hello\n");
         playerController.startMovingDown();
 
     // move arrows

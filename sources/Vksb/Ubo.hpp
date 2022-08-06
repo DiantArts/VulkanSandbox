@@ -17,7 +17,7 @@ struct Ubo {
     ::glm::vec4 ambientLightColor{ 1.0f, 1.0f, 1.0f, 0.02f }; // w is intensity
 
     static inline constexpr const ::std::size_t maxLights{ 10uz };
-    ::vksb::component::PointLight pointLights[maxLights];
+    ::vksb::component::PointLight::PushConstant pointLights[maxLights];
     ::std::size_t numOfLights;
 };
 

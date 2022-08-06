@@ -180,18 +180,22 @@ auto ::vksb::AScene::update()
     }
 
     {
+        auto lightIndex{ 0uz };
+        m_registry.view<::vksb::component::PointLight, ::vksb::component::Position>().each(
+            [this, &lightIndex](auto& pointLight, auto& position) {
+                m_pointLightSystem.update(m_frameInfo, pointLight, position, lightIndex);
+                ++lightIndex;
+            }
+        );
+        m_frameInfo.ubo.numOfLights = lightIndex;
+    }
+
+    {
         auto& position{ m_registry.get<::vksb::component::Position>(m_camera.getId()) };
         auto& rotation{ m_registry.get<::vksb::component::Rotation>(m_camera.getId()) };
         m_camera.setViewDirection(position, rotation.getDirection());
         // m_camera.setViewDirection(::glm::vec3{ 0.0f, 0.0f, -2.5f }, ::glm::vec3{ 0.0f, 0.0f, 1.0f });
     }
-
-    auto lightIndex{ 0uz };
-    m_registry.view<::vksb::component::PointLight>().each([this, &lightIndex](auto& pointLight) {
-        m_pointLightSystem.update(m_frameInfo, pointLight, lightIndex);
-        ++lightIndex;
-    });
-    m_frameInfo.ubo.numOfLights = lightIndex;
     return true;
 }
 
@@ -232,9 +236,9 @@ void ::vksb::AScene::draw()
     });
 
     m_pointLightSystem.bind(m_frameInfo);
-    m_registry.view<::vksb::component::PointLight>().each([this](auto& pointLight) {
-        m_pointLightSystem(m_frameInfo, pointLight);
-    });
+    m_registry.view<::vksb::component::PointLight, ::vksb::component::Position>().each(
+        [this](auto& pointLight, auto position) { m_pointLightSystem(m_frameInfo, pointLight, position); }
+    );
 
     m_renderer.endSwapChainRenderPass(m_frameInfo.commandBuffer);
     m_renderer.endFrame();

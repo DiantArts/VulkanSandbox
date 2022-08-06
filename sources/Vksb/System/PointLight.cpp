@@ -61,7 +61,7 @@ void ::vksb::system::PointLight::createPipelineLayout(
     ::VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = ::VK_SHADER_STAGE_VERTEX_BIT | ::VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(::vksb::component::PointLight);
+    pushConstantRange.size = sizeof(::vksb::component::PointLight::PushConstant);
 
     ::std::vector<::VkDescriptorSetLayout> descriptorSetLayouts{ descriptorSetLayout };
 
@@ -98,16 +98,18 @@ void ::vksb::system::PointLight::createPipeline(
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::system::PointLight::operator()(
     ::vksb::FrameInfo& frameInfo,
-    const ::vksb::component::PointLight& pointLight
+    const ::vksb::component::PointLight& pointLight,
+    const ::vksb::component::Position& position
 ) const
 {
+    ::vksb::component::PointLight::PushConstant pushConstant{ pointLight, position };
     ::vkCmdPushConstants(
         frameInfo.commandBuffer,
         m_pipelineLayout,
         VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0,
-        sizeof(pointLight),
-        &pointLight
+        sizeof(pushConstant),
+        &pushConstant
     );
     ::vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
 }
@@ -134,8 +136,11 @@ void ::vksb::system::PointLight::bind(
 void ::vksb::system::PointLight::update(
     ::vksb::FrameInfo& frameInfo,
     ::vksb::component::PointLight& pointLight,
+    ::vksb::component::Position& position,
     ::std::size_t lightIndex
 )
 {
-    frameInfo.ubo.pointLights[lightIndex] = auto{ pointLight };
+    auto rotation{ ::glm::rotate(::glm::mat4(1.0f), (float)frameInfo.deltaTime.get() / 1000, { 0.0f, -1.0f, 0.0f }) };
+    position = ::glm::vec3{ rotation * ::glm::vec4{ ::glm::vec3{ position }, 1.0f } };
+    frameInfo.ubo.pointLights[lightIndex] = ::vksb::component::PointLight::PushConstant{ pointLight, position };
 }

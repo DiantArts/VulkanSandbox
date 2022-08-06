@@ -1,0 +1,30 @@
+<C-o> ::std::
+<C-A-o> ::xrn::
+<C-e> this->
+<C-A-e> *this
+<C-u> ::std::vector
+<C-A-u> ::std::span
+<C-u> ::std::make_unique<>()
+<C-A-u> ::std::make_shared<>()
+<C-l> const
+<C-a-l> constexpr
+<C-c> static
+<C-g> [[ nodiscard ]]
+<C-f> noexcept
+<C-n> if () {<CR>}<Esc><Up>A
+<C-A-n> switch () {<CR>// case : break;<CR>default: break;<CR>}
+<C-t> for (const auto& elem : ) {<CR>}
+<C-A-t> for (auto i{ 0uz }; i < ; ++i) {<CR>}
+<C-d> while () {<CR>}<Esc><Up>A
+<C-b> <Esc>:call AppendNamespace()<CR>
+<C-x> ::std::cout << << ::std::endl;
+<C-A-x> ::std::cout << "" << ::std::endl;
+<C-k> auto&&... args
+<C-A-k> ::std::forward<decltype(args)>(args)...
+p :cnext
+P :cprevious
+y :cc
+Y :copen
+f :copen .build/errorFile
+F :cclose
+g :AsyncRun make hide_color=true

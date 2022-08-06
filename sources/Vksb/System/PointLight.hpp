@@ -99,7 +99,8 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     void operator()(
         ::vksb::FrameInfo& frameInfo,
-        const ::vksb::component::PointLight& pointLight
+        const ::vksb::component::PointLight& pointLight,
+        const ::vksb::component::Position& position
     ) const;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -115,6 +116,7 @@ public:
     void update(
         ::vksb::FrameInfo& frameInfo,
         ::vksb::component::PointLight& pointLight,
+        ::vksb::component::Position& position,
         ::std::size_t lightIndex
     );
 
