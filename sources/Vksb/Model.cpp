@@ -69,22 +69,22 @@ auto ::vksb::Model::Vertex::getAttributeDescriptions()
         .location = 0,
         .binding = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
-        .offset = offsetof(::vksb::Model::Vertex, Vertex::position)
+        .offset = offsetof(::vksb::Model::Vertex, position)
     }, {
         .location = 1,
         .binding = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
-        .offset = offsetof(::vksb::Model::Vertex, Vertex::color)
+        .offset = offsetof(::vksb::Model::Vertex, color)
     }, {
         .location = 2,
         .binding = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
-        .offset = offsetof(::vksb::Model::Vertex, Vertex::normal)
+        .offset = offsetof(::vksb::Model::Vertex, normal)
     }, {
         .location = 3,
         .binding = 0,
         .format = VK_FORMAT_R32G32B32_SFLOAT,
-        .offset = offsetof(::vksb::Model::Vertex, Vertex::uv)
+        .offset = offsetof(::vksb::Model::Vertex, uv)
     } };
 }
 

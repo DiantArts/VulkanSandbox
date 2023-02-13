@@ -4,9 +4,17 @@
 
 runProgram() (
     if [ ${buildType} = Debug ]; then
-        valgrind ./${binary} || exit $?
+        valgrind ./${binaryPath} ${argv1} || exit $?
     else
-        ./${binary} || exit $?
+        ./${binaryPath} ${argv1} || exit $?
+    fi
+)
+
+runProgram2() (
+    if [ ${buildType} = Debug ]; then
+        valgrind ./${binaryPath2} ${argv2} || exit $?
+    else
+        ./${binaryPath2} ${argv2} || exit $?
     fi
 )
 
@@ -16,14 +24,19 @@ compiler=clang++
 buildDir=.build
 cxxVersion=23
 buildType=Release
-binary=${buildDir}/sources/xrn
+binaryName=vksb_client
+binaryName2=vksb_server
+binaryPath=${buildDir}/sources/bin/${binaryName}
+binaryPath2=${buildDir}/sources/bin/${binaryName2}
+argv1="127.0.0.1 8080"
+argv2="8080"
 parallel=$(nproc)
 
 # -------------------------------------------------------------------------------------------------
 
 declare -a listOfDisablable=("clear" "run" "cov" "coverage" "binary" "build" "color" "pch")
 getoptArgShort="hglstmdc"
-getoptArgLong="help,gcc,g\+\+,clang,clang\+\+,setup,test,tests,tests_run,debug,makefile,clean,debug-cmake,type:,version:,compiler:,cc-compiler:,cxx-compiler:,directory:,parallel:"
+getoptArgLong="help,gcc,g\+\+,clang,clang++,setup,test,tests,tests_run,debug,makefile,clean,debug-cmake,server,type:,version:,compiler:,cc-compiler:,cxx-compiler:,directory:,parallel:"
 
 
 
@@ -56,6 +69,7 @@ Options (* only applies if cmake is setup):
                                   ($buildDir by default)
         --parallel=NUMBER         Specify the number of core to use
                                   ($parallel by default)
+        --server                  Run second binary (used for client/server programming)
         --no-*                    Values:
                                     clear: Do not clear the screen when running the script
                                     build: Do not build the project
@@ -70,6 +84,7 @@ Actions:
     remake rebuild re             Clean and build everything again
     tests run_tests unit_tests  * Rebuild to generate and run tests informations
     cov coverage                  Only run the coverage and nothing else
+    clear-logs logs log           Clear the log files archived
 EOF
 }
 
@@ -77,6 +92,7 @@ setupCmake() {
     clean
     cmakeCommands=""
     if [ ${testsNeeded} = true ]; then
+        buildType=Debug
         cmakeCommands+="-DENABLE_COVERAGE=true -DENABLE_UNIT_TESTING=true -DRUN_UNIT_TESTS=false -DENABLE_TESTING=true "
     else
         cmakeCommands="-DENABLE_UNIT_TESTING=false -DRUN_UNIT_TESTS=false -DENABLE_TESTING=false "
@@ -97,6 +113,9 @@ setupCmake() {
     else
         cmakeCommands+="-DENABLE_BINARY=OFF "
     fi
+    if [ ${runSecondBinary} = true ]; then
+        cmakeCommands+="-DCOMPILE_SERVER=true "
+    fi
     cmake \
         -S. \
         -B${buildDir} \
@@ -116,13 +135,23 @@ build() {
 }
 
 run() {
-    if [ ! -f "./${binary}" ]; then
-        echo -e "${bold}${red}[ERROR]${normal}: the binary file './${binary}' does not exist. Try to:" 1>&2
-        echo -e "    - ${bold}${red}Resolve${normal} the invalid script arguments" 1>&2
-        echo -e "    - ${bold}${red}Fix${normal} compilation errors" 1>&2
-        echo -e "    - Run the script again with the '-s' argument" 1>&2
+    if [ ${runSecondBinary} = true ]; then
+        if [ ! -f "./${binaryPath2}" ]; then
+            echo -e "${bold}${red}[ERROR]${normal}: the binary file './${binaryPath2}' does not exist. Try to:" 1>&2
+            echo -e "    - ${bold}${red}Resolve${normal} the invalid script arguments" 1>&2
+            echo -e "    - ${bold}${red}Fix${normal} compilation errors" 1>&2
+            echo -e "    - Run the script again with the '-s' argument" 1>&2
+        fi
+        runProgram2
+    else
+        if [ ! -f "./${binaryPath}" ]; then
+            echo -e "${bold}${red}[ERROR]${normal}: the binary file './${binaryPath}' does not exist. Try to:" 1>&2
+            echo -e "    - ${bold}${red}Resolve${normal} the invalid script arguments" 1>&2
+            echo -e "    - ${bold}${red}Fix${normal} compilation errors" 1>&2
+            echo -e "    - Run the script again with the '-s' argument" 1>&2
+        fi
+        runProgram
     fi
-    runProgram
 }
 
 clean() {
@@ -134,11 +163,19 @@ clean() {
 }
 
 runTests() {
-    ctest --test-dir ${buildDir} -C ${buildType}
+    ctest --test-dir ${buildDir} -C ${buildType} --output-on-failure
 }
 
 runCoverage() {
-    gcovr -j ${parallel} --root ./ ./ -e ./.build/ -e ./tests/ --gcov-executable 'gcov'
+    if [[ ${CXX} == *"clang++"* ]]; then
+        gcovr -j ${parallel} -b --root ./ ./ -e .build/ -e tests/ -e externals/ --gcov-executable 'llvm-cov gcov'
+        gcovr -j ${parallel} --root ./ ./ -e .build/ -e tests/ -e externals/ --gcov-executable 'llvm-cov gcov'
+        gcovr --delete -j ${parallel} --root ./ ./ -e .build/ -e tests/ -e externals/ --xml-pretty --xml ./.build/coverage.xml --gcov-executable 'llvm-cov gcov'
+    else
+        gcovr -j ${parallel} -b --root ./ ./ -e .build/ -e tests/ -e externals/ --gcov-executable 'gcov'
+        gcovr -j ${parallel} --root ./ ./ -e .build/ -e tests/ -e externals/ --gcov-executable 'gcov'
+        gcovr --delete -j ${parallel} --root ./ ./ -e .build/ -e tests/ -e externals/ --xml-pretty --xml ./.build/coverage.xml --gcov-executable 'gcov'
+    fi
 }
 
 abortError() {
@@ -164,8 +201,10 @@ cleanNeeded=false
 stopAfterCleanNeeded=false
 debugCmakeNeeded=false
 pchNeeded=true
+runSecondBinary=false
 
 compilerModified=false
+cc_compilerModified=false
 typeModified=false
 
 error=false
@@ -238,17 +277,17 @@ while [ $# -gt 0 ]; do
         fi
         export CXX=clang++ ;;
     --gcc)
-        if [ $compilerModified = true ]; then
+        if [ $cc_compilerModified = true ]; then
             compilerSpecifiedMultipleTime=true; error=true
         else
-            compilerModified=true
+            cc_compilerModified=true
         fi
         export CC=gcc ;;
     --clang)
-        if [ $compilerModified = true ]; then
+        if [ $cc_compilerModified = true ]; then
             compilerSpecifiedMultipleTime=true; error=true
         else
-            compilerModified=true
+            cc_compilerModified=true
         fi
         export CC=clang ;;
     --compiler) shift;
@@ -259,10 +298,10 @@ while [ $# -gt 0 ]; do
         fi
         export CXX=$1  ;;
     --cc-compiler) shift;
-        if [ $compilerModified = true ]; then
+        if [ $cc_compilerModified = true ]; then
             compilerSpecifiedMultipleTime=true; error=true
         else
-            compilerModified=true
+            cc_compilerModified=true
         fi
         export CC=$1  ;;
     --cxx-compiler) shift;
@@ -283,6 +322,7 @@ while [ $# -gt 0 ]; do
     --version) shift; cxxVersion=$1  ;;
     --directory) shift; buildDir=$1  ;;
     --parallel) shift; parallel=$1  ;;
+    --server) shift; runSecondBinary=true ;;
     --no-*)
         if [[ $1 == *"-clear-"* ]] || [[ $1 == *"-clear" ]]; then
             clearNeeded=false;
@@ -312,6 +352,7 @@ while [ $# -gt 0 ]; do
     "'re'"|"'remake'"|"'rebuild'") cleanNeeded=true; setupNeeded=true ;;
     "'test'"|"'tests'"|"'run_tests'"|"'unit_test'"|"'unit_tests'") testsNeeded=true ;;
     "'cov'"|"'coverage'") runCoverage; exit 0 ;;
+    "'clear-logs'"|"'logs'"|"'log'"|"'clear-log'") rm -rf ./.logs/.old/* ./.logs/*; exit 0 ;;
     esac
     shift
 done
@@ -369,6 +410,14 @@ fi
 
 # -------------------------------------------------------------------------------------------------
 
+if [ -d "./.logs" ]; then
+    str=$(date +"%F-%H-%M-%S")
+    mkdir -p ./.logs/.old/
+    cd ./.logs
+    tar -zcf ./.old/log-${str}.tar.gz *.txt
+    cd - &>/dev/null
+fi
+
 if [ ${cleanNeeded} = true ]; then
     clean
     if [ ${stopAfterCleanNeeded} = true ]; then
@@ -389,7 +438,7 @@ if [ ${buildNeeded} = true ]; then
     build
 fi
 
-if [ ${runNeeded} = true ] && [ ${binaryNeeded} = true ]; then
+if [ ${runNeeded} = true ] && [ ${binaryNeeded} = true ] && [ ${testsNeeded} = false ]; then
     run
 fi
 

@@ -6,14 +6,16 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 # project
 project(CMakeSandbox LANGUAGES CXX)
-set(XRN_BIN_NAME xrn)
 set(XRN_CXX_VERSION 23)
 
+set(XRN_ERROR_LIMIT 10)
+
 # dependencies
-set(XRN_LIBS_REQUIRED glfw/3.3.7 entt/3.10.1 fmt/8.1.1)
-set(XRN_LIBRARIES_REQUIREMENTS Vulkan glfw3 EnTT fmt Threads) # find_package
-set(XRN_LIBRARIES_DEPENDENCY Vulkan::Vulkan glfw::glfw EnTT::EnTT fmt::fmt Threads::Threads) # target_link_libraries
-set(XRN_LIBRARIES_HEADERS glfw3 EnTT fmt) # include_directories(${library}_INCLUDE_DIRS)
+set(XRN_PERSONAL_DEPENDENCIES xrnLog xrnMeta xrnUtil) # include other xrn projects
+set(XRN_LIBRARIES_REQUIRED glfw/3.3.7 entt/3.10.1 spdlog/1.10.0 asio/1.24.0)
+set(XRN_LIBRARIES_REQUIREMENTS Vulkan glfw3 EnTT fmt Threads spdlog fmt asio) # find_package
+set(XRN_LIBRARIES_DEPENDENCIES Vulkan::Vulkan glfw::glfw EnTT::EnTT fmt::fmt Threads::Threads CONAN_PKG::spdlog CONAN_PKG::fmt CONAN_PKG::asio) # target_link_libraries
+set(XRN_LIBRARIES_HEADERS glfw3 EnTT spdlog fmt asio) # include_directories()
 
 set(SPDLOG_BUILD_SHARED OFF)
 set(SPDLOG_FMT_EXTERNAL ON)
@@ -24,13 +26,15 @@ set(SPDLOG_BUILD_TESTS OFF)
 set(XRN_TOOLCHAIN_DIR "${CMAKE_SOURCE_DIR}/.toolchain")
 set(XRN_TOOLCHAIN_DETAILS_DIR "${XRN_TOOLCHAIN_DIR}/.details")
 set(XRN_SOURCES_DIR "sources")
+set(XRN_EXTERNALS_DIR "externals")
 set(XRN_TESTS_DIR "tests")
-set(XRN_EXTERNAL_DIR "externals")
 set(XRN_OUTPUT_DIR "binaries")
 
 set(XRN_SHADERS_DIR "shaders")
 set(XRN_FRAGMENTS_DIR "Fragment")
 set(XRN_VERTEXES_DIR "Vertex")
+
+option(COMPILE_SERVER "Compile the server instead of the client" OFF)
 
 # testing
 option(ENABLE_TESTING "Enable testing" OFF)
@@ -62,7 +66,7 @@ option(ENABLE_C++20_COROUTINES "Enable coroutines supports" OFF)
 option(ENABLE_SHADERS "Compiles GLSL shaders to SPV" ON)
 
 # optimization
-option(ENABLE_IPO "Enable IterpPocedural Optimization (Link Time Optimization)" ON)
+option(ENABLE_IPO "Enable IterpPocedural Optimization (Link Time Optimization)" OFF)
 option(ENABLE_CACHE "Enable cache if available" ON)
 option(ENABLE_PCH "Enable personal Precompiled Headers (<pch.hpp>)" OFF)
 
@@ -80,166 +84,24 @@ option(ENABLE_SHARED_LIBRARY "Compile the main program as a shared library" OFF)
 
 
 # =========================================================================
-# Abolute paths
+# xrnCMake
 # =========================================================================
 
-set(XRN_ROOT_DIR_RELATIVE ${CMAKE_SOURCE_DIR})
-set(XRN_BUILD_DIR_RELATIVE ${CMAKE_BINARY_DIR})
-set(XRN_TOOLCHAIN_DIR_RELATIVE ${XRN_TOOLCHAIN_DIR})
-set(XRN_TOOLCHAIN_DETAILS_DIR_RELATIVE ${XRN_TOOLCHAIN_DETAILS_DIR})
-set(XRN_SOURCES_DIR_RELATIVE ${XRN_SOURCES_DIR})
-set(XRN_TESTS_DIR_RELATIVE ${XRN_TESTS_DIR})
-set(XRN_INCLUDE_DIRS_RELATIVE ${XRN_EXTERNAL_DIR})
-
-set(XRN_SHADERS_DIR_RELATIVE ${XRN_SHADERS_DIR})
-set(XRN_FRAGMENTS_DIR_RELATIVE ${XRN_SHADERS_DIR}/${XRN_FRAGMENTS_DIR})
-set(XRN_VERTEXES_DIR_RELATIVE ${XRN_SHADERS_DIR}/${XRN_VERTEXES_DIR})
-
-get_filename_component(XRN_ROOT_DIR ${CMAKE_SOURCE_DIR} REALPATH)
-get_filename_component(XRN_BUILD_DIR ${CMAKE_BINARY_DIR} REALPATH)
-get_filename_component(XRN_TOOLCHAIN_DIR ${XRN_TOOLCHAIN_DIR} REALPATH)
-get_filename_component(XRN_TOOLCHAIN_DETAILS_DIR ${XRN_TOOLCHAIN_DETAILS_DIR} REALPATH)
-get_filename_component(XRN_SOURCES_DIR ${XRN_SOURCES_DIR} REALPATH)
-get_filename_component(XRN_TESTS_DIR ${XRN_TESTS_DIR} REALPATH)
-get_filename_component(XRN_EXTERNAL_DIR ${XRN_EXTERNAL_DIR} REALPATH)
-get_filename_component(XRN_OUTPUT_DIR ${XRN_BUILD_DIR}/${XRN_OUTPUT_DIR} REALPATH)
-
-get_filename_component(XRN_SHADERS_DIR ${XRN_SHADERS_DIR} REALPATH)
-get_filename_component(XRN_VERTEXES_DIR ${XRN_VERTEXES_DIR_RELATIVE} REALPATH)
-get_filename_component(XRN_FRAGMENTS_DIR ${XRN_FRAGMENTS_DIR_RELATIVE} REALPATH)
-
-
-
-# =========================================================================
-# Sources
-# =========================================================================
-
-get_filename_component(XRN_MAIN ${XRN_SOURCES_DIR}/main.cpp REALPATH)
-file(
-    GLOB_RECURSE
-    XRN_SOURCES
-    ${XRN_SOURCES_DIR}/*.cpp
-    ${XRN_SOURCES_DIR}/*.cxx
-    ${XRN_SOURCES_DIR}/*.c
-    ${XRN_SOURCES_DIR}/*.CC
-    PARENT_SCOPE
+include(FetchContent)
+FetchContent_Declare(
+    _project_options
+    GIT_REPOSITORY https://github.com/DiantArts/xrnCMake
+    GIT_TAG        main
 )
-file(
-    GLOB_RECURSE
-    XRN_HEADERS
-    ${XRN_SOURCES_DIR}/*.hpp
-    ${XRN_SOURCES_DIR}/*.hxx
-    ${XRN_SOURCES_DIR}/*.h
-    PARENT_SCOPE
-)
-file(
-    GLOB_RECURSE
-    XRN_FRAGMENTS
-    ${XRN_FRAGMENTS_DIR}/*.glsl
-    ${XRN_FRAGMENTS_DIR}/*.shader
-    ${XRN_SHADERS_DIR}/*.vert
-    ${XRN_SHADERS_DIR}/*.vertex
-    ${XRN_SHADERS_DIR}/*.vs
-    PARENT_SCOPE
-)
-file(
-    GLOB_RECURSE
-    XRN_VERTEXES
-    ${XRN_VERTEXES_DIR}/*.glsl
-    ${XRN_VERTEXES_DIR}/*.shader
-    ${XRN_SHADERS_DIR}/*.vert
-    ${XRN_SHADERS_DIR}/*.vertex
-    ${XRN_SHADERS_DIR}/*.fs
-    PARENT_SCOPE
-)
+FetchContent_MakeAvailable(_project_options)
 
-
-
-# =========================================================================
-# Setup interfaces and configurations
-# =========================================================================
-
-# debug
-if (ENABLE_CMAKE_DEBUG)
-    SET(CMAKE_VERBOSE_MAKEFILE TRUE)
-endif ()
-
-# generate sources list without the main
-list(REMOVE_ITEM XRN_SOURCES "${XRN_MAIN}")
-
-# includes
-include_directories(${XRN_SOURCES_DIR})
-include_directories(${XRN_EXTERNAL_DIR})
-
-
-
-# =========================================================================
-# Options
-# =========================================================================
-
-add_library(project_options INTERFACE)
-
-# basic useful actions controlled by the options/
-include(${XRN_TOOLCHAIN_DIR}/StandardProjectSettings.cmake)
-set_standard_project_settings(project_options ${XRN_CXX_VERSION})
-
-# sanitizer options if supported by compiler
-include(${XRN_TOOLCHAIN_DIR}/Sanitizers.cmake)
-enable_sanitizers(project_options)
-
-
-
-# =========================================================================
-# Warnings and flags
-# =========================================================================
-
-add_library(project_warnings INTERFACE)
-
-# compiler warnings
-include(${XRN_TOOLCHAIN_DIR}/CompilerWarnings.cmake)
-set_compiler_warnings(project_warnings)
-
-# compiler flags
-include(${XRN_TOOLCHAIN_DIR}/CompilerFlags.cmake)
-set_compiler_flags(project_warnings)
-
-
-
-# =========================================================================
-# Dependencies
-# =========================================================================
-
-add_library(project_dependencies INTERFACE)
-
-# compile shaders
-include(${XRN_TOOLCHAIN_DIR}/Shaders.cmake)
-compile_shaders(project_dependencies)
-
-
-
-# =========================================================================
-# Others
-# =========================================================================
-
-# checks the build directory if it points to the sources, aborts if it does
-include(${XRN_TOOLCHAIN_DIR}/PreventInSourceBuilds.cmake)
-prevent_in_source_builds()
-
-# cache if supported by compiler
-include(${XRN_TOOLCHAIN_DIR}/Cache.cmake)
-enable_cache()
-
-# enable documentation
-include(${XRN_TOOLCHAIN_DIR}/Documentation.cmake) # documentation configuration in the file
-extract_documentation()
-
-# allow for static analysis options
-include(${XRN_TOOLCHAIN_DIR}/StaticAnalyzers.cmake) # possible to add more static analyzers in the file
-run_static_analysis()
-
-# download dependencies
-include(${XRN_TOOLCHAIN_DIR}/Dependencies.cmake)
-download_dependencies("${XRN_LIBS_REQUIRED}") # isn't check whether the dowloaded failed or not
+default_setup_filepaths()
+default_find_files()
+default_setup_vars()
+default_setup_options()
+default_setup_flags()
+default_setup_dependencies()
+default_setup_extra()
 
 
 
@@ -248,14 +110,11 @@ download_dependencies("${XRN_LIBS_REQUIRED}") # isn't check whether the dowloade
 # =========================================================================
 
 # sub projects
-add_subdirectory(${XRN_SOURCES_DIR})
+if (ENABLE_TESTING)
+    if (NOT CMAKE_CURRENT_LIST_DIR MATCHES "-src/sources$")
+        enable_tests()
+    endif ()
+else ()
+    add_subdirectory(${XRN_SOURCES_DIR})
+endif ()
 
-
-
-# =========================================================================
-# Tests
-# =========================================================================
-
-# tests
-include(${XRN_TOOLCHAIN_DIR}/Tests.cmake)
-enable_tests()
