@@ -1,0 +1,38 @@
+Game systems
+    [DONE] ECS architecture
+    [NO] multi threaded ECS systems
+    [DONE] scaling / rotation / moving objects
+    [DONE] input managment
+    [DONE] 3D tranformation
+    [DONE] camera
+    [NO] attach camera to object
+    [NO] HUD / 2d elements
+
+Lighting
+    [DONE] hardcoded point light
+    [NO] hardcoded directional light
+    [NO] hardcoded spot light
+    [NO] dynamic shaders
+    [NO] shadow
+
+Game Dev
+    [DONE] import 3d objects (.obj files) (meshes)
+    [NO] materials
+    [NO] import animations
+    [NO] dynamic object loading
+    [NO] level abstraction
+    [NO] level editor (placing elements to level)
+    [NO] behavioral scripting
+
+Networking
+    [NO] client/server to communicate and send information (implemented seperatly, not integrated)
+    [NO] multiple player
+
+Physics
+    [NO] Collision events
+    [NO] Collision behavior
+    [NO] Gravity
+
+Audio
+    [NO] music
+    [NO] sound
