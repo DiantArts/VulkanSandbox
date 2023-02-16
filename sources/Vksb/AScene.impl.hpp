@@ -9,8 +9,8 @@ template <
     -> ComponentType&
 {
     XRN_SASSERT(
-        m_registry.valid(m_player),
-        "the controlled index is greater than the number of game ojects"
+        m_registry.valid(m_player)
+        , "the controlled index is greater than the number of game ojects"
     );
 
     return m_registry.get<ComponentType>(m_player);

@@ -39,7 +39,7 @@
         m_pDescriptorSetLayout->getDescriptorSetLayout()
     }
     , m_player{ m_registry.create() }
-    , m_camera{ m_player }
+    , m_camera{ m_registry.create() }
 {
     m_pDescriptorPool = ::vksb::descriptor::Pool::Builder{ m_device }
         .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -64,9 +64,11 @@
             .build(m_descriptorSets[i]);
     }
 
+    // hardcode cube as player
     m_registry.emplace<::vksb::component::Control>(m_player); // player always is controllable
 
-    // m_registry.emplace<::vksb::component::Control>(m_camera.getId());
+    m_registry.emplace<::vksb::component::Control>(m_camera.getId());
+    m_registry.emplace<::vksb::component::Control>(m_camera.getId());
     m_registry.emplace<::vksb::component::Position>(m_camera.getId(), ::glm::vec3{ 0.0f, 0.0f, -2.5f });
     m_registry.emplace<::vksb::component::Rotation>(m_camera.getId(), ::glm::vec3{ 90.0f, 0.0f, 0.0f });
 }
@@ -136,24 +138,34 @@ auto ::vksb::AScene::update()
 {
     this->updateCamera();
 
+    // control
     for (auto [entity, control]: m_registry.view<::vksb::component::Control>().each()) {
         auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
         auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
 
-        if (pRotation->isChanged() || control.isRotated()) {
-            pRotation->updateDirection(control.getRotation());
-            pRotation->resetChangedFlag();
-            control.resetRotatedFlag();
-        }
-        if (pPosition) {
-            if (pRotation) {
+        if (pRotation) {
+            if (control.isRotated()) {
+                pRotation->updateDirection(control.getRotation());
+                control.resetRotatedFlag();
+            }
+            if (pPosition) {
                 pPosition->update(m_frameInfo.deltaTime, control, pRotation->getDirection());
-            } else {
-                pPosition->update(m_frameInfo.deltaTime, control, ::glm::vec3{ 0.0f });
+            }
+        } else {
+            if (pPosition) {
+                auto direction{
+                    ::glm::normalize(::glm::vec3(
+                        cos(::glm::radians(0.0f)) * cos(::glm::radians(0.0f)),
+                        sin(::glm::radians(0.0f)),
+                        sin(::glm::radians(0.0f)) * cos(::glm::radians(0.0f))
+                    ))
+                };
+                pPosition->update(m_frameInfo.deltaTime, control, direction);
             }
         }
     }
 
+    // transform (apply position rotation scale)
     for (auto [entity, transform]: m_registry.view<::vksb::component::Transform3d>().each()) {
         auto* pPosition{ m_registry.try_get<::vksb::component::Position>(entity) };
         auto* pRotation{ m_registry.try_get<::vksb::component::Rotation>(entity) };
@@ -168,12 +180,23 @@ auto ::vksb::AScene::update()
                         transform.updateNormalMatrix(*pRotation, *pScale);
                     }
                     pScale->resetChangedFlag();
+                    pRotation->resetChangedFlag();
                 } else if (pPosition->isChanged() || pRotation->isChanged()) {
                     transform.updateMatrix(*pPosition, *pRotation);
                     transform.updateNormalMatrix(*pRotation);
+                    pRotation->resetChangedFlag();
                 }
-            } else if (pPosition->isChanged()) {
-                transform.updateMatrix(*pPosition);
+            } else {
+                if (pScale) {
+                    if (pPosition->isChanged() || pScale->isChanged()) {
+                        transform.updateMatrix(*pPosition);
+                        transform.updateMatrix(*pPosition, { 0.0f, 0.0f, 0.0f }, *pScale);
+                        transform.updateNormalMatrix(*pScale);
+                        pScale->resetChangedFlag();
+                    }
+                } else if (pPosition->isChanged()) {
+                    transform.updateMatrix(*pPosition);
+                }
             }
             pPosition->resetChangedFlag();
         }

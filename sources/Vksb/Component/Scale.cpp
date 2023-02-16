@@ -21,9 +21,9 @@
 ::vksb::component::Scale::Scale(
     float scale
 )
-{
-    this->scale(scale);
-}
+    : m_scale{ ::glm::vec3{ scale } }
+    , m_isChanged{ true }
+{}
 
 ///////////////////////////////////////////////////////////////////////////
 ///
@@ -31,9 +31,9 @@
 ::vksb::component::Scale::Scale(
     const ::glm::vec3& scale
 )
-{
-    this->scale(scale.x, scale.y, scale.z);
-}
+    : m_scale{ ::glm::vec3{ scale } }
+    , m_isChanged{ true }
+{}
 
 ///////////////////////////////////////////////////////////////////////////
 ///
@@ -43,9 +43,9 @@
     float scaleY,
     float scaleZ
 )
-{
-    this->scale(scaleX, scaleY, scaleZ);
-}
+    : m_scale{ ::glm::vec3{ scaleX, scaleY, scaleZ } }
+    , m_isChanged{ true }
+{}
 
 
 

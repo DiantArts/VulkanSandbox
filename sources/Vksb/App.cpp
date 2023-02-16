@@ -72,25 +72,30 @@ auto ::vksb::App::postUpdate()
 ///////////////////////////////////////////////////////////////////////////
 void ::vksb::App::loadObjects()
 {
-    {
+    { // player hardcoded as cube
+        auto entity{ m_player };
+        m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "Cube"));
+        m_registry.emplace<::vksb::component::Position>(entity, 0.0f, 0.4f, -1.0f);
+        m_registry.emplace<::vksb::component::Scale>(entity, 0.1f);
+        m_registry.emplace<::vksb::component::Rotation>(entity, ::glm::vec3{ 0.0f, 0.0f, 0.0f });
+    }
+
+    { // vase 1
         auto entity{ m_registry.create() };
         m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "FlatVase"));
         m_registry.emplace<::vksb::component::Position>(entity, -0.25f, 0.5f, 0.0f);
-        m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
     }
 
-    {
+    { // vase 1
         auto entity{ m_registry.create() };
         m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "SmoothVase"));
         m_registry.emplace<::vksb::component::Position>(entity, 0.25f, 0.5f, 0.0f);
-        m_registry.emplace<::vksb::component::Scale>(entity, 3.0f, 1.5f, 3.0f);
     }
 
-    {
+    { // floor
         auto entity{ m_registry.create() };
         m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "Floor"));
         m_registry.emplace<::vksb::component::Position>(entity, 0.0f, 0.5f, 0.0f);
-        m_registry.emplace<::vksb::component::Scale>(entity, 0.1f);
     }
 
     {
