@@ -22,10 +22,12 @@
 
 ///////////////////////////////////////////////////////////////////////////
 ::vksb::AScene::AScene()
+    // create the vulkan things (I dont remember what it does)
     : m_pDescriptorSetLayout{ ::vksb::descriptor::SetLayout::Builder{ m_device }
         .addBinding(0, ::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::VK_SHADER_STAGE_ALL_GRAPHICS)
         .build()
     }
+    // Keep track of information to help vulkan
     , m_frameInfo{ m_descriptorSets, *this }
     , m_uboBuffers{ ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT }
     , m_renderSystem{
@@ -33,14 +35,17 @@
         m_renderer.getSwapChainRenderPass(),
         m_pDescriptorSetLayout->getDescriptorSetLayout()
     }
+    // draw lights and update their position
     , m_pointLightSystem{
         m_device,
         m_renderer.getSwapChainRenderPass(),
         m_pDescriptorSetLayout->getDescriptorSetLayout()
     }
+    // entity that the player controls
     , m_player{ m_registry.create() }
     , m_camera{ m_registry.create() }
 {
+    // vulkan stuff
     m_pDescriptorPool = ::vksb::descriptor::Pool::Builder{ m_device }
         .setMaxSets(::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ::vksb::SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -67,7 +72,6 @@
     // hardcode cube as player
     m_registry.emplace<::vksb::component::Control>(m_player); // player always is controllable
 
-    m_registry.emplace<::vksb::component::Control>(m_camera.getId());
     m_registry.emplace<::vksb::component::Control>(m_camera.getId());
     m_registry.emplace<::vksb::component::Position>(m_camera.getId(), ::glm::vec3{ 0.0f, 0.0f, -2.5f });
     m_registry.emplace<::vksb::component::Rotation>(m_camera.getId(), ::glm::vec3{ 90.0f, 0.0f, 0.0f });

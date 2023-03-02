@@ -86,7 +86,7 @@ void ::vksb::App::loadObjects()
         m_registry.emplace<::vksb::component::Position>(entity, -0.25f, 0.5f, 0.0f);
     }
 
-    { // vase 1
+    { // vase 2
         auto entity{ m_registry.create() };
         m_registry.emplace<::vksb::component::Transform3d>(entity, ::vksb::Model::createFromFile(m_device, "SmoothVase"));
         m_registry.emplace<::vksb::component::Position>(entity, 0.25f, 0.5f, 0.0f);
@@ -98,7 +98,7 @@ void ::vksb::App::loadObjects()
         m_registry.emplace<::vksb::component::Position>(entity, 0.0f, 0.5f, 0.0f);
     }
 
-    {
+    { // lights
         std::vector<glm::vec3> lightColors{
             { 1.f, .1f, .1f },
             { .1f, .1f, 1.f },
@@ -107,6 +107,8 @@ void ::vksb::App::loadObjects()
             { .1f, 1.f, 1.f },
             { 1.f, 1.f, 1.f }
         };
+
+        // create the lights at equal distances from each other in circle
         for (auto i{ 0uz }; const auto& color : lightColors) {
             auto rotation{ ::glm::rotate(
                 ::glm::mat4(1.0f),

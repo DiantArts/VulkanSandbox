@@ -40,46 +40,51 @@ void ::vksb::event::KeyPressed::resolve(
     ::vksb::AScene& scene
 )
 {
-    auto& playerController{ scene.getPlayerComponent<::vksb::component::Control>() };
+    auto* playerController{ scene.tryGetPlayerComponent<::vksb::component::Control>() };
 
     // default
     if (m_keyCode == ::vksb::configuration.keyBinding.closeWindow) {
-        scene.getWindow().close();
-
-    // move
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveForward) {
-        playerController.startMovingForward();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward) {
-        playerController.startMovingBackward();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveLeft) {
-        playerController.startMovingLeft();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveRight) {
-        playerController.startMovingRight();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveUp) {
-        playerController.startMovingUp();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveDown) {
-        playerController.startMovingDown();
-
-    // move arrows
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveForward2) {
-        playerController.startMovingForward();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward2) {
-        playerController.startMovingBackward();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveLeft2) {
-        playerController.startMovingLeft();
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.moveRight2) {
-        playerController.startMovingRight();
-
-    // look
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookUp) {
-        playerController.rotateZ(-45 / 2);
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookDown) {
-        playerController.rotateZ(45 / 2);
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookLeft) {
-        playerController.rotateX(45 / 2);
-    } else if (m_keyCode == ::vksb::configuration.keyBinding.lookRight) {
-        playerController.rotateX(-45 / 2);
-    } else {
-        ::std::cout << "this key is not bound" << ::std::endl;
+        return scene.getWindow().close();
     }
+
+    // if player is controllable
+    if (playerController) {
+        // move
+        if (m_keyCode == ::vksb::configuration.keyBinding.moveForward) {
+            return playerController->startMovingForward();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward) {
+            return playerController->startMovingBackward();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveLeft) {
+            return playerController->startMovingLeft();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveRight) {
+            return playerController->startMovingRight();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveUp) {
+            return playerController->startMovingUp();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveDown) {
+            return playerController->startMovingDown();
+
+        // move arrows
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveForward2) {
+            return playerController->startMovingForward();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveBackward2) {
+            return playerController->startMovingBackward();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveLeft2) {
+            return playerController->startMovingLeft();
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.moveRight2) {
+            return playerController->startMovingRight();
+
+        // look
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.lookUp) {
+            return playerController->rotateZ(-45 / 2);
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.lookDown) {
+            return playerController->rotateZ(45 / 2);
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.lookLeft) {
+            return playerController->rotateX(45 / 2);
+        } else if (m_keyCode == ::vksb::configuration.keyBinding.lookRight) {
+            return playerController->rotateX(-45 / 2);
+        }
+
+    }
+
+    XRN_ERROR("this key is not bound");
 }
